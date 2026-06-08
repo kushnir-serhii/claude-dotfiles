@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:api.anthropic.com)",
+      "PowerShell(Start-Process \"C:\\\\Users\\\\Juliet\\\\Downloads\\\\Alma Locket\\\\ALMA.html\")",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(node -e ' *)",
+      "Bash(node build.js)",
+      "Bash(grep -v \"//\\\\|button.*Begin\\\\|background: 'var\\(--accent\\)'\\\\|boxShadow.*accent\\\\|on-accent\")",
+      "Skill(run)",
+      "Skill(run:*)",
+      "mcp__Claude_in_Chrome__list_connected_browsers",
+      "mcp__Claude_in_Chrome__select_browser",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "mcp__Claude_in_Chrome__navigate",
+      "mcp__Claude_in_Chrome__computer",
+      "Bash(npx serve *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:3400/ALMA.html)",
+      "Bash(Read \"C:\\\\Users\\\\Juliet\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--Users-Juliet-Downloads-Alma-Locket\\\\d7f556f5-d870-4481-9fe5-ffa6ea1bb238\\\\tasks\\\\bxmw8b5kz.output\")",
+      "mcp__Claude_in_Chrome__tabs_create_mcp",
+      "Bash(taskkill /F /IM node.exe)"
+    ]
+  }
+}

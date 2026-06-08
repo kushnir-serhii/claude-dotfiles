@@ -1,0 +1,3492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ALMA</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ALMA — design tokens & base styles
+   Moon Mode (dark espresso, default) + Sun Mode (light sand) */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --accent: #4839F4;
+  --accent-press: #7C4DF0;
+  --font: 'Outfit', -apple-system, system-ui, sans-serif;
+  --ease: cubic-bezier(0.4, 0.0, 0.1, 1);
+  --ease-spring: cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+
+/* ── Moon Mode (dark espresso / black canvas) ── */
+.alma[data-theme="moon"] {
+  --bg-0: #0E0B09;
+  --bg-1: #161210;
+  --bg-grad: radial-gradient(130% 90% at 50% 8%, #221C19 0%, #161210 42%, #0C0A08 100%);
+  --surface: rgba(255,255,255,0.045);
+  --surface-2: rgba(255,255,255,0.07);
+  --surface-press: rgba(255,255,255,0.10);
+  --surface-solid: #211B18;
+  --text: #F4F1EC;
+  --text-2: #ACA59D;          /* warm neutral gray */
+  --text-3: #837C73;          /* dim warm gray */
+  --hairline: rgba(255,255,255,0.085);
+  --hairline-strong: rgba(255,255,255,0.14);
+  --accent-soft: color-mix(in srgb, var(--accent) 16%, transparent);
+  --accent-glow: color-mix(in srgb, var(--accent) 45%, transparent);
+  --shadow: 0 18px 50px rgba(0,0,0,0.55);
+  --mandala-opacity: 0.15;
+  --on-accent: #fff;
+  --statusbar: light;
+}
+
+/* ── Sun Mode (light sand variant) ── */
+.alma[data-theme="sun"] {
+  --bg-0: #F6F1EA;
+  --bg-1: #FAF7F2;
+  --bg-grad: radial-gradient(130% 90% at 50% 6%, #FEFCF9 0%, #F8F3EC 46%, #F0E9DE 100%);
+  --surface: rgba(43,33,24,0.05);
+  --surface-2: rgba(43,33,24,0.08);
+  --surface-press: rgba(43,33,24,0.11);
+  --surface-solid: #FDFAF6;
+  --text: #2B2118;
+  --text-2: #524A43;          /* warm neutral gray — AA 6.5:1 on bg-0 */
+  --text-3: #6E665E;          /* dim warm gray — AA 4.6:1 on bg-0 */
+  --hairline: rgba(43,33,24,0.10);
+  --hairline-strong: rgba(43,33,24,0.16);
+  --accent-soft: color-mix(in srgb, var(--accent) 13%, transparent);
+  --accent-glow: color-mix(in srgb, var(--accent) 30%, transparent);
+  --shadow: 0 18px 50px rgba(80,60,40,0.18);
+  --mandala-opacity: 0.16;
+  --on-accent: #fff;
+  --statusbar: dark;
+}
+
+* { box-sizing: border-box; }
+
+.alma {
+  font-family: var(--font);
+  color: var(--text);
+  background: var(--bg-grad);
+  height: 100%;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  transition: background 600ms var(--ease), color 400ms var(--ease);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.alma button { font-family: var(--font); cursor: pointer; border: none; background: none; color: inherit; }
+.alma ::-webkit-scrollbar { width: 0; height: 0; }
+
+/* scrolling screen body */
+.scrollbody {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scrollbody::-webkit-scrollbar { display: none; }
+
+/* generic pressable */
+.press { transition: transform 140ms var(--ease), background 160ms var(--ease), opacity 160ms var(--ease); }
+.press:active { transform: scale(0.96); }
+
+/* horizontal carousels */
+.hscroll {
+  display: flex;
+  gap: 14px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-left: 20px;
+  padding: 2px 20px 4px 0;
+  margin: 0 -20px;
+  scrollbar-width: none;
+}
+.hscroll::-webkit-scrollbar { display: none; }
+.hscroll > * { scroll-snap-align: start; flex-shrink: 0; }
+.hscroll > *:first-child { margin-left: 20px; }
+
+/* section label */
+.eyebrow {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1.4px;
+  text-transform: uppercase;
+  color: var(--text-2);
+}
+
+@keyframes almaFadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes almaFade { from { opacity: 0; } to { opacity: 1; } }
+
+/* mandala motion */
+@keyframes spinCW  { to { transform: rotate(360deg); } }
+@keyframes spinCCW { to { transform: rotate(-360deg); } }
+@keyframes breathe {
+  0%, 100% { transform: scale(0.98); }
+  50%      { transform: scale(1.02); }
+}
+@keyframes almaMorph {
+  0%   { opacity: 0; transform: scale(0.94); }
+  6%   { opacity: 1; transform: scale(1); }
+  16%  { opacity: 1; transform: scale(1.03); }
+  20%  { opacity: 0; transform: scale(1.08); }
+  100% { opacity: 0; transform: scale(0.94); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mandala-cw, .mandala-ccw, .mandala-breathe { animation: none !important; }
+}
+
+/* toast */
+@keyframes toastIn {
+  from { opacity: 0; transform: transl(-50%, 16px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+</style>
+</head>
+<body>
+  <div id="stage"><div id="root"></div></div>
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+  <script type="text/babel">
+// ALMA — seed content + cover art identities (image-based + a few gradients).
+// ALMA_GRADIENTS is the single map used by <Orb> — values are valid CSS background shorthand.
+
+const ALMA_GRADIENTS = {
+  // ── Image covers (master tracks) — premium photo-painting artwork
+  sun:     "url('images/sun.webp') center / cover no-repeat",
+  evening: "url('images/evening.webp') center / cover no-repeat",
+  flower:  "url('images/flower.webp') center / cover no-repeat",
+  light:   "url('images/light.webp') center / cover no-repeat",
+  weve:    "url('images/weve.webp') center / cover no-repeat",
+  sea:     "url('images/sea.webp') center / cover no-repeat",
+  searay:  "url('images/sea light.webp') center / cover no-repeat",
+  day:     "url('images/day.webp') center / cover no-repeat",
+  morning: "url('images/morning.webp') center / cover no-repeat",
+  ocean:   "url('images/ocean.webp') center / cover no-repeat",
+  waves:   "url('images/waves.webp') center / cover no-repeat",
+  dust:    "url('images/dust.webp') center / cover no-repeat",
+
+  // ── Ritual gradient images
+  g1:      "url('alma/img/gradient1.webp') center / cover no-repeat",
+  g2:      "url('alma/img/gradient2.webp') center / cover no-repeat",
+  g3:      "url('alma/img/gradient3.webp') center / cover no-repeat",
+  g4:      "url('alma/img/gradient4.webp') center / cover no-repeat",
+  g5:      "url('alma/img/gradient5.webp') center / cover no-repeat",
+  g6:      "url('alma/img/gradient6.webp') center / cover no-repeat",
+
+  // ── Subtle gradients (ambient layers — small thumbs only)
+  rain:    'radial-gradient(120% 120% at 45% 30%, #93C5FD 0%, #3B6EA5 55%, #16304D 100%)',
+  forest:  'radial-gradient(120% 120% at 40% 30%, #86EFAC 0%, #2E7D5B 55%, #123226 100%)',
+  ember:   'radial-gradient(120% 120% at 35% 25%, #FDBA74 0%, #C2541F 55%, #4A1E0A 100%)',
+  dawn:    'radial-gradient(120% 120% at 60% 20%, #FCD9B6 0%, #B98A6A 50%, #5C4533 100%)',
+  oceang:  'radial-gradient(120% 120% at 30% 30%, #5EEAD4 0%, #2563A8 55%, #0E2A52 100%)',
+  theta:   'radial-gradient(120% 120% at 40% 80%, #6366F1 0%, #3730A3 55%, #1E1B4B 100%)',
+  violet:  'radial-gradient(120% 120% at 70% 25%, #C4B5FD 0%, #8B5CF6 50%, #4C1D95 100%)',
+  bound:   'radial-gradient(120% 120% at 70% 30%, #F0ABFC 0%, #A855F7 50%, #581C87 100%)',
+
+  // ── Muted Pin-File gradients (curated palette for user choice)
+  blu:     'linear-gradient(140deg, #7B96BA 0%, #4A6485 55%, #2B3D55 100%)',
+  plum:    'linear-gradient(140deg, #8E80A8 0%, #5F5479 55%, #382E4C 100%)',
+  ink:     'linear-gradient(140deg, #4A5066 0%, #2A2F3F 55%, #14171F 100%)',
+  honey:   'linear-gradient(140deg, #C9AE7B 0%, #91754A 55%, #4F3F26 100%)',
+  seaish:  'linear-gradient(140deg, #7CB0A8 0%, #4E807A 55%, #2A4B47 100%)',
+};
+
+// Curated Pin-File customization palette
+const PIN_COLORS = [
+  { id: 'blu',    name: 'Blue' },
+  { id: 'plum',   name: 'Plum' },
+  { id: 'ink',    name: 'Ink' },
+  { id: 'honey',  name: 'Honey' },
+  { id: 'seaish', name: 'Sea' },
+];
+
+// Curated Pin-File icon set (Lucide outline, white over color)
+const PIN_ICONS = [
+  { id: 'wave',       label: 'Wave' },
+  { id: 'droplets',   label: 'Rain' },
+  { id: 'flame',      label: 'Flame' },
+  { id: 'leaf',       label: 'Leaf' },
+  { id: 'mic',        label: 'Voice' },
+  { id: 'music',      label: 'Music' },
+  { id: 'bell',       label: 'Bell' },
+  { id: 'sparkles',   label: 'Spark' },
+  { id: 'headphones', label: 'Phones' },
+  { id: 'flower',     label: 'Bloom' },
+];
+
+const MASTER_TRACKS = [
+  { id: 't1', title: 'OM Waves',        sub: 'Chant · Deep Rest',     dur: 10, grad: 'sea',     state: 'downloaded', audioSrc: 'nature/master-tracks/aum-waves-om.mp3' },
+  { id: 't2', title: 'Healing Light',   sub: 'Piano · Restore',       dur: 9,  grad: 'light',   state: 'downloaded', audioSrc: 'nature/master-tracks/healing-light-over-piano.mp3' },
+  { id: 't3', title: 'Flowing Balance', sub: 'Yoga · Movement',       dur: 9,  grad: 'weve',    state: 'downloaded', audioSrc: 'nature/master-tracks/background-music-yoga.mp3' },
+  { id: 't4', title: 'Gayatri',         sub: 'Mantra · Dawn',         dur: 7,  grad: 'sun',     state: 'downloaded', audioSrc: 'nature/master-tracks/gayatri-mantra.mp3' },
+  { id: 't5', title: 'Zen Garden',      sub: 'Nature · Peace',        dur: 9,  grad: 'day',     state: 'downloaded', audioSrc: 'nature/master-tracks/japanese-bamboo-garden-peace.mp3' },
+  { id: 't6', title: 'Gregorian Chant', sub: 'Sacred · Choir',        dur: 4,  grad: 'evening', state: 'downloaded', audioSrc: 'nature/master-tracks/mysterious-gregorian-chant.mp3' },
+  { id: 't7', title: 'Desert Soul',     sub: 'Sufi · Transcendence',  dur: 8,  grad: 'dust',    state: 'downloaded', audioSrc: 'nature/master-tracks/arabian-sufi.mp3' },
+];
+
+const SAVED_RITUALS = [
+  { id: 'r1', title: 'Deep Morning Focus', layers: 'Flowing Balance + Rainfall', dur: 9,  grad: 'weve',    audioSrc: 'nature/master-tracks/background-music-yoga.mp3', layerSrc: 'nature/calming rain.mp3' },
+  { id: 'r2', title: 'Evening Wind-Down',  layers: 'Healing Light + Chimes',     dur: 9,  grad: 'light',   audioSrc: 'nature/master-tracks/healing-light-over-piano.mp3', layerSrc: 'nature/effects/deep-healing-tibetan-bowl-frequencies.mp3' },
+  { id: 'r3', title: 'Sacred Stillness',   layers: 'OM Waves + Ocean',           dur: 10, grad: 'sea',     audioSrc: 'nature/master-tracks/aum-waves-om.mp3', layerSrc: 'nature/ocean-waves-crashing-on-the-coast.wav' },
+];
+
+const AMBIENT_LAYERS = [
+  // ── Nature ambience ──
+  { id: 'a1', name: 'Gentle Rain',     desc: 'Soft steady rainfall',       grad: 'rain',  audioSrc: 'nature/calming rain.mp3' },
+  { id: 'a2', name: 'Ocean Waves',     desc: 'Slow tidal breath',          grad: 'oceang',audioSrc: 'nature/ocean-waves-crashing-on-the-coast.wav' },
+  { id: 'a3', name: 'Forest Night',    desc: 'Crickets & night sounds',    grad: 'forest',audioSrc: 'nature/forest.mp3' },
+  { id: 'a4', name: 'Hearthfire',      desc: 'Warm crackling fire',        grad: 'ember', audioSrc: 'nature/hearthfire.wav' },
+  // ── Healing frequencies ──
+  { id: 'a5', name: 'Gamma Waves',     desc: '40 Hz focus & clarity',      grad: 'theta', audioSrc: 'nature/effects/40-hz-gamma-beats-noise.mp3' },
+  { id: 'a6', name: 'Solfeggio',       desc: '174 · 396 · 528 Hz healing', grad: 'bound', audioSrc: 'nature/effects/solfegio-174hz-396hz-528hz.mp3' },
+  { id: 'a7', name: 'Tibetan Bowls',   desc: 'Deep resonant sustain',      grad: 'honey', audioSrc: 'nature/effects/deep-healing-tibetan-bowl-frequencies.mp3' },
+  // ── Session markers (short strikes) ──
+  { id: 'a8', name: 'Keisu Bell',       desc: 'Plays at start & end',        grad: 'dawn',  audioSrc: 'nature/effects/intro-outro-keisu-temple-bell.mp3', isIntroOutro: true },
+  { id: 'a9', name: 'Interval Bell',   desc: 'Rings at selected intervals',  grad: 'dust',  audioSrc: 'nature/effects/temple-bell-interval.mp3', isInterval: true },
+];
+
+const RAW_AUDIO = [
+  { id: 'p1', name: 'Calming Rain',         meta: 'MP3 · Nature', color: 'blu',    icon: 'droplets',   pinned: true,  audioSrc: 'nature/calming rain.mp3' },
+  { id: 'p2', name: 'Tibetan Bowl',         meta: 'MP3 · Effects',color: 'honey',  icon: 'bell',       pinned: true,  audioSrc: 'nature/effects/bowl.mp3' },
+  { id: 'p3', name: 'Gregorian Chant',      meta: 'MP3 · Vocal',  color: 'plum',   icon: 'music',      pinned: true,  audioSrc: 'nature/master-tracks/mysterious-gregorian-chant.mp3' },
+  { id: 'p4', name: 'Ocean Waves',          meta: 'WAV · Nature', color: 'seaish', icon: 'wave',       pinned: false, audioSrc: 'nature/ocean-waves-crashing-on-the-coast.wav' },
+];
+
+const DURATIONS = [5, 15, 30, 45];
+
+function fmtTime(totalSec) {
+  const m = Math.floor(totalSec / 60);
+  const s = Math.floor(totalSec % 60);
+  return `${m}:${String(s).padStart(2, '0')}`;
+}
+
+Object.assign(window, {
+  ALMA_GRADIENTS, MASTER_TRACKS, SAVED_RITUALS,
+  AMBIENT_LAYERS, RAW_AUDIO, DURATIONS, PIN_COLORS, PIN_ICONS, fmtTime,
+});
+
+
+// ALMA — Lucide icon set. All icons rendered with stroke="currentColor",
+// strokeWidth 1.8, rounded caps/joins. Default size 18 (min 16 enforced).
+
+function _lucide(children, { size: defaultSize = 18, sw = 1.8, fill = 'none' } = {}) {
+  return (props) => {
+    const { size, style, strokeWidth, ...rest } = props || {};
+    const s = Math.max(16, size || defaultSize);
+    return (
+      <svg width={s} height={s} viewBox="0 0 24 24" fill={fill}
+        stroke="currentColor" strokeWidth={strokeWidth ?? sw}
+        strokeLinecap="round" strokeLinejoin="round"
+        style={{ flexShrink: 0, ...style }} {...rest}>
+        {children}
+      </svg>
+    );
+  };
+}
+
+// Solid icons (filled, no stroke)
+function _solid(children, { size: defaultSize = 18 } = {}) {
+  return (props) => {
+    const { size, style, ...rest } = props || {};
+    const s = Math.max(16, size || defaultSize);
+    return (
+      <svg width={s} height={s} viewBox="0 0 24 24" fill="currentColor"
+        style={{ flexShrink: 0, ...style }} {...rest}>
+        {children}
+      </svg>
+    );
+  };
+}
+
+// ── Playback ──
+const IconPlay = _solid(<path d="M6 4.5c0-.79.87-1.27 1.54-.85l11.6 7.5a1 1 0 0 1 0 1.7l-11.6 7.5A1 1 0 0 1 6 19.5v-15z" />);
+const IconPause = _solid(<><rect x="6" y="4" width="4" height="16" rx="1" /><rect x="14" y="4" width="4" height="16" rx="1" /></>);
+
+// ── System ──
+const IconMoon = _lucide(<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />);
+const IconSun = _lucide(<><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" /></>);
+
+// ── Heart (Lucide heart — supports filled) ──
+const IconHeart = (props) => {
+  const { size, style, filled, ...rest } = props || {};
+  const s = Math.max(16, size || 18);
+  return (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'}
+      stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+      style={{ flexShrink: 0, ...style }} {...rest}>
+      <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z" />
+    </svg>
+  );
+};
+
+const IconMute = _lucide(<><path d="M11 5 6 9H2v6h4l5 4V5z" /><path d="M22 9l-6 6M16 9l6 6" /></>);
+
+// ── Chevrons ──
+const IconChevDown = _lucide(<polyline points="6 9 12 15 18 9" />, { sw: 2 });
+const IconChevRight = _lucide(<polyline points="9 6 15 12 9 18" />, { sw: 2 });
+const IconChevDownSmall = _lucide(<polyline points="6 9 12 15 18 9" />, { sw: 2.2 });
+
+// ── Cloud / download ──
+const IconDownload = _lucide(<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" /><polyline points="7 10 12 15 17 10" /><line x1="12" y1="15" x2="12" y2="3" /></>);
+const IconCloud = _lucide(<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9z" />);
+
+// ── Preview (play-circle) ──
+const IconPreview = _lucide(<><circle cx="12" cy="12" r="9" /><path d="M10 8.5v7l6-3.5z" fill="currentColor" stroke="none" /></>);
+
+// ── Plus / Pin / Layers / Sliders ──
+const IconPlus = _lucide(<><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></>, { sw: 2 });
+const IconPin = _lucide(<><line x1="12" y1="17" x2="12" y2="22" /><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24z" /></>);
+const IconLayers = _lucide(<><polygon points="12 2 2 7 12 12 22 7 12 2" /><polyline points="2 17 12 22 22 17" /><polyline points="2 12 12 17 22 12" /></>);
+const IconSliders = _lucide(<><line x1="21" y1="4" x2="14" y2="4" /><line x1="10" y1="4" x2="3" y2="4" /><line x1="21" y1="12" x2="12" y2="12" /><line x1="8" y1="12" x2="3" y2="12" /><line x1="21" y1="20" x2="16" y2="20" /><line x1="12" y1="20" x2="3" y2="20" /><line x1="14" y1="2" x2="14" y2="6" /><line x1="8" y1="10" x2="8" y2="14" /><line x1="16" y1="18" x2="16" y2="22" /></>);
+
+// ── Tab bar ──
+const IconHome = _lucide(<><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><path d="M9 21V12h6v9" /></>);
+const IconMixer = _lucide(<><path d="M4 21V14" /><path d="M4 10V3" /><path d="M12 21v-9" /><path d="M12 8V3" /><path d="M20 21v-5" /><path d="M20 12V3" /><line x1="1" y1="14" x2="7" y2="14" /><line x1="9" y1="8" x2="15" y2="8" /><line x1="17" y1="16" x2="23" y2="16" /></>);
+const IconVault = _lucide(<><rect x="2" y="4" width="20" height="5" rx="2" /><path d="M4 9v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9" /><line x1="10" y1="13" x2="14" y2="13" /></>);
+
+// ── Status / actions ──
+const IconCheck = _lucide(<polyline points="20 6 9 17 4 12" />, { sw: 2.2 });
+const IconClose = _lucide(<><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></>, { sw: 2 });
+const IconEdit = _lucide(<><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3Z" /><path d="m15 5 4 4" /></>);
+const IconTrash = _lucide(<><path d="M3 6h18" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /></>);
+
+// ── Star (Lucide star — supports filled) ──
+const IconStar = (props) => {
+  const { size, style, filled, ...rest } = props || {};
+  const s = Math.max(16, size || 18);
+  return (
+    <svg width={s} height={s} viewBox="0 0 24 24" fill={filled ? 'currentColor' : 'none'}
+      stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+      style={{ flexShrink: 0, ...style }} {...rest}>
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </svg>
+  );
+};
+
+// ── Audio waveform ──
+const IconWave = _lucide(<><path d="M2 10v3" /><path d="M6 6v11" /><path d="M10 3v18" /><path d="M14 8v7" /><path d="M18 5v13" /><path d="M22 10v3" /></>);
+
+// ── Picker icons (used on pinned-file orbs) ──
+const IconWaves     = _lucide(<><path d="M2 6c.7 0 1.4-.2 2-.6.6.4 1.3.6 2 .6s1.4-.2 2-.6c.6.4 1.3.6 2 .6s1.4-.2 2-.6c.6.4 1.3.6 2 .6s1.4-.2 2-.6c.6.4 1.3.6 2 .6s1.4-.2 2-.6c.6.4 1.3.6 2 .6" /><path d="M2 12c.7 0 1.4-.2 2-.6.6.4 1.3.6 2 .6s1.4-.2 2-.6c.6.4 1.3.6 2 .6s1.4-.2 2-.6c.6.4 1.3.6 2 .6s1.4-.2 2-.6c.6.4 1.3.6 2 .6s1.4-.2 2-.6c.6.4 1.3.6 2 .6" /><path d="M2 18c.7 0 1.4-.2 2-.6.6.4 1.3.6 2 .6s1.4-.2 2-.6c.6.4 1.3.6 2 .6s1.4-.2 2-.6c.6.4 1.3.6 2 .6s1.4-.2 2-.6c.6.4 1.3.6 2 .6s1.4-.2 2-.6c.6.4 1.3.6 2 .6" /></>);
+const IconDroplets  = _lucide(<><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z" /><path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97" /></>);
+const IconFlame     = _lucide(<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />);
+const IconLeaf      = _lucide(<><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19.2 2.96c1.4 9.3-3.4 15.6-8.2 17.04z" /><path d="M2 21c0-3 1.85-5.36 5.08-6" /></>);
+const IconMic       = _lucide(<><rect x="9" y="2" width="6" height="12" rx="3" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" y1="19" x2="12" y2="22" /></>);
+const IconMusic     = _lucide(<><path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" /></>);
+const IconBell      = _lucide(<><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></>);
+const IconSparkles  = _lucide(<><path d="M9.94 14.34 7.5 21l-2.44-6.66L0 12l5.06-2.34L7.5 3l2.44 6.66L15 12z" transform="translate(2 0)" /><path d="M19 3v4M21 5h-4M18 17v3M19.5 18.5h-3" /></>);
+const IconHeadphones= _lucide(<><path d="M3 18v-6a9 9 0 0 1 18 0v6" /><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z" /><path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" /></>);
+const IconFlower    = _lucide(<><circle cx="12" cy="12" r="3" /><path d="M12 16.5A4.5 4.5 0 1 1 7.5 12 4.5 4.5 0 1 1 12 7.5a4.5 4.5 0 1 1 4.5 4.5 4.5 4.5 0 1 1-4.5 4.5" /><path d="M12 7.5V9M7.5 12H9M12 16.5V15M16.5 12H15" /></>);
+const IconStop = ({ size = 18, style } = {}) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style={style}>
+    <rect x="5" y="5" width="14" height="14" rx="2" />
+  </svg>
+);
+const IconPlayFilled = ({ size = 18, style } = {}) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style={style}>
+    <polygon points="6,3 20,12 6,21" />
+  </svg>
+);
+
+Object.assign(window, {
+  IconPlay, IconPause, IconMoon, IconSun, IconHeart, IconMute,
+  IconChevDown, IconChevRight, IconChevDownSmall, IconDownload, IconCloud,
+  IconPreview, IconPlus, IconPin, IconLayers, IconSliders, IconHome,
+  IconMixer, IconVault, IconCheck, IconClose, IconEdit, IconTrash, IconStar, IconWave,
+  IconWaves, IconDroplets, IconFlame, IconLeaf, IconMic, IconMusic, IconBell,
+  IconSparkles, IconHeadphones, IconFlower, IconStop, IconPlayFilled,
+});
+
+
+// ALMA — shared UI components. Exported to window.
+const { useState, useEffect, useRef } = React;
+
+// Gradient "cover art" tile
+function Orb({ grad, size = 64, radius = 18, style = {}, children, glow = false }) {
+  const g = ALMA_GRADIENTS[grad] || ALMA_GRADIENTS.g1;
+  return (
+    <div style={{
+      width: size, height: size, borderRadius: radius, background: g, backgroundColor: '#1a1714',
+      position: 'relative', flexShrink: 0, overflow: 'hidden',
+      boxShadow: glow ? '0 10px 30px -8px rgba(0,0,0,0.55)' : 'none',
+      ...style,
+    }}>
+      <div style={{
+        position: 'absolute', inset: 0, borderRadius: radius, pointerEvents: 'none',
+        boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.18), inset 0 -10px 24px rgba(0,0,0,0.16)',
+      }} />
+      {children}
+    </div>
+  );
+}
+
+// Small circular play badge
+function PlayBadge({ size = 38, onClick, playing = false, tone = 'glass' }) {
+  const isAccent = tone === 'accent';
+  return (
+    <button className="press" onClick={onClick} aria-label={playing ? 'Pause' : 'Play'} style={{
+      width: size, height: size, borderRadius: '50%',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      background: isAccent ? 'var(--accent)' : 'var(--surface-2)',
+      color: isAccent ? 'var(--on-accent)' : 'var(--text)',
+      border: isAccent ? 'none' : '1px solid var(--hairline-strong)',
+      flexShrink: 0,
+    }}>
+      {playing
+        ? <IconPause size={size * 0.46} />
+        : <IconPlay size={size * 0.42} style={{ marginLeft: size * 0.04 }} />}
+    </button>
+  );
+}
+
+// Duration pill row
+function DurationPills({ value, onChange, options = DURATIONS, dense = false }) {
+  return (
+    <div style={{ display: 'flex', gap: dense ? 8 : 10, flexWrap: 'wrap' }}>
+      {options.map(min => {
+        const active = value === min;
+        return (
+          <button key={min} className="press" onClick={() => onChange(min)} style={{
+            flex: dense ? '1 1 0' : '0 0 auto',
+            minWidth: dense ? 0 : 70,
+            padding: dense ? '11px 8px' : '12px 18px',
+            borderRadius: 14,
+            background: active ? 'var(--text)' : 'var(--surface)',
+            color: active ? 'var(--bg-0)' : 'var(--text-2)',
+            border: active ? 'none' : '1px solid var(--hairline)',
+            fontSize: 15, fontWeight: 600, letterSpacing: 0.2,
+            transition: 'background 200ms var(--ease), color 200ms var(--ease)',
+            whiteSpace: 'nowrap',
+          }}>
+            {min} min
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+// Section header with right-side counter or chevron
+function SectionHead({ title, counter, onMore, style = {} }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, ...style }}>
+      <h2 style={{ margin: 0, fontSize: 22, fontWeight: 600, letterSpacing: -0.3, color: 'var(--text)', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>{title}</h2>
+      {counter != null && (
+        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-3)', letterSpacing: 0.3, flexShrink: 0, whiteSpace: 'nowrap' }}>{counter}</span>
+      )}
+      {onMore && (
+        <button className="press" onClick={onMore} style={{ display: 'flex', alignItems: 'center', color: 'var(--text-3)' }}>
+          <IconChevRight size={20} />
+        </button>
+      )}
+    </div>
+  );
+}
+
+// Bottom tab bar — grayscale (no purple)
+function TabBar({ active, onChange, hasMini }) {
+  const tabs = [
+    { id: 'sanctuary', label: 'Sanctuary', Icon: IconHome },
+    { id: 'mixer', label: 'Mixer', Icon: IconMixer },
+    { id: 'vault', label: 'Vault', Icon: IconVault },
+  ];
+  return (
+    <div style={{
+      position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 40,
+      paddingBottom: 30, paddingTop: 12,
+      background: 'linear-gradient(to top, var(--bg-1) 62%, transparent)',
+    }}>
+      <div style={{
+        display: 'flex', justifyContent: 'space-around', alignItems: 'center',
+        padding: '0 22px',
+      }}>
+        {tabs.map(({ id, label, Icon }) => {
+          const on = active === id;
+          return (
+            <button key={id} className="press" onClick={() => onChange(id)} style={{
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
+              color: on ? 'var(--text)' : 'var(--text-3)', flex: 1,
+            }}>
+              <Icon size={24} strokeWidth={on ? 2 : 1.7} />
+              <span style={{ fontSize: 12, fontWeight: on ? 600 : 500, letterSpacing: 0.2 }}>{label}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// Top header: ALMA wordmark + sun/moon toggle
+function AlmaHeader({ theme, onToggleTheme, sub }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 4 }}>
+      <div>
+        <div style={{
+          fontSize: 34, fontWeight: 600, letterSpacing: 6, color: 'var(--text)', lineHeight: 1,
+        }}>ALMA</div>
+        {sub && <div style={{ fontSize: 14, color: 'var(--text-2)', marginTop: 8, letterSpacing: 0.2 }}>{sub}</div>}
+      </div>
+      <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+    </div>
+  );
+}
+
+// Sun/Moon switch — grayscale
+function ThemeToggle({ theme, onToggle }) {
+  const isMoon = theme === 'moon';
+  return (
+    <button className="press" onClick={onToggle} aria-label="Toggle theme" style={{
+      width: 74, height: 38, borderRadius: 19, position: 'relative',
+      background: 'var(--surface-2)', border: '1px solid var(--hairline)',
+      display: 'flex', alignItems: 'center', padding: 3,
+    }}>
+      <div style={{
+        position: 'absolute', top: 3, left: isMoon ? 3 : 39,
+        width: 32, height: 30, borderRadius: 15,
+        background: 'var(--text)', transition: 'left 320ms var(--ease-spring)',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.25)',
+      }} />
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1, color: isMoon ? 'var(--bg-0)' : 'var(--text-3)' }}>
+        <IconMoon size={16} />
+      </div>
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1, color: !isMoon ? 'var(--bg-0)' : 'var(--text-3)' }}>
+        <IconSun size={16} />
+      </div>
+    </button>
+  );
+}
+
+// Toast notification
+function Toast({ message }) {
+  if (!message) return null;
+  return (
+    <div style={{
+      position: 'absolute', bottom: 150, left: '50%', transform: 'translateX(-50%)',
+      zIndex: 90, background: 'var(--surface-solid)', color: 'var(--text)',
+      padding: '13px 20px', borderRadius: 16, fontSize: 14, fontWeight: 500,
+      boxShadow: 'var(--shadow)', border: '1px solid var(--hairline-strong)',
+      whiteSpace: 'nowrap', animation: 'almaFadeUp 300ms var(--ease) both',
+      display: 'flex', alignItems: 'center', gap: 9,
+    }}>
+      <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--text)' }} />
+      {message}
+    </div>
+  );
+}
+
+Object.assign(window, {
+  Orb, PlayBadge, DurationPills, SectionHead, TabBar, AlmaHeader, ThemeToggle, Toast,
+});
+
+// ── Customizable pin orb (gradient + centered Lucide icon) ──
+const PIN_ICON_MAP = {
+  wave: IconWave,
+  droplets: IconDroplets,
+  flame: IconFlame,
+  leaf: IconLeaf,
+  mic: IconMic,
+  music: IconMusic,
+  bell: IconBell,
+  sparkles: IconSparkles,
+  headphones: IconHeadphones,
+  flower: IconFlower,
+};
+
+function PinOrb({ color = 'blu', icon = 'wave', size = 48, radius = 13, glow = false }) {
+  const Icon = PIN_ICON_MAP[icon] || IconMusic;
+  const iconSize = Math.max(16, Math.round(size * 0.46));
+  return (
+    <Orb grad={color} size={size} radius={radius} glow={glow}>
+      <div style={{
+        position: 'absolute', inset: 0, display: 'flex',
+        alignItems: 'center', justifyContent: 'center', color: '#fff',
+      }}>
+        <Icon size={iconSize} />
+      </div>
+    </Orb>
+  );
+}
+
+Object.assign(window, { PinOrb, PIN_ICON_MAP });
+
+
+// ALMA — Morphing mandala for the full-screen player.
+// 4 mandala variations crossfade in a continuous loop over the track's hero image.
+// Rendered in white with transparency, slowly rotates, gently breathes.
+
+function Mandala({ active = true, size = 380 }) {
+  const C = 200;       // SVG center
+  const W = '#FFFFFF'; // white stroke
+
+  // helpers
+  const ring = (n, r, render) =>
+    Array.from({ length: n }, (_, i) => {
+      const a = (i / n) * Math.PI * 2 - Math.PI / 2;
+      const x = C + Math.cos(a) * r;
+      const y = C + Math.sin(a) * r;
+      return <g key={i}>{render(x, y, ((a + Math.PI / 2) * 180) / Math.PI)}</g>;
+    });
+  const starPts = (r1, r2, n) =>
+    Array.from({ length: n * 2 }, (_, i) => {
+      const r = i % 2 === 0 ? r1 : r2;
+      const a = (i / (n * 2)) * Math.PI * 2 - Math.PI / 2;
+      return `${C + Math.cos(a) * r},${C + Math.sin(a) * r}`;
+    }).join(' ');
+  const polyPts = (r, n, offset = 0) =>
+    Array.from({ length: n }, (_, i) => {
+      const a = (i / n) * Math.PI * 2 - Math.PI / 2 + offset;
+      return `${C + Math.cos(a) * r},${C + Math.sin(a) * r}`;
+    }).join(' ');
+
+  const s = (sw = 1.1) => ({ stroke: W, fill: 'none', strokeWidth: sw, strokeLinecap: 'round', strokeLinejoin: 'round' });
+
+  // ── Shape A — Flower-of-Life lotus, 12 petal circles + outer ring
+  const ShapeA = (
+    <g>
+      <circle cx={C} cy={C} r="172" {...s(0.8)} />
+      <circle cx={C} cy={C} r="156" {...s(1.0)} />
+      {ring(12, 100, (x, y) => <circle cx={x} cy={y} r="56" {...s(0.9)} />)}
+      <circle cx={C} cy={C} r="56" {...s(1.0)} />
+      <circle cx={C} cy={C} r="22" {...s(1.0)} />
+    </g>
+  );
+
+  // ── Shape B — Hexagram inside circle + 6 petal rounds
+  const ShapeB = (
+    <g>
+      <circle cx={C} cy={C} r="170" {...s(0.8)} />
+      <circle cx={C} cy={C} r="150" {...s(1.0)} />
+      <polygon points={polyPts(140, 3, 0)} {...s(1.0)} />
+      <polygon points={polyPts(140, 3, Math.PI)} {...s(1.0)} />
+      {ring(6, 95, (x, y) => <circle cx={x} cy={y} r="42" {...s(0.9)} />)}
+      <circle cx={C} cy={C} r="42" {...s(1.0)} />
+      <circle cx={C} cy={C} r="18" {...s(1.0)} />
+    </g>
+  );
+
+  // ── Shape C — 8-pointed star, square frame
+  const ShapeC = (
+    <g>
+      <circle cx={C} cy={C} r="172" {...s(0.8)} />
+      <polygon points={polyPts(160, 4, 0)} {...s(1.0)} />
+      <polygon points={polyPts(160, 4, Math.PI / 4)} {...s(1.0)} />
+      <polygon points={starPts(140, 90, 8)} {...s(1.0)} />
+      <polygon points={starPts(100, 60, 8)} {...s(1.0)} transform={`rotate(22.5 ${C} ${C})`} />
+      <circle cx={C} cy={C} r="34" {...s(1.0)} />
+      <circle cx={C} cy={C} r="14" {...s(1.0)} />
+    </g>
+  );
+
+  // ── Shape D — 12-point sunburst star with dots
+  const ShapeD = (
+    <g>
+      <circle cx={C} cy={C} r="172" {...s(0.8)} />
+      <polygon points={starPts(170, 110, 12)} {...s(1.0)} />
+      <polygon points={starPts(120, 70, 12)} {...s(0.9)} transform={`rotate(15 ${C} ${C})`} />
+      {ring(24, 145, (x, y) => <circle cx={x} cy={y} r="1.8" fill={W} />)}
+      <circle cx={C} cy={C} r="44" {...s(1.0)} />
+      {ring(12, 44, (x, y) => <circle cx={x} cy={y} r="1.6" fill={W} />)}
+      <circle cx={C} cy={C} r="16" {...s(1.0)} />
+    </g>
+  );
+
+  // ── Shape E — Many-petal flower (24 petals)
+  const ShapeE = (
+    <g>
+      <circle cx={C} cy={C} r="170" {...s(0.8)} />
+      {ring(24, 120, (x, y, deg) => (
+        <ellipse cx={x} cy={y} rx="9" ry="36"
+          transform={`rotate(${deg} ${x} ${y})`} {...s(0.9)} />
+      ))}
+      <circle cx={C} cy={C} r="62" {...s(1.0)} />
+      {ring(12, 62, (x, y) => <circle cx={x} cy={y} r="2.2" fill={W} />)}
+      <circle cx={C} cy={C} r="22" {...s(1.0)} />
+    </g>
+  );
+
+  // 5 shapes × 5s slot = 25s loop. Same keyframe (almaMorph), staggered by +5s each.
+  // Visible windows (of 25s wall-time): A 0-5, B 5-10, C 10-15, D 15-20, E 20-25.
+  const slotDelay = (idx) => `${idx * 5}s`;
+
+  const shapeStyle = (idx) => ({
+    transformOrigin: '200px 200px',
+    transformBox: 'fill-box',
+    animation: active ? `almaMorph 25s ease-in-out infinite` : 'none',
+    animationDelay: slotDelay(idx),
+    opacity: 0, // initial; overridden by animation
+  });
+
+  return (
+    <div style={{
+      width: size, height: size, opacity: 0.55,
+      animation: active ? 'breathe 9s ease-in-out infinite' : 'none',
+      willChange: 'transform',
+      mixBlendMode: 'screen',
+    }}>
+      <svg viewBox="0 0 400 400" width="100%" height="100%" style={{ overflow: 'visible' }}>
+        {/* Slow global rotation gives morph a sense of constant motion */}
+        <g style={{
+          transformOrigin: '200px 200px',
+          animation: active ? 'spinCW 240s linear infinite' : 'none',
+        }}>
+          <g style={shapeStyle(0)}>{ShapeA}</g>
+          <g style={shapeStyle(1)}>{ShapeB}</g>
+          <g style={shapeStyle(2)}>{ShapeC}</g>
+          <g style={shapeStyle(3)}>{ShapeD}</g>
+          <g style={shapeStyle(4)}>{ShapeE}</g>
+        </g>
+      </svg>
+    </div>
+  );
+}
+
+window.Mandala = Mandala;
+
+
+// ALMA — Player. Full Deck ("Now Sounding") + compacted Mini-Player pill.
+const { useState: useStateP, useRef: useRefP, useEffect: useEffectP } = React;
+
+// ── Morphing mandala — crossfades between 4 SVG shapes in a loop ──
+function PlayerMandala({ size = 160 }) {
+  const SHAPES = [
+    // mandala 1 — double octagon
+    { vb: '0 0 310 310', paths: [
+      'M298.681 133.403L271.7 106.422V68.251C271.7 51.5213 258.14 37.9609 241.41 37.9609H203.239L176.258 10.9802C164.436 -0.855414 145.253 -0.855414 133.417 10.9802L106.436 37.9609H68.2651C51.5354 37.9609 37.9749 51.5213 37.9749 68.251V106.422L10.9802 133.403C-0.855384 145.239 -0.855384 164.408 10.9802 176.244L37.9749 203.225V241.382C37.9749 258.111 51.5354 271.672 68.2651 271.672H106.422L133.403 298.653C145.239 310.488 164.408 310.488 176.244 298.653L203.225 271.672H241.396C258.126 271.672 271.686 258.111 271.686 241.382V203.225L298.667 176.244C310.502 164.408 310.502 145.239 298.681 133.403Z',
+      'M271.869 203.295C271.869 203.295 266.75 180.928 254.129 154.816C266.75 128.705 271.869 106.338 271.869 106.338C271.869 106.338 252.432 94.1519 225.045 84.6021C215.509 57.2147 203.309 37.7785 203.309 37.7785C203.309 37.7785 180.942 42.897 154.831 55.5179C128.72 42.897 106.353 37.7785 106.353 37.7785C106.353 37.7785 94.1663 57.2147 84.6165 84.6021C57.2292 94.1379 37.793 106.338 37.793 106.338C37.793 106.338 42.9114 128.705 55.5323 154.816C42.9114 180.928 37.793 203.295 37.793 203.295C37.793 203.295 57.2292 215.481 84.6165 225.031C94.1523 252.418 106.353 271.854 106.353 271.854C106.353 271.854 128.72 266.736 154.831 254.115C180.942 266.736 203.309 271.854 203.309 271.854C203.309 271.854 215.495 252.418 225.045 225.031C252.432 215.481 271.869 203.295 271.869 203.295Z',
+    ]},
+    // mandala 3 — star-blob + rotated square
+    { vb: '0 0 290 290', paths: [
+      'M287.42 203.912C287.42 203.912 281.18 176.679 265.811 144.888C281.18 113.084 287.42 85.8646 287.42 85.8646C287.42 85.8646 263.749 71.0141 230.402 59.4028C218.777 26.0556 203.94 2.3844 203.94 2.3844C203.94 2.3844 176.707 8.62474 144.902 23.9942C113.098 8.62474 85.8646 2.3844 85.8646 2.3844C85.8646 2.3844 71.014 26.0556 59.4027 59.4028C26.0555 71.0281 2.38428 85.8787 2.38428 85.8787C2.38428 85.8787 8.62466 113.112 23.9941 144.902C8.62466 176.693 2.38428 203.94 2.38428 203.94C2.38428 203.94 26.0555 218.791 59.4027 230.402C71.014 263.749 85.8646 287.42 85.8646 287.42C85.8646 287.42 113.098 281.18 144.902 265.811C176.707 281.18 203.94 287.42 203.94 287.42C203.94 287.42 218.777 263.749 230.402 230.402C263.749 218.763 287.42 203.912 287.42 203.912Z',
+      'M254.424 254.396C254.424 254.396 261.267 198.85 244.145 144.874C261.267 90.899 254.424 35.353 254.424 35.353C254.424 35.353 198.878 28.5097 144.902 45.632C90.9268 28.5097 35.3808 35.353 35.3808 35.353C35.3808 35.353 28.5375 90.899 45.6598 144.874C28.5375 198.85 35.3808 254.396 35.3808 254.396C35.3808 254.396 90.9268 261.239 144.902 244.117C198.878 261.239 254.424 254.396 254.424 254.396Z',
+    ]},
+    // mandala 4 — rounded square + 8-blade star + cardinal eyes
+    { vb: '0 0 286 286', paths: [
+      'M250.616 222.724V187.54L275.493 162.662C286.403 151.752 286.403 134.069 275.493 123.173L250.616 98.2958V63.0975C250.616 47.6719 238.107 35.1772 222.696 35.1632H187.512L162.634 10.286C151.724 -0.624063 134.041 -0.624063 123.145 10.286L98.2678 35.1632H63.0835C47.658 35.1632 35.1633 47.6579 35.1633 63.0834V98.2677L10.2861 123.145C-0.624002 134.055 -0.624002 151.738 10.2861 162.634L35.1633 187.512V222.696C35.1633 238.121 47.658 250.63 63.0835 250.63H98.2678L123.145 275.507C134.055 286.417 151.738 286.417 162.634 275.507L187.512 250.63H222.696C238.121 250.644 250.616 238.149 250.616 222.724Z',
+      'M142.875 254.458C190.807 271.637 235.527 262.9 276.741 276.783C262.844 235.569 271.581 190.849 254.416 142.918C271.595 94.9863 262.858 50.2802 276.741 9.05194C235.513 22.9349 190.807 14.2125 142.875 31.3769C94.93 14.1985 50.224 22.9349 9.00977 9.05194C22.9068 50.2802 14.1563 94.9863 31.3347 142.918C14.1563 190.849 22.8928 235.555 9.00977 276.783C50.238 262.886 94.944 271.623 142.875 254.458Z',
+    ]},
+    // mandala 5 — diamond + inner rotated square + corner petals
+    { vb: '0 0 305 305', paths: [
+      'M302.205 152.436C302.205 152.436 268.899 109.778 220.295 84.5781C195.095 35.9596 152.437 2.66846 152.437 2.66846C152.437 2.66846 109.778 35.9736 84.5781 84.5781C35.9736 109.778 2.66846 152.436 2.66846 152.436C2.66846 152.436 35.9736 195.095 84.5781 220.295C109.778 268.913 152.437 302.204 152.437 302.204C152.437 302.204 195.095 268.899 220.295 220.295C268.899 195.095 302.205 152.436 302.205 152.436Z',
+      'M258.34 258.326C258.34 258.326 264.959 204.617 248.398 152.422C264.959 100.228 258.34 46.519 258.34 46.519C258.34 46.519 204.631 39.9001 152.437 56.4615C100.242 39.9001 46.5333 46.519 46.5333 46.519C46.5333 46.519 39.9143 100.228 56.4758 152.422C39.9143 204.617 46.5333 258.326 46.5333 258.326C46.5333 258.326 100.242 264.945 152.437 248.383C204.631 264.945 258.34 258.326 258.34 258.326Z',
+    ]},
+  ];
+
+  const CYCLE = 20; // full loop duration in seconds
+  const PER = CYCLE / SHAPES.length; // seconds each shape is "on deck"
+
+  return (
+    <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
+      {SHAPES.map((shape, i) => (
+        <svg
+          key={i}
+          viewBox={shape.vb}
+          width={size}
+          height={size}
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          style={{
+            position: 'absolute',
+            inset: 0,
+            opacity: 0,
+            animation: `almaMorph ${CYCLE}s ${i * PER}s ease-in-out infinite`,
+          }}
+        >
+          {shape.paths.map((d, j) => (
+            <path key={j} d={d} stroke="rgba(255,255,255,0.65)" strokeWidth="4.20697" strokeMiterlimit="10" />
+          ))}
+        </svg>
+      ))}
+    </div>
+  );
+}
+
+// ── Draggable / tappable progress timeline ──
+function Scrubber({ elapsed, total, onSeek }) {
+  const barRef = useRefP(null);
+  const [drag, setDrag] = useStateP(false);
+  const pct = Math.max(0, Math.min(1, elapsed / total));
+
+  const seekFromEvent = (clientX) => {
+    const el = barRef.current; if (!el) return;
+    const r = el.getBoundingClientRect();
+    onSeek(Math.max(0, Math.min(1, (clientX - r.left) / r.width)) * total);
+  };
+  const down = (e) => { setDrag(true); seekFromEvent(e.clientX ?? e.touches?.[0]?.clientX); };
+  useEffectP(() => {
+    if (!drag) return;
+    const move = (e) => seekFromEvent(e.clientX ?? e.touches?.[0]?.clientX);
+    const up = () => setDrag(false);
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    return () => { window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); };
+  }, [drag]);
+
+  return (
+    <div style={{ width: '100%' }}>
+      <div ref={barRef} className="press" onPointerDown={down} style={{
+        height: 22, display: 'flex', alignItems: 'center', cursor: 'pointer', touchAction: 'none',
+      }}>
+        <div style={{ position: 'relative', width: '100%', height: 4, borderRadius: 4, background: 'rgba(255,255,255,0.22)' }}>
+          <div style={{ position: 'absolute', inset: 0, width: `${pct * 100}%`, background: '#fff', borderRadius: 4 }} />
+          <div style={{
+            position: 'absolute', top: '50%', left: `${pct * 100}%`,
+            width: drag ? 16 : 12, height: drag ? 16 : 12, borderRadius: '50%', background: '#fff',
+            transform: 'translate(-50%, -50%)', boxShadow: '0 2px 6px rgba(0,0,0,0.4)',
+            transition: 'width 120ms, height 120ms',
+          }} />
+        </div>
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.65)', fontVariantNumeric: 'tabular-nums' }}>
+        <span>{fmtTime(elapsed)}</span>
+        <span>-{fmtTime(Math.max(0, total - elapsed))}</span>
+      </div>
+    </div>
+  );
+}
+
+// ── Full Player Deck ──
+function FullPlayer({ track, duration, elapsed, isPlaying, muted, mode, motion = true,
+  onTogglePlay, onCollapse, onSeek, onCustomize, onToggleMute, onSaveRitual, savedFlash, canSaveRitual }) {
+  const total = duration * 60;
+  const remaining = Math.max(0, total - elapsed);
+  const open = mode === 'full';
+
+  // drag-to-dismiss
+  const [dragY, setDragY] = useStateP(0);
+  const startY = useRefP(null);
+  const onDown = (e) => { startY.current = e.clientY ?? e.touches?.[0]?.clientY; };
+  const onMove = (e) => {
+    if (startY.current == null) return;
+    const y = e.clientY ?? e.touches?.[0]?.clientY;
+    setDragY(Math.max(0, y - startY.current));
+  };
+  const onUp = () => {
+    if (dragY > 120) onCollapse();
+    setDragY(0); startY.current = null;
+  };
+
+  const grad = ALMA_GRADIENTS[track?.grad] || ALMA_GRADIENTS.violet;
+
+  return (
+    <div style={{
+      position: 'absolute', inset: 0, zIndex: 70,
+      transform: open ? `translateY(${dragY}px)` : 'translateY(102%)',
+      transition: startY.current != null ? 'none' : 'transform 480ms var(--ease-spring)',
+      pointerEvents: open ? 'auto' : 'none',
+      overflow: 'hidden', borderRadius: 48,
+    }}>
+      {/* full-bleed hero artwork */}
+      <div style={{ position: 'absolute', inset: 0, background: grad, backgroundColor: '#16100C' }} />
+      {/* frosted glass overlay */}
+      <div style={{ position: 'absolute', inset: 0, background: 'rgba(128,128,128,0.08)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }} />
+      {/* soft bottom legibility gradient — keep hero image prominent */}
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(14,11,9,0) 35%, rgba(14,11,9,0.45) 70%, rgba(14,11,9,0.85) 100%)' }} />
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(14,11,9,0) 80%, rgba(14,11,9,0.40) 100%)' }} />
+
+      {/* drag handle / collapse chevron — top center */}
+      <div onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} style={{
+        position: 'absolute', top: 0, left: 0, right: 0, zIndex: 5,
+        paddingTop: 54, paddingBottom: 20, touchAction: 'none', cursor: 'grab',
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+      }}>
+        <button className="press" onClick={onCollapse} aria-label="Collapse player" style={{
+          width: 52, height: 30, borderRadius: 15, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          background: 'rgba(255,255,255,0.12)', color: '#fff',
+        }}>
+          <IconChevDownSmall size={22} />
+        </button>
+      </div>
+
+      {/* content column */}
+      <div style={{
+        position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
+        padding: '128px 30px 42px', color: '#fff',
+      }}>
+        {/* mandala + countdown */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 0, gap: 28 }}>
+          <PlayerMandala />
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 72, fontWeight: 300, letterSpacing: 1, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+              {fmtTime(remaining)}
+            </div>
+            <div style={{ fontSize: 13, fontWeight: 500, letterSpacing: 1.5, color: 'rgba(255,255,255,0.6)', marginTop: 12, textTransform: 'uppercase' }}>
+              {duration} min session
+            </div>
+          </div>
+        </div>
+
+        {/* title */}
+        <div style={{ textAlign: 'center', marginBottom: 22 }}>
+          <div style={{ fontSize: 27, fontWeight: 600, letterSpacing: -0.3 }}>{track?.title}</div>
+          <div style={{ fontSize: 15, color: 'rgba(255,255,255,0.6)', marginTop: 4 }}>{track?.sub || track?.layers}</div>
+        </div>
+
+        {/* scrubber */}
+        <div style={{ marginBottom: 22 }}>
+          <Scrubber elapsed={elapsed} total={total} onSeek={onSeek} />
+        </div>
+
+        {/* controls */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 28, marginBottom: 26 }}>
+          <CircleBtn onClick={onCustomize}><IconSliders size={22} /></CircleBtn>
+          <button className="press" onClick={onTogglePlay} aria-label={isPlaying ? 'Pause' : 'Play'} style={{
+            width: 78, height: 78, borderRadius: '50%', background: '#fff', color: '#16100C',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 10px 30px rgba(0,0,0,0.35)',
+          }}>
+            {isPlaying ? <IconPause size={34} /> : <IconPlay size={32} style={{ marginLeft: 3 }} />}
+          </button>
+          <CircleBtn onClick={onToggleMute} active={muted}><IconMute size={22} /></CircleBtn>
+        </div>
+
+        {/* save as ritual — only shown when playing a mixer session */}
+        {canSaveRitual && (
+          <button className="press" onClick={onSaveRitual} style={{
+            alignSelf: 'center', display: 'flex', alignItems: 'center', gap: 9,
+            padding: '13px 24px', borderRadius: 30,
+            background: savedFlash ? '#fff' : 'rgba(255,255,255,0.10)',
+            border: '1px solid rgba(255,255,255,0.18)',
+            color: savedFlash ? '#16100C' : '#fff',
+            fontSize: 15, fontWeight: 600, transition: 'background 240ms var(--ease), color 240ms var(--ease)',
+          }}>
+            {savedFlash ? <IconCheck size={18} /> : <IconStar size={18} />}
+            {savedFlash ? 'Saved to Rituals' : 'Save as Ritual'}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function CircleBtn({ children, onClick, active }) {
+  return (
+    <button className="press" onClick={onClick} style={{
+      width: 56, height: 56, borderRadius: '50%',
+      background: active ? 'rgba(255,255,255,0.28)' : 'rgba(255,255,255,0.12)',
+      color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      transition: 'background 200ms var(--ease)',
+    }}>{children}</button>
+  );
+}
+
+// ── Compacted Mini-Player pill ──
+function MiniPlayer({ track, duration, elapsed, isPlaying, mode, onExpand, onTogglePlay, onClose }) {
+  const total = duration * 60;
+  const pct = Math.max(0, Math.min(1, elapsed / total));
+  const show = mode === 'mini';
+
+  // swipe-left-to-dismiss
+  const swipeRef = useRefP(null);
+  const [swipeDx, setSwipeDx] = useStateP(0);
+  const onPointerDown = (e) => { swipeRef.current = { startX: e.clientX, startY: e.clientY, moved: false }; };
+  const onPointerMove = (e) => {
+    if (!swipeRef.current) return;
+    const dx = e.clientX - swipeRef.current.startX;
+    const dy = e.clientY - swipeRef.current.startY;
+    if (!swipeRef.current.moved && Math.abs(dy) > Math.abs(dx)) { swipeRef.current = null; return; }
+    if (dx < 0) { swipeRef.current.moved = true; setSwipeDx(dx); }
+  };
+  const onPointerUp = () => {
+    if (swipeRef.current?.moved && swipeDx < -80) { onClose?.(); }
+    swipeRef.current = null;
+    setSwipeDx(0);
+  };
+
+  return (
+    <div style={{
+      position: 'absolute', left: 14, right: 14, bottom: 96, zIndex: 45,
+      transform: show ? `translateY(0) translateX(${swipeDx}px)` : 'translateY(140%)',
+      opacity: show ? Math.max(0, 1 + swipeDx / 200) : 0,
+      transition: swipeDx !== 0 ? 'none' : 'transform 440ms var(--ease-spring), opacity 240ms var(--ease)',
+      pointerEvents: show ? 'auto' : 'none',
+    }}
+      onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp}
+    >
+      <div className="press" onClick={onExpand} style={{
+        position: 'relative', display: 'flex', alignItems: 'center', gap: 12,
+        padding: 8, paddingRight: 18, borderRadius: 20, overflow: 'hidden',
+        background: 'var(--surface-solid)', border: '1px solid var(--hairline-strong)',
+        boxShadow: 'var(--shadow)', cursor: 'pointer',
+      }}>
+        <button className="press" onClick={(e) => { e.stopPropagation(); onTogglePlay(); }} aria-label={isPlaying ? 'Pause' : 'Play'} style={{
+          width: 44, height: 44, borderRadius: 14, flexShrink: 0,
+          background: 'var(--text)', color: 'var(--bg-0)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          {isPlaying ? <IconPause size={20} /> : <IconPlay size={18} style={{ marginLeft: 2 }} />}
+        </button>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{track?.title}</div>
+          <div style={{ fontSize: 12.5, color: 'var(--text-2)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{fmtTime(Math.max(0, total - elapsed))} left · {track?.sub || track?.layers}</div>
+        </div>
+        <Orb grad={track?.grad} size={32} radius={10} />
+        {/* thin progress along bottom edge — grayscale */}
+        <div style={{ position: 'absolute', left: 0, bottom: 0, height: 2.5, width: `${pct * 100}%`, background: 'var(--text)', transition: 'width 400ms linear' }} />
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { FullPlayer, MiniPlayer, Scrubber });
+
+
+// ALMA — Sanctuary (Home) + Quick-Configuration sheet
+const { useState: useStateS } = React;
+
+// Premium master-track tile (dual-state: downloaded vs in-cloud).
+// Flush layout — no card wrapper — so orb left edge aligns with section head.
+function MasterCard({ track, onSelect, onPreview, onLoad, loading, justLoaded }) {
+  const downloaded = track.state === 'downloaded';
+  return (
+    <div className="press" onClick={() => downloaded && onSelect(track)} style={{
+      width: 168,
+      cursor: downloaded ? 'pointer' : 'default',
+    }}>
+      <Orb grad={track.grad} size={168} radius={22} glow style={{ width: '100%' }}>
+        {/* state badge */}
+        <div style={{
+          position: 'absolute', top: 10, right: 10, width: 28, height: 28, borderRadius: '50%',
+          background: 'rgba(10,8,6,0.42)', backdropFilter: 'blur(6px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff',
+        }}>
+          {downloaded ? <IconCheck size={16} /> : <IconCloud size={16} />}
+        </div>
+        {/* duration chip — bottom left, on the artwork */}
+        {downloaded && (
+          <div style={{
+            position: 'absolute', left: 10, bottom: 10, padding: '4px 9px', borderRadius: 20,
+            background: 'rgba(10,8,6,0.42)', backdropFilter: 'blur(6px)', color: '#fff',
+            fontSize: 12, fontWeight: 600, letterSpacing: 0.2, whiteSpace: 'nowrap',
+          }}>{track.dur} min</div>
+        )}
+      </Orb>
+      <div style={{ marginTop: 11 }}>
+        <div style={{ fontSize: 15.5, fontWeight: 600, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{track.title}</div>
+        <div style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{track.sub}</div>
+      </div>
+      {!downloaded && (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+          <button className="press" onClick={(e) => { e.stopPropagation(); onPreview(track); }} style={{
+            display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: 'var(--text-2)',
+          }}>
+            <IconPreview size={16} /> Pre-listen
+          </button>
+          <button className="press" onClick={(e) => { e.stopPropagation(); onLoad(track); }} aria-label="Load to Vault" style={{
+            width: 36, height: 36, borderRadius: '50%', border: '1px solid var(--hairline-strong)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: justLoaded ? 'var(--text)' : 'var(--text-2)',
+            background: loading ? 'var(--surface-2)' : 'transparent',
+          }}>
+            {justLoaded ? <IconCheck size={16} /> : loading ? <Spinner /> : <IconDownload size={16} />}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Spinner() {
+  return <div style={{
+    width: 16, height: 16, borderRadius: '50%',
+    border: '2px solid var(--hairline-strong)', borderTopColor: 'var(--text)',
+    animation: 'spinCW 0.7s linear infinite',
+  }} />;
+}
+
+// Saved-ritual card (horizontal lane). Uses ritual gradient image as full-bleed cover.
+function RitualCard({ ritual, onLaunch }) {
+  return (
+    <div className="press" onClick={() => onLaunch(ritual)} style={{
+      width: 230, borderRadius: 22, overflow: 'hidden', position: 'relative',
+      cursor: 'pointer',
+    }}>
+      <div style={{ height: 138, background: ALMA_GRADIENTS[ritual.grad], backgroundColor: '#1a1714', position: 'relative' }}>
+        <div style={{ position: 'absolute', inset: 0, borderRadius: 22, background: 'rgba(128,128,128,0.08)', backdropFilter: 'blur(10px)', WebkitBackdropFilter: 'blur(10px)' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(8,6,5,0.65), rgba(8,6,5,0.10) 55%, transparent 80%)' }} />
+        <div style={{
+          position: 'absolute', top: 12, right: 12, padding: '4px 10px', borderRadius: 20,
+          background: 'rgba(10,8,6,0.42)', backdropFilter: 'blur(6px)', color: '#fff',
+          fontSize: 12, fontWeight: 600, letterSpacing: 0.2, whiteSpace: 'nowrap',
+        }}>{ritual.dur} min</div>
+        <div style={{ position: 'absolute', left: 14, bottom: 12, right: 14 }}>
+          <div style={{ fontSize: 16, fontWeight: 600, color: '#fff', letterSpacing: -0.1 }}>{ritual.title}</div>
+          <div style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.78)', marginTop: 2 }}>{ritual.layers}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Pinned file row — flush list (no outer card wrapper).
+function PinnedRow({ file, onSelect, onEdit, divider }) {
+  return (
+    <>
+      <div className="press" onClick={() => onSelect(file)} style={{
+        display: 'flex', alignItems: 'center', gap: 14, padding: '7px 0',
+        cursor: 'pointer',
+      }}>
+        <PinOrb color={file.color} icon={file.icon} size={48} radius={13} />
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 15, fontWeight: 500, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{file.name}</div>
+          <div style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 1 }}>{file.meta}</div>
+        </div>
+        <button className="press" onClick={(e) => { e.stopPropagation(); onEdit(file); }} aria-label="Customize" style={{
+          width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: 'var(--text-3)', border: '1px solid var(--hairline)',
+        }}>
+          <IconEdit size={16} />
+        </button>
+        <PlayBadge size={34} onClick={(e) => { e?.stopPropagation?.(); onSelect(file); }} />
+      </div>
+      {divider && <div style={{ height: 1, background: 'var(--hairline)', marginLeft: 62 }} />}
+    </>
+  );
+}
+
+// "Add more rituals" call-to-action card (last in Saved Rituals lane)
+function AddMoreRitualCard({ onClick }) {
+  return (
+    <button className="press" onClick={onClick} style={{
+      width: 230, height: 138, borderRadius: 22, flexShrink: 0,
+      border: '1.5px dashed var(--hairline-strong)',
+      background: 'transparent', color: 'var(--text-2)',
+      display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+      gap: 10, padding: 16,
+    }}>
+      <span style={{
+        width: 44, height: 44, borderRadius: '50%',
+        border: '1.5px dashed var(--hairline-strong)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: 'var(--text-2)',
+      }}>
+        <IconPlus size={20} />
+      </span>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: 14.5, fontWeight: 600, color: 'var(--text)' }}>Create a Ritual</div>
+        <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>Build one in the Mixer</div>
+      </div>
+    </button>
+  );
+}
+
+function Sanctuary({ theme, onToggleTheme, tracks, rituals, pinned, onConfigure, onPreview, onLoad,
+  loadingId, loadedIds, onLaunchRitual, onPlayFile, onEditFile, onAddMoreRitual, onUpgrade }) {
+  return (
+    <div style={{ padding: '60px 20px 200px', animation: 'almaFade 400ms var(--ease)' }}>
+      <AlmaHeader theme={theme} onToggleTheme={onToggleTheme} sub="A quiet place for your sound." />
+
+      {/* Master Tracks */}
+      <section style={{ marginTop: 32 }}>
+        <SectionHead title="Master Tracks" counter={`${tracks.length} tracks`} style={{ marginBottom: 16 }} />
+        <div className="hscroll">
+          {tracks.map(t => (
+            <MasterCard key={t.id} track={t} onSelect={onConfigure} onPreview={onPreview}
+              onLoad={onLoad} loading={loadingId === t.id} justLoaded={loadedIds.includes(t.id)} />
+          ))}
+        </div>
+      </section>
+
+      {/* Saved Rituals */}
+      <section style={{ marginTop: 36 }}>
+        <SectionHead title="Your Saved Rituals" counter={`${rituals.length} saved`} style={{ marginBottom: 16 }} />
+        <div className="hscroll">
+          {rituals.map(r => <RitualCard key={r.id} ritual={r} onLaunch={onLaunchRitual} />)}
+          <AddMoreRitualCard onClick={onAddMoreRitual} />
+        </div>
+      </section>
+
+      {/* Pinned Audio Files — flush list, aligned with section head */}
+      <section style={{ marginTop: 36 }}>
+        <SectionHead title="Pinned Files" counter={`${pinned.length} pinned`} style={{ marginBottom: 4 }} />
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {pinned.map((f, i) => (
+            <PinnedRow key={f.id} file={f} onSelect={onPlayFile} onEdit={onEditFile} divider={i < pinned.length - 1} />
+          ))}
+        </div>
+      </section>
+
+      {/* Pro upgrade banner */}
+      <section style={{ marginTop: 32 }}>
+        <button className="press" onClick={onUpgrade} style={{
+          width: '100%', borderRadius: 22, overflow: 'hidden',
+          position: 'relative', height: 110, display: 'block',
+          background: `url('alma/img/gradient4.webp') center / cover no-repeat`,
+          border: 'none', cursor: 'pointer',
+        }}>
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(100deg, rgba(0,0,0,0.62) 40%, rgba(0,0,0,0.18) 100%)' }} />
+          <div style={{ position: 'absolute', right: -24, top: '50%', transform: 'translateY(-50%)', opacity: 0.45, pointerEvents: 'none' }}>
+            <PlayerMandala />
+          </div>
+          <div style={{ position: 'absolute', left: 20, top: '50%', transform: 'translateY(-50%)', textAlign: 'left' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2.5, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', marginBottom: 4 }}>ALMA Pro</div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: '#fff', letterSpacing: -0.3, lineHeight: 1.2, marginBottom: 8 }}>Unlock everything</div>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 13px', borderRadius: 20, background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(6px)', border: '1px solid rgba(255,255,255,0.22)' }}>
+              <span style={{ fontSize: 12.5, fontWeight: 600, color: '#fff', whiteSpace: 'nowrap' }}>Start free trial →</span>
+            </div>
+          </div>
+        </button>
+      </section>
+    </div>
+  );
+}
+
+// ── Quick-Configuration bottom sheet ──
+function QuickConfigSheet({ track, onClose, onBegin, onAddLayers }) {
+  const [dur, setDur] = useStateS(15);
+  const open = !!track;
+  return (
+    <>
+      {/* backdrop */}
+      <div onClick={onClose} style={{
+        position: 'absolute', inset: 0, zIndex: 55, background: 'rgba(6,4,3,0.5)',
+        backdropFilter: open ? 'blur(3px)' : 'none',
+        opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none',
+        transition: 'opacity 300ms var(--ease)', borderRadius: 48,
+      }} />
+      {/* sheet */}
+      <div style={{
+        position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 56,
+        transform: open ? 'translateY(0)' : 'translateY(102%)',
+        transition: 'transform 460ms var(--ease-spring)',
+        background: 'var(--surface-solid)', borderRadius: '30px 30px 48px 48px',
+        padding: '14px 24px 40px', boxShadow: 'var(--shadow)',
+        border: '1px solid var(--hairline)', borderBottom: 'none',
+      }}>
+        <div style={{ width: 40, height: 5, borderRadius: 3, background: 'var(--hairline-strong)', margin: '0 auto 22px' }} />
+        {track && (
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 15, marginBottom: 26 }}>
+              <Orb grad={track.grad} size={64} radius={18} glow />
+              <div>
+                <div className="eyebrow" style={{ marginBottom: 4 }}>Configure session</div>
+                <div style={{ fontSize: 21, fontWeight: 600, color: 'var(--text)' }}>{track.title}</div>
+                <div style={{ fontSize: 14, color: 'var(--text-2)', marginTop: 1 }}>{track.sub}</div>
+              </div>
+            </div>
+
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-2)', marginBottom: 11 }}>Duration</div>
+            <DurationPills value={dur} onChange={setDur} dense />
+
+            <button className="press" onClick={() => onBegin(track, dur)} style={{
+              width: '100%', marginTop: 26, padding: '17px', borderRadius: 18,
+              background: 'var(--accent)', color: 'var(--on-accent)',
+              fontSize: 17, fontWeight: 600, boxShadow: '0 10px 26px -8px var(--accent-glow)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, whiteSpace: 'nowrap',
+            }}>
+              <IconPlay size={18} /> Begin Session
+            </button>
+
+            <button className="press" onClick={() => onAddLayers(track)} style={{
+              width: '100%', marginTop: 14, color: 'var(--text-2)', fontSize: 15, fontWeight: 500,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, whiteSpace: 'nowrap',
+            }}>
+              Add Ambient Layers & Effects <IconChevRight size={16} />
+            </button>
+          </>
+        )}
+      </div>
+    </>
+  );
+}
+
+Object.assign(window, { Sanctuary, QuickConfigSheet, MasterCard, RitualCard, PinnedRow, AddMoreRitualCard });
+
+
+// ALMA — Mixer (The Enhancement Studio). Controlled: focus/dur/layer live in App,
+// so the launch action bar can be pinned at the device level (above the mini-player).
+const { useState: useStateM, useEffect: useEffectM, useRef: useRefM } = React;
+
+function MixerDurationPicker({ value, onChange }) {
+  const [customMode, setCustomMode] = useStateM(false);
+  const [customInput, setCustomInput] = useStateM('');
+  const presets = [5, 15, 30];
+  const isPreset = presets.includes(value);
+
+  const activateCustom = () => {
+    setCustomMode(true);
+    setCustomInput(isPreset ? '' : String(value));
+  };
+
+  const onInputChange = (e) => {
+    const raw = e.target.value.replace(/\D/g, '');
+    setCustomInput(raw);
+    const n = parseInt(raw, 10);
+    if (n > 0 && n <= 360) onChange(n);
+  };
+
+  return (
+    <div style={{ display: 'flex', gap: 8 }}>
+      {presets.map(min => {
+        const active = value === min && !customMode;
+        return (
+          <button key={min} className="press" onClick={() => { onChange(min); setCustomMode(false); }} style={{
+            flex: '1 1 0', padding: '11px 8px', borderRadius: 14,
+            background: active ? 'var(--text)' : 'var(--surface)',
+            color: active ? 'var(--bg-0)' : 'var(--text-2)',
+            border: active ? 'none' : '1px solid var(--hairline)',
+            fontSize: 15, fontWeight: 600,
+            transition: 'background 200ms var(--ease), color 200ms var(--ease)',
+          }}>{min} min</button>
+        );
+      })}
+      {customMode ? (
+        <div style={{
+          flex: '1 1 0', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          borderRadius: 14, background: 'var(--text)', padding: '6px 8px',
+        }}>
+          <input
+            autoFocus
+            type="text" inputMode="numeric" pattern="[0-9]*"
+            value={customInput}
+            onChange={onInputChange}
+            placeholder="min"
+            style={{
+              width: '100%', background: 'transparent', border: 'none', outline: 'none',
+              color: 'var(--bg-0)', fontSize: 15, fontWeight: 600,
+              textAlign: 'center', fontFamily: 'var(--font)',
+            }}
+          />
+        </div>
+      ) : (
+        <button className="press" onClick={activateCustom} style={{
+          flex: '1 1 0', padding: '11px 8px', borderRadius: 14,
+          background: 'var(--surface)', color: 'var(--text-2)',
+          border: '1px solid var(--hairline)', fontSize: 15, fontWeight: 600,
+        }}>Custom</button>
+      )}
+    </div>
+  );
+}
+
+function Mixer({ focus, setFocus, dur, setDur, layer, setLayer, bell, setBell, intervalMin, setIntervalMin, tracks, onToast, onPreviewLayer }) {
+  const [dropOpen, setDropOpen] = useStateM(false);
+  const [previewing, setPreviewing] = useStateM(null);
+  const previewAudioRef = useRefM(null);
+
+  const downloaded = tracks.filter(t => t.state === 'downloaded');
+
+  const toggleLayer = (l) => {
+    if (layer && layer.id === l.id) { setLayer(null); return; }
+    if (layer && layer.id !== l.id) onToast('Only one ambient layer at a time — switched to ' + l.name);
+    setLayer(l);
+  };
+
+  const toggleBell = (l) => {
+    setBell(b => b?.id === l.id ? null : l);
+  };
+
+  const stopPreview = () => {
+    previewAudioRef.current?.pause();
+    previewAudioRef.current = null;
+    setPreviewing(null);
+  };
+
+  const previewLayer = (l) => {
+    if (previewing === l.id) { stopPreview(); return; }
+    stopPreview();
+    if (!l.audioSrc) return;
+    const a = new Audio(l.audioSrc);
+    a.volume = 0.75;
+    a.play().catch(() => {});
+    previewAudioRef.current = a;
+    setPreviewing(l.id);
+    const clear = () => { if (previewAudioRef.current === a) { previewAudioRef.current = null; setPreviewing(p => p === l.id ? null : p); } };
+    a.onended = clear;
+    setTimeout(clear, 12000);
+  };
+
+  return (
+    <div style={{ padding: '24px 20px 220px', animation: 'almaFade 400ms var(--ease)' }}>
+      <div style={{ textAlign: 'center', marginBottom: 6 }}>
+        <div className="eyebrow">Enhancement Studio</div>
+        <h1 style={{ margin: '6px 0 0', fontSize: 28, fontWeight: 600, letterSpacing: -0.4 }}>Mixer</h1>
+      </div>
+
+      {/* A — Primary Focus Track */}
+      <section style={{ marginTop: 24 }}>
+        <div className="eyebrow" style={{ marginBottom: 10 }}>Primary Focus Track</div>
+        <div style={{
+          borderRadius: 22, background: 'var(--surface)', border: '1px solid var(--hairline)',
+          padding: 14, position: 'relative',
+        }}>
+          {focus ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <Orb grad={focus.grad} size={56} radius={16} glow />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 17, fontWeight: 600, color: 'var(--text)' }}>{focus.title}</div>
+                <div style={{ fontSize: 13.5, color: 'var(--text-2)', marginTop: 1 }}>{focus.sub} · {focus.dur} min</div>
+              </div>
+              <button className="press" onClick={() => setDropOpen(o => !o)} style={{
+                padding: '9px 15px', borderRadius: 13, background: 'var(--surface-2)',
+                border: '1px solid var(--hairline)', color: 'var(--text-2)', fontSize: 14, fontWeight: 600,
+                display: 'flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap',
+              }}>Change <IconChevDown size={15} style={{ transform: dropOpen ? 'rotate(180deg)' : 'none', transition: 'transform 200ms' }} /></button>
+            </div>
+          ) : (
+            <button className="press" onClick={() => setDropOpen(o => !o)} style={{
+              width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              color: 'var(--text-2)', fontSize: 15.5, fontWeight: 500, padding: '6px 4px', gap: 10,
+            }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 11, minWidth: 0 }}>
+                <span style={{ width: 56, height: 56, borderRadius: 16, border: '1.5px dashed var(--hairline-strong)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <IconPlus size={22} />
+                </span>
+                <span style={{ whiteSpace: 'nowrap' }}>Select a track from the Vault</span>
+              </span>
+              <IconChevDown size={18} style={{ flexShrink: 0, transform: dropOpen ? 'rotate(180deg)' : 'none', transition: 'transform 200ms' }} />
+            </button>
+          )}
+
+          {dropOpen && (
+            <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--hairline)', display: 'flex', flexDirection: 'column', gap: 2, animation: 'almaFadeUp 220ms var(--ease)' }}>
+              {downloaded.map(t => (
+                <button key={t.id} className="press" onClick={() => { setFocus(t); setDropOpen(false); }} style={{
+                  display: 'flex', alignItems: 'center', gap: 12, padding: 8, borderRadius: 13,
+                  background: focus?.id === t.id ? 'var(--surface-2)' : 'transparent', textAlign: 'left',
+                }}>
+                  <Orb grad={t.grad} size={40} radius={11} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)' }}>{t.title}</div>
+                    <div style={{ fontSize: 12.5, color: 'var(--text-3)' }}>{t.sub} · {t.dur} min</div>
+                  </div>
+                  {focus?.id === t.id && <IconCheck size={18} style={{ color: 'var(--text-2)' }} />}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* B — Session Timer */}
+      <section style={{ marginTop: 26 }}>
+        <div className="eyebrow" style={{ marginBottom: 11 }}>Session Length</div>
+        <MixerDurationPicker value={dur} onChange={setDur} />
+      </section>
+
+      {/* C — Ambient Layers & Effects */}
+      <section style={{ marginTop: 26 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 11, gap: 10 }}>
+          <div className="eyebrow">Ambient Layers & Effects</div>
+          <span style={{ fontSize: 12, color: 'var(--text-3)', display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0, whiteSpace: 'nowrap' }}>
+            <IconLayers size={14} /> one at a time
+          </span>
+        </div>
+
+        {[
+          { label: 'Nature', ids: ['a1','a2','a3','a4'] },
+          { label: 'Frequencies', ids: ['a5','a6','a7'] },
+        ].map(group => (
+          <div key={group.label} style={{ marginBottom: 18 }}>
+            <div style={{ fontSize: 12, fontWeight: 500, letterSpacing: 0.2, color: 'var(--text-3)', marginBottom: 8 }}>{group.label}</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+          {AMBIENT_LAYERS.filter(l => group.ids.includes(l.id)).map(l => {
+            const on = layer?.id === l.id;
+            return (
+              <div key={l.id} style={{
+                borderRadius: 17,
+                background: on ? 'var(--surface-2)' : 'var(--surface)',
+                border: `1px solid ${on ? 'var(--hairline-strong)' : 'var(--hairline)'}`,
+                transition: 'background 220ms var(--ease), border-color 220ms var(--ease)',
+                overflow: 'hidden',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 13, padding: '12px 14px' }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)' }}>{l.name}</div>
+                    <div style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 2 }}>{l.desc}</div>
+                  </div>
+                  <button className="press" onClick={() => previewLayer(l)} aria-label={previewing === l.id ? 'Stop' : 'Listen'} style={{
+                    width: 90, height: 40, borderRadius: 20, flexShrink: 0,
+                    border: '1px solid var(--hairline-strong)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+                    color: previewing === l.id ? 'var(--text)' : 'var(--text-2)',
+                    fontSize: 13, fontWeight: 600,
+                  }}>
+                    {previewing === l.id ? <IconStop size={14} /> : <IconPlayFilled size={14} />}
+                    {previewing === l.id ? 'Stop' : 'Listen'}
+                  </button>
+                  <button className="press" onClick={() => toggleLayer(l)} aria-label="Toggle layer" style={{
+                    width: 50, height: 30, borderRadius: 15, position: 'relative', flexShrink: 0,
+                    background: on ? 'var(--text)' : 'var(--surface-2)',
+                    border: `1px solid ${on ? 'transparent' : 'var(--hairline)'}`,
+                    transition: 'background 220ms var(--ease)',
+                  }}>
+                    <span style={{
+                      position: 'absolute', top: 3, left: on ? 23 : 3, width: 22, height: 22, borderRadius: '50%',
+                      background: on ? 'var(--bg-0)' : '#fff',
+                      transition: 'left 240ms var(--ease-spring)', boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                    }} />
+                  </button>
+                </div>
+                {/* Interval picker — shown when Interval Bell is active */}
+                {on && l.isInterval && (
+                  <div style={{ padding: '0 14px 14px', animation: 'almaFadeUp 200ms var(--ease)' }}>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-3)', marginBottom: 8, letterSpacing: 0.5 }}>RING EVERY</div>
+                    <div style={{ display: 'flex', gap: 7 }}>
+                      {[1, 3, 5, 10, 15].map(m => {
+                        const active = intervalMin === m;
+                        return (
+                          <button key={m} className="press" onClick={() => setIntervalMin(m)} style={{
+                            flex: '1 1 0', padding: '8px 4px', borderRadius: 11,
+                            background: active ? 'var(--text)' : 'var(--surface-2)',
+                            color: active ? 'var(--bg-0)' : 'var(--text-2)',
+                            border: active ? 'none' : '1px solid var(--hairline)',
+                            fontSize: 13, fontWeight: 600,
+                            transition: 'background 180ms var(--ease), color 180ms var(--ease)',
+                          }}>{m}m</button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+            </div>
+          </div>
+        ))}
+      </section>
+
+      {/* D — Session Bells */}
+      <section style={{ marginTop: 26 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 11, gap: 10 }}>
+          <div className="eyebrow">Session Bells</div>
+          <span style={{ fontSize: 12, color: 'var(--text-3)', flexShrink: 0, whiteSpace: 'nowrap' }}>intro · outro · interval</span>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+          {AMBIENT_LAYERS.filter(l => ['a8','a9'].includes(l.id)).map(l => {
+            const on = bell?.id === l.id;
+            return (
+              <div key={l.id} style={{
+                borderRadius: 17,
+                background: on ? 'var(--surface-2)' : 'var(--surface)',
+                border: `1px solid ${on ? 'var(--hairline-strong)' : 'var(--hairline)'}`,
+                transition: 'background 220ms var(--ease), border-color 220ms var(--ease)',
+                overflow: 'hidden',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 13, padding: '12px 14px' }}>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)' }}>{l.name}</div>
+                    <div style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 2 }}>{l.desc}</div>
+                  </div>
+                  <button className="press" onClick={() => previewLayer(l)} aria-label={previewing === l.id ? 'Stop' : 'Listen'} style={{
+                    width: 90, height: 40, borderRadius: 20, flexShrink: 0,
+                    border: '1px solid var(--hairline-strong)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+                    color: previewing === l.id ? 'var(--text)' : 'var(--text-2)',
+                    fontSize: 13, fontWeight: 600,
+                  }}>
+                    {previewing === l.id ? <IconStop size={14} /> : <IconPlayFilled size={14} />}
+                    {previewing === l.id ? 'Stop' : 'Listen'}
+                  </button>
+                  <button className="press" onClick={() => toggleBell(l)} aria-label="Toggle bell" style={{
+                    width: 50, height: 30, borderRadius: 15, position: 'relative', flexShrink: 0,
+                    background: on ? 'var(--text)' : 'var(--surface-2)',
+                    border: `1px solid ${on ? 'transparent' : 'var(--hairline)'}`,
+                    transition: 'background 220ms var(--ease)',
+                  }}>
+                    <span style={{
+                      position: 'absolute', top: 3, left: on ? 23 : 3, width: 22, height: 22, borderRadius: '50%',
+                      background: on ? 'var(--bg-0)' : '#fff',
+                      transition: 'left 240ms var(--ease-spring)', boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                    }} />
+                  </button>
+                </div>
+                {on && l.isInterval && (
+                  <div style={{ padding: '0 14px 14px', animation: 'almaFadeUp 200ms var(--ease)' }}>
+                    <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-3)', marginBottom: 8, letterSpacing: 0.5 }}>RING EVERY</div>
+                    <div style={{ display: 'flex', gap: 7 }}>
+                      {[1, 3, 5, 10, 15].map(m => {
+                        const active = intervalMin === m;
+                        return (
+                          <button key={m} className="press" onClick={() => setIntervalMin(m)} style={{
+                            flex: '1 1 0', padding: '8px 4px', borderRadius: 11,
+                            background: active ? 'var(--text)' : 'var(--surface-2)',
+                            color: active ? 'var(--bg-0)' : 'var(--text-2)',
+                            border: active ? 'none' : '1px solid var(--hairline)',
+                            fontSize: 13, fontWeight: 600,
+                            transition: 'background 180ms var(--ease), color 180ms var(--ease)',
+                          }}>{m}m</button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+// D — Pre-Hear & Launch Action Bar (rendered at device level, pinned, stacks above mini-player)
+function MixerActionBar({ focus, dur, layer, bell, raised, onBegin, onPreviewMix }) {
+  const [isPreviewing, setIsPreviewing] = useStateM(false);
+  const previewRefs = useRefM([]);
+
+  const stopAll = () => {
+    previewRefs.current.forEach(a => { try { a.pause(); } catch(e) {} });
+    previewRefs.current = [];
+    setIsPreviewing(false);
+  };
+
+  const handlePreview = () => {
+    if (isPreviewing) { stopAll(); return; }
+    if (!focus?.audioSrc) return;
+
+    const audios = [];
+
+    // main track
+    const main = new Audio(focus.audioSrc);
+    main.volume = 0.75; main.loop = true;
+    main.play().catch(() => {});
+    audios.push(main);
+
+    // ambient layer
+    if (layer?.audioSrc) {
+      const lyr = new Audio(layer.audioSrc);
+      lyr.volume = 0.45; lyr.loop = true;
+      lyr.play().catch(() => {});
+      audios.push(lyr);
+    }
+
+    // session bell (one-shot at start)
+    if (bell?.audioSrc) {
+      const b = new Audio(bell.audioSrc);
+      b.volume = 0.85;
+      setTimeout(() => b.play().catch(() => {}), 400);
+      audios.push(b);
+    }
+
+    previewRefs.current = audios;
+    setIsPreviewing(true);
+    setTimeout(stopAll, 15000);
+  };
+
+  return (
+    <div style={{
+      position: 'absolute', left: 14, right: 14, zIndex: 44,
+      bottom: raised ? 158 : 98,
+      transition: 'bottom 360ms var(--ease-spring)',
+    }}>
+      <div style={{
+        display: 'flex', gap: 11, padding: 10, borderRadius: 22,
+        background: 'var(--surface-solid)', border: '1px solid var(--hairline-strong)', boxShadow: 'var(--shadow)',
+      }}>
+        <button className="press" onClick={handlePreview} disabled={!focus} style={{
+          flex: '0 0 130px', padding: '15px 0', borderRadius: 15,
+          background: 'var(--surface-2)', border: '1px solid var(--hairline)',
+          color: focus ? 'var(--text)' : 'var(--text-3)', fontSize: 14.5, fontWeight: 600,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+          opacity: focus ? 1 : 0.5, whiteSpace: 'nowrap',
+        }}>
+          {isPreviewing ? <IconStop size={18} /> : <IconWave size={18} />}
+          {isPreviewing ? 'Stop' : 'Pre-listen'}
+        </button>
+        <button className="press" onClick={() => onBegin(focus, dur, layer, 'mixer')} disabled={!focus} style={{
+          flex: 1, padding: '15px', borderRadius: 15,
+          background: focus ? 'var(--accent)' : 'var(--surface-2)',
+          color: focus ? 'var(--on-accent)' : 'var(--text-3)', fontSize: 16, fontWeight: 600,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, whiteSpace: 'nowrap',
+          boxShadow: focus ? '0 8px 22px -8px var(--accent-glow)' : 'none', opacity: focus ? 1 : 0.6,
+        }}>
+          <IconPlay size={19} /> Begin Session
+        </button>
+      </div>
+    </div>
+  );
+}
+
+Object.assign(window, { Mixer, MixerActionBar });
+
+
+// ALMA — Vault (The File Manager)
+const { useState: useStateV } = React;
+
+function SegTabs({ tabs, active, onChange }) {
+  return (
+    <div style={{
+      display: 'flex', padding: 4, borderRadius: 16, background: 'var(--surface)',
+      border: '1px solid var(--hairline)', gap: 4,
+    }}>
+      {tabs.map(t => {
+        const on = active === t.id;
+        return (
+          <button key={t.id} className="press" onClick={() => onChange(t.id)} style={{
+            flex: 1, padding: '11px', borderRadius: 12, fontSize: 14.5, fontWeight: 600,
+            background: on ? 'var(--text)' : 'transparent',
+            color: on ? 'var(--bg-0)' : 'var(--text-2)',
+            transition: 'background 220ms var(--ease), color 220ms var(--ease)',
+          }}>{t.label}</button>
+        );
+      })}
+    </div>
+  );
+}
+
+function RitualVaultRow({ ritual, onRename, onLaunch, onDelete }) {
+  const [editing, setEditing] = useStateV(false);
+  const [val, setVal] = useStateV(ritual.title);
+  const commit = () => { onRename(ritual.id, val.trim() || ritual.title); setEditing(false); };
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 13, padding: '11px 12px' }}>
+      <Orb grad={ritual.grad} size={46} radius={13} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        {editing ? (
+          <input autoFocus value={val} onChange={e => setVal(e.target.value)}
+            onBlur={commit} onKeyDown={e => e.key === 'Enter' && commit()}
+            style={{
+              width: '100%', background: 'var(--surface-2)', border: '1px solid var(--accent)',
+              borderRadius: 9, padding: '6px 9px', color: 'var(--text)', fontSize: 15, fontWeight: 600,
+              fontFamily: 'var(--font)', outline: 'none',
+            }} />
+        ) : (
+          <div style={{ fontSize: 15.5, fontWeight: 600, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ritual.title}</div>
+        )}
+        <div style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 2 }}>{ritual.layers} · {ritual.dur} min</div>
+      </div>
+      <button className="press" onClick={() => editing ? commit() : setEditing(true)} aria-label="Rename" style={iconBtn}>
+        {editing ? <IconCheck size={16} style={{ color: 'var(--accent)' }} /> : <IconEdit size={16} />}
+      </button>
+      <button className="press" onClick={() => onDelete(ritual.id)} aria-label="Delete" style={iconBtn}>
+        <IconTrash size={16} />
+      </button>
+    </div>
+  );
+}
+
+function RawRow({ file, onTogglePin, onDelete, onEdit }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 13, padding: '11px 12px' }}>
+      <PinOrb color={file.color} icon={file.icon} size={46} radius={13} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 15, fontWeight: 500, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{file.name}</div>
+        <div style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 1 }}>{file.meta}</div>
+      </div>
+      <button className="press" onClick={() => onEdit(file)} aria-label="Customize" style={iconBtn}>
+        <IconEdit size={16} />
+      </button>
+      <button className="press" onClick={() => onTogglePin(file.id)} aria-label="Pin to Sanctuary" style={{
+        ...iconBtn, color: file.pinned ? 'var(--text)' : 'var(--text-3)',
+        background: file.pinned ? 'var(--surface-2)' : 'transparent',
+      }}>
+        <IconPin size={16} />
+      </button>
+      <button className="press" onClick={() => onDelete(file.id)} aria-label="Clear slot" style={iconBtn}>
+        <IconTrash size={16} />
+      </button>
+    </div>
+  );
+}
+
+const iconBtn = {
+  width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
+  display: 'flex', alignItems: 'center', justifyContent: 'center',
+  color: 'var(--text-2)', border: '1px solid var(--hairline)',
+};
+
+function Vault({ rituals, rawAudio, onRename, onDeleteRitual, onTogglePin, onDeleteFile, onLaunchRitual, onEditFile, onGoMixer, onImportFile, onUpgrade }) {
+  const [tab, setTab] = useStateV('rituals');
+  const fileInputRef = React.useRef(null);
+  const SLOTS = 5;
+  const used = rawAudio.length;
+
+  const handleImportClick = () => { if (used < SLOTS) fileInputRef.current?.click(); };
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    const name = file.name.replace(/\.[^.]+$/, '');
+    onImportFile({ id: 'imp-' + Date.now(), name, meta: file.type.includes('wav') ? 'WAV · Imported' : 'MP3 · Imported', color: 'blu', icon: 'music', pinned: false, audioSrc: url });
+    e.target.value = '';
+  };
+
+  return (
+    <div style={{ padding: '24px 20px 200px', animation: 'almaFade 400ms var(--ease)' }}>
+      <div style={{ textAlign: 'center', marginBottom: 18 }}>
+        <div className="eyebrow">File Manager</div>
+        <h1 style={{ margin: '6px 0 0', fontSize: 28, fontWeight: 600, letterSpacing: -0.4 }}>Vault</h1>
+      </div>
+
+      {/* hidden file input */}
+      <input ref={fileInputRef} type="file" accept="audio/*" style={{ display: 'none' }} onChange={handleFileChange} />
+
+      {/* Pro banner */}
+      <button className="press" onClick={onUpgrade} style={{
+        width: '100%', borderRadius: 22, marginBottom: 18, overflow: 'hidden',
+        position: 'relative', height: 110, display: 'block',
+        background: `url('alma/img/gradient4.webp') center / cover no-repeat`,
+        border: 'none', cursor: 'pointer',
+      }}>
+        {/* scrim */}
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(100deg, rgba(0,0,0,0.62) 40%, rgba(0,0,0,0.18) 100%)' }} />
+        {/* mandala right side */}
+        <div style={{ position: 'absolute', right: -24, top: '50%', transform: 'translateY(-50%)', opacity: 0.45, pointerEvents: 'none' }}>
+          <PlayerMandala />
+        </div>
+        {/* text left side */}
+        <div style={{ position: 'absolute', left: 20, top: '50%', transform: 'translateY(-50%)', textAlign: 'left' }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2.5, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', marginBottom: 4 }}>ALMA Pro</div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: '#fff', letterSpacing: -0.3, lineHeight: 1.2, marginBottom: 8 }}>Unlock everything</div>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 13px', borderRadius: 20, background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(6px)', border: '1px solid rgba(255,255,255,0.22)' }}>
+            <span style={{ fontSize: 12.5, fontWeight: 600, color: '#fff', whiteSpace: 'nowrap' }}>Start free trial →</span>
+          </div>
+        </div>
+        {/* storage pill — bottom right */}
+        <div style={{ position: 'absolute', bottom: 10, right: 14, fontSize: 11.5, fontWeight: 600, color: 'rgba(255,255,255,0.55)', whiteSpace: 'nowrap' }}>
+          {used}/{SLOTS} slots used
+        </div>
+      </button>
+
+      <SegTabs tabs={[{ id: 'rituals', label: 'Saved Rituals' }, { id: 'raw', label: 'Raw Audio' }]} active={tab} onChange={setTab} />
+
+      <div style={{ marginTop: 16 }}>
+        {tab === 'rituals' ? (
+          <>
+          <div style={{ background: 'var(--surface)', borderRadius: 20, border: '1px solid var(--hairline)', padding: 4 }}>
+            {rituals.length === 0 && <Empty text="No saved rituals yet" />}
+            {rituals.map((r, i) => (
+              <React.Fragment key={r.id}>
+                <RitualVaultRow ritual={r} onRename={onRename} onLaunch={onLaunchRitual} onDelete={onDeleteRitual} />
+                {i < rituals.length - 1 && <div style={{ height: 1, background: 'var(--hairline)', margin: '0 12px' }} />}
+              </React.Fragment>
+            ))}
+          </div>
+          <button className="press" onClick={onGoMixer} style={{
+            display: 'flex', alignItems: 'center', gap: 12, padding: 14, borderRadius: 16, marginTop: 10,
+            border: '1.5px dashed var(--hairline-strong)', color: 'var(--text-3)',
+            background: 'transparent', width: '100%',
+          }}>
+            <span style={{ width: 36, height: 36, borderRadius: 11, border: '1.5px dashed var(--hairline-strong)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <IconPlus size={18} />
+            </span>
+            <span style={{ fontSize: 14.5, fontWeight: 500, whiteSpace: 'nowrap' }}>Add Ritual — open the Mixer</span>
+          </button>
+          </>
+        ) : (
+          <>
+            <div style={{ background: 'var(--surface)', borderRadius: 20, border: '1px solid var(--hairline)', padding: 4 }}>
+              {rawAudio.map((f, i) => (
+                <React.Fragment key={f.id}>
+                  <RawRow file={f} onTogglePin={onTogglePin} onDelete={onDeleteFile} onEdit={onEditFile} />
+                  {i < rawAudio.length - 1 && <div style={{ height: 1, background: 'var(--hairline)', margin: '0 12px' }} />}
+                </React.Fragment>
+              ))}
+            </div>
+            {/* empty upload slots */}
+            {used < SLOTS && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 9, marginTop: 12 }}>
+                {Array.from({ length: SLOTS - used }).map((_, i) => (
+                  <button key={i} className="press" onClick={handleImportClick} style={{
+                    display: 'flex', alignItems: 'center', gap: 12, padding: 14, borderRadius: 16,
+                    border: '1.5px dashed var(--hairline-strong)', color: 'var(--text-3)',
+                    background: 'transparent', width: '100%',
+                  }}>
+                    <span style={{ width: 36, height: 36, borderRadius: 11, border: '1.5px dashed var(--hairline-strong)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <IconPlus size={18} />
+                    </span>
+                    <span style={{ fontSize: 14.5, fontWeight: 500, whiteSpace: 'nowrap' }}>Import audio — slot {used + i + 1}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Empty({ text }) {
+  return <div style={{ padding: '34px 0', textAlign: 'center', color: 'var(--text-3)', fontSize: 14 }}>{text}</div>;
+}
+
+window.Vault = Vault;
+
+// ── Paywall — full-screen overlay ──
+function PaywallSheet({ open, onClose }) {
+  const { useState: useStateW } = React;
+  const [plan, setPlan] = useStateW('yearly');
+
+  const FEATURES = [
+    { icon: IconLayers,    title: 'Unlimited Vault',     desc: 'Store as many audio files as you need' },
+    { icon: IconMixer,     title: 'Full Mixer Access',   desc: 'All layers, bells, and custom durations' },
+    { icon: IconStar,      title: 'Unlimited Rituals',   desc: 'Save and organise as many rituals as you like' },
+    { icon: IconSparkles,  title: 'New tracks monthly',  desc: 'Exclusive master tracks added every month' },
+  ];
+
+  return (
+    <>
+      {/* backdrop */}
+      <div style={{
+        position: 'absolute', inset: 0, zIndex: 70,
+        background: 'rgba(6,4,3,0.6)', backdropFilter: open ? 'blur(4px)' : 'none',
+        opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none',
+        transition: 'opacity 300ms var(--ease)', borderRadius: 48,
+      }} />
+
+      {/* sheet — slides up full screen */}
+      <div style={{
+        position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 71,
+        height: '96%', borderRadius: '28px 28px 48px 48px',
+        transform: open ? 'translateY(0)' : 'translateY(104%)',
+        transition: 'transform 500ms var(--ease-spring)',
+        background: 'var(--bg-grad)', overflow: 'hidden',
+        display: 'flex', flexDirection: 'column',
+        border: '1px solid var(--hairline-strong)', borderBottom: 'none',
+        boxShadow: 'var(--shadow)',
+      }}>
+
+        {/* hero */}
+        <div style={{
+          flexShrink: 0, height: 200, position: 'relative', overflow: 'hidden',
+          background: `url('alma/img/gradient4.webp') center / cover no-repeat`,
+        }}>
+          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.25)' }} />
+          {/* mandala — fully visible, centered */}
+          <div style={{
+            position: 'absolute', left: '50%', top: '50%',
+            transform: 'translate(-50%, calc(-50% + 40px))', opacity: 0.38,
+          }}>
+            <PlayerMandala size={220} />
+          </div>
+          {/* wordmark */}
+          <div style={{ position: 'absolute', bottom: 22, left: 0, right: 0, textAlign: 'center' }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 4, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', marginBottom: 3 }}>ALMA</div>
+            <div style={{ fontSize: 22, fontWeight: 700, color: '#fff', letterSpacing: -0.4 }}>Go Pro</div>
+          </div>
+          {/* close — 40px, frosted white */}
+          <button className="press" onClick={onClose} aria-label="Close" style={{
+            position: 'absolute', top: 12, right: 12, width: 40, height: 40, borderRadius: '50%',
+            background: 'rgba(255,255,255,0.22)', backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255,255,255,0.3)', color: '#fff',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}>
+            <IconClose size={16} />
+          </button>
+        </div>
+
+        {/* body */}
+        <div style={{ flex: 1, padding: '22px 22px 0', display: 'flex', flexDirection: 'column' }}>
+
+          {/* headline */}
+          <div style={{ textAlign: 'center', marginBottom: 20 }}>
+            <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text)', letterSpacing: -0.4, lineHeight: 1.2 }}>
+              Your complete sound sanctuary
+            </div>
+            <div style={{ fontSize: 14.5, color: 'var(--text-2)', marginTop: 7 }}>
+              Unlock everything and deepen your practice
+            </div>
+          </div>
+
+          {/* feature list */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 13, marginBottom: 20 }}>
+            {FEATURES.map(({ icon: Icon, title, desc }) => (
+              <div key={title} style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+                <div style={{
+                  width: 38, height: 38, borderRadius: 11, flexShrink: 0,
+                  background: 'var(--surface-2)', border: '1px solid var(--hairline)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text)',
+                }}>
+                  <Icon size={18} />
+                </div>
+                <div style={{ paddingTop: 2 }}>
+                  <span style={{ fontSize: 14.5, fontWeight: 600, color: 'var(--text)' }}>{title} </span>
+                  <span style={{ fontSize: 14, color: 'var(--text-2)' }}>{desc}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* plan selector */}
+          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-2)', textAlign: 'center', marginBottom: 12 }}>Select a plan</div>
+          <div style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
+            {/* Yearly */}
+            <button className="press" onClick={() => setPlan('yearly')} style={{
+              flex: 1, padding: '14px 12px', borderRadius: 18, position: 'relative', textAlign: 'left',
+              background: plan === 'yearly' ? 'var(--surface-2)' : 'var(--surface)',
+              border: `1.5px solid ${plan === 'yearly' ? 'var(--text)' : 'var(--hairline)'}`,
+              transition: 'border-color 200ms var(--ease), background 200ms var(--ease)',
+            }}>
+              <div style={{
+                position: 'absolute', top: -11, left: 12,
+                padding: '3px 10px', borderRadius: 20,
+                background: 'var(--accent)', color: 'var(--on-accent)',
+                fontSize: 11, fontWeight: 700, letterSpacing: 0.4,
+              }}>SAVE 48%</div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', letterSpacing: 0.5, textTransform: 'uppercase' }}>Yearly</div>
+                <div style={{
+                  width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
+                  background: plan === 'yearly' ? 'var(--accent)' : 'transparent',
+                  border: `1.5px solid ${plan === 'yearly' ? 'var(--accent)' : 'var(--hairline-strong)'}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  {plan === 'yearly' && <IconCheck size={11} style={{ color: 'var(--on-accent)' }} />}
+                </div>
+              </div>
+              <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text)' }}>$49.99 <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-2)' }}>/yr</span></div>
+              <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 3 }}>$4.17/mo · billed annually</div>
+            </button>
+            {/* Monthly */}
+            <button className="press" onClick={() => setPlan('monthly')} style={{
+              flex: 1, padding: '14px 12px', borderRadius: 18, textAlign: 'left',
+              background: plan === 'monthly' ? 'var(--surface-2)' : 'var(--surface)',
+              border: `1.5px solid ${plan === 'monthly' ? 'var(--text)' : 'var(--hairline)'}`,
+              transition: 'border-color 200ms var(--ease), background 200ms var(--ease)',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', letterSpacing: 0.5, textTransform: 'uppercase' }}>Monthly</div>
+                <div style={{
+                  width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
+                  background: plan === 'monthly' ? 'var(--accent)' : 'transparent',
+                  border: `1.5px solid ${plan === 'monthly' ? 'var(--accent)' : 'var(--hairline-strong)'}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  {plan === 'monthly' && <IconCheck size={11} style={{ color: 'var(--on-accent)' }} />}
+                </div>
+              </div>
+              <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text)' }}>$7.99 <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-2)' }}>/mo</span></div>
+              <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 3 }}>billed monthly</div>
+            </button>
+          </div>
+
+          <div style={{ fontSize: 12.5, color: 'var(--text-3)', textAlign: 'center' }}>Change or cancel anytime</div>
+        </div>
+
+        {/* CTA */}
+        <div style={{ flexShrink: 0, padding: '14px 22px 28px' }}>
+          <button className="press" onClick={onClose} style={{
+            width: '100%', padding: '17px', borderRadius: 18,
+            background: 'var(--accent)', color: 'var(--on-accent)',
+            fontSize: 17, fontWeight: 700, letterSpacing: -0.2,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            boxShadow: '0 10px 30px -8px var(--accent-glow)',
+          }}>
+            Start 7-Day Free Trial
+          </button>
+          <div style={{ textAlign: 'center', fontSize: 12, color: 'var(--text-3)', marginTop: 10 }}>
+            {plan === 'yearly' ? '7 days free, then $49.99/yr' : '7 days free, then $7.99/mo'} · cancel anytime
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+window.PaywallSheet = PaywallSheet;
+
+
+// ALMA — Pin file customizer: bottom sheet for choosing icon + color
+// for a saved file. Renders at device level; controlled by App.
+
+function PinCustomizerSheet({ file, onClose, onSave }) {
+  const open = !!file;
+  const [color, setColor] = React.useState(file?.color || 'blu');
+  const [icon, setIcon] = React.useState(file?.icon || 'wave');
+  const [name, setName] = React.useState(file?.name || '');
+
+  // re-sync when a different file is opened
+  React.useEffect(() => {
+    if (file) {
+      setColor(file.color || 'blu');
+      setIcon(file.icon || 'wave');
+      setName(file.name || '');
+    }
+  }, [file?.id]);
+
+  const commit = () => {
+    if (!file) return;
+    onSave(file.id, { color, icon, name: name.trim() || file.name });
+    onClose();
+  };
+
+  return (
+    <>
+      <div onClick={onClose} style={{
+        position: 'absolute', inset: 0, zIndex: 58,
+        background: 'rgba(6,4,3,0.55)',
+        backdropFilter: open ? 'blur(3px)' : 'none',
+        opacity: open ? 1 : 0, pointerEvents: open ? 'auto' : 'none',
+        transition: 'opacity 280ms var(--ease)', borderRadius: 48,
+      }} />
+      <div style={{
+        position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 59,
+        transform: open ? 'translateY(0)' : 'translateY(102%)',
+        transition: 'transform 460ms var(--ease-spring)',
+        background: 'var(--surface-solid)', borderRadius: '30px 30px 48px 48px',
+        padding: '14px 24px 38px', boxShadow: 'var(--shadow)',
+        border: '1px solid var(--hairline)', borderBottom: 'none',
+      }}>
+        <div style={{ width: 40, height: 5, borderRadius: 3, background: 'var(--hairline-strong)', margin: '0 auto 20px' }} />
+
+        {file && (
+          <>
+            {/* Header preview */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
+              <PinOrb color={color} icon={icon} size={56} radius={15} glow />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div className="eyebrow" style={{ marginBottom: 6 }}>Customize</div>
+                <input
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  placeholder={file.name}
+                  style={{
+                    width: '100%', background: 'var(--surface-2)', border: '1px solid var(--hairline-strong)',
+                    borderRadius: 10, padding: '7px 11px', color: 'var(--text)', fontSize: 15, fontWeight: 600,
+                    fontFamily: 'var(--font)', outline: 'none',
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Color row */}
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-2)', marginBottom: 12 }}>Color</div>
+            <div style={{ display: 'flex', gap: 14, marginBottom: 24 }}>
+              {PIN_COLORS.map(c => {
+                const on = color === c.id;
+                return (
+                  <button key={c.id} className="press" onClick={() => setColor(c.id)} aria-label={c.name} style={{
+                    width: 48, height: 48, borderRadius: '50%', padding: 0,
+                    border: on ? '2px solid var(--text)' : '2px solid transparent',
+                    boxShadow: on ? '0 0 0 2px var(--surface-solid) inset' : 'none',
+                  }}>
+                    <span style={{
+                      display: 'block', width: '100%', height: '100%', borderRadius: '50%',
+                      background: ALMA_GRADIENTS[c.id],
+                    }} />
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Icon grid */}
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-2)', marginBottom: 12 }}>Icon</div>
+            <div style={{
+              display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 26,
+            }}>
+              {PIN_ICONS.map(i => {
+                const on = icon === i.id;
+                const Comp = PIN_ICON_MAP[i.id];
+                return (
+                  <button key={i.id} className="press" onClick={() => setIcon(i.id)} aria-label={i.label} style={{
+                    aspectRatio: '1 / 1', borderRadius: 14,
+                    background: on ? 'var(--surface-2)' : 'transparent',
+                    border: `1px solid ${on ? 'var(--text)' : 'var(--hairline)'}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    color: on ? 'var(--text)' : 'var(--text-2)',
+                    transition: 'background 180ms var(--ease), border-color 180ms var(--ease), color 180ms var(--ease)',
+                  }}>
+                    <Comp size={20} />
+                  </button>
+                );
+              })}
+            </div>
+
+            <button className="press" onClick={commit} style={{
+              width: '100%', padding: '16px', borderRadius: 18,
+              background: 'var(--accent)', color: 'var(--on-accent)',
+              fontSize: 16, fontWeight: 600, boxShadow: '0 10px 26px -8px var(--accent-glow)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, whiteSpace: 'nowrap',
+            }}>
+              <IconCheck size={18} /> {file._isNew ? 'Add to Vault' : 'Save'}
+            </button>
+          </>
+        )}
+      </div>
+    </>
+  );
+}
+
+window.PinCustomizerSheet = PinCustomizerSheet;
+
+
+// @ds-adherence-ignore -- omelette starter scaffold (raw elements/hex/px by design)
+
+/* BEGIN USAGE */
+// tweaks-panel.jsx
+// Reusable Tweaks shell + form-control helpers.
+// Exports (to window): useTweaks, TweaksPanel, TweakSection, TweakRow, TweakSlider,
+//   TweakToggle, TweakRadio, TweakSelect, TweakText, TweakNumber, TweakColor, TweakButton.
+//
+// Owns the host protocol (listens for __activate_edit_mode / __deactivate_edit_mode,
+// posts __edit_mode_available / __edit_mode_set_keys / __edit_mode_dismissed) so
+// individual prototypes don't re-roll it. Ships a consistent set of controls so you
+// don't hand-draw <input type="range">, segmented radios, steppers, etc.
+//
+// Usage (in an HTML file that loads React + Babel):
+//
+//   const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+//     "primaryColor": "#D97757",
+//     "palette": ["#D97757", "#29261b", "#f6f4ef"],
+//     "fontSize": 16,
+//     "density": "regular",
+//     "dark": false
+//   }/*EDITMODE-END*/;
+//
+//   function App() {
+//     const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+//     return (
+//       <div style={{ fontSize: t.fontSize, color: t.primaryColor }}>
+//         Hello
+//         <TweaksPanel>
+//           <TweakSection label="Typography" />
+//           <TweakSlider label="Font size" value={t.fontSize} min={10} max={32} unit="px"
+//                        onChange={(v) => setTweak('fontSize', v)} />
+//           <TweakRadio  label="Density" value={t.density}
+//                        options={['compact', 'regular', 'comfy']}
+//                        onChange={(v) => setTweak('density', v)} />
+//           <TweakSection label="Theme" />
+//           <TweakColor  label="Primary" value={t.primaryColor}
+//                        options={['#D97757', '#2A6FDB', '#1F8A5B', '#7A5AE0']}
+//                        onChange={(v) => setTweak('primaryColor', v)} />
+//           <TweakColor  label="Palette" value={t.palette}
+//                        options={[['#D97757', '#29261b', '#f6f4ef'],
+//                                  ['#475569', '#0f172a', '#f1f5f9']]}
+//                        onChange={(v) => setTweak('palette', v)} />
+//           <TweakToggle label="Dark mode" value={t.dark}
+//                        onChange={(v) => setTweak('dark', v)} />
+//         </TweaksPanel>
+//       </div>
+//     );
+//   }
+//
+// TweakRadio is the segmented control for 2–3 short options (auto-falls-back to
+// TweakSelect past ~16/~10 chars per label); reach for TweakSelect directly when
+// options are many or long. For color tweaks always curate 3-4 options rather than
+// a free picker; an option can also be a whole 2–5 color palette (the stored value
+// is the array). The Tweak* controls are a floor, not a ceiling — build custom
+// controls inside the panel if a tweak calls for UI they don't cover.
+/* END USAGE */
+// ─────────────────────────────────────────────────────────────────────────────
+
+const __TWEAKS_STYLE = `
+  .twk-panel{position:fixed;right:16px;bottom:16px;z-index:2147483646;width:280px;
+    max-height:calc(100vh - 32px);display:flex;flex-direction:column;
+    transform:scale(var(--dc-inv-zoom,1));transform-origin:bottom right;
+    background:rgba(250,249,247,.78);color:#29261b;
+    -webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);
+    border:.5px solid rgba(255,255,255,.6);border-radius:14px;
+    box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 12px 40px rgba(0,0,0,.18);
+    font:11.5px/1.4 ui-sans-serif,system-ui,-apple-system,sans-serif;overflow:hidden}
+  .twk-hd{display:flex;align-items:center;justify-content:space-between;
+    padding:10px 8px 10px 14px;cursor:move;user-select:none}
+  .twk-hd b{font-size:12px;font-weight:600;letter-spacing:.01em}
+  .twk-x{appearance:none;border:0;background:transparent;color:rgba(41,38,27,.55);
+    width:22px;height:22px;border-radius:6px;cursor:default;font-size:13px;line-height:1}
+  .twk-x:hover{background:rgba(0,0,0,.06);color:#29261b}
+  .twk-body{padding:2px 14px 14px;display:flex;flex-direction:column;gap:10px;
+    overflow-y:auto;overflow-x:hidden;min-height:0;
+    scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.15) transparent}
+  .twk-body::-webkit-scrollbar{width:8px}
+  .twk-body::-webkit-scrollbar-track{background:transparent;margin:2px}
+  .twk-body::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:4px;
+    border:2px solid transparent;background-clip:content-box}
+  .twk-body::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,.25);
+    border:2px solid transparent;background-clip:content-box}
+  .twk-row{display:flex;flex-direction:column;gap:5px}
+  .twk-row-h{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
+  .twk-lbl{display:flex;justify-content:space-between;align-items:baseline;
+    color:rgba(41,38,27,.72)}
+  .twk-lbl>span:first-child{font-weight:500}
+  .twk-val{color:rgba(41,38,27,.5);font-variant-numeric:tabular-nums}
+
+  .twk-sect{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+    color:rgba(41,38,27,.45);padding:10px 0 0}
+  .twk-sect:first-child{padding-top:0}
+
+  .twk-field{appearance:none;box-sizing:border-box;width:100%;min-width:0;height:26px;padding:0 8px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:7px;
+    background:rgba(255,255,255,.6);color:inherit;font:inherit;outline:none}
+  .twk-field:focus{border-color:rgba(0,0,0,.25);background:rgba(255,255,255,.85)}
+  select.twk-field{padding-right:22px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='rgba(0,0,0,.5)' d='M0 0h10L5 6z'/></svg>");
+    background-repeat:no-repeat;background-position:right 8px center}
+
+  .twk-slider{appearance:none;-webkit-appearance:none;width:100%;height:4px;margin:6px 0;
+    border-radius:999px;background:rgba(0,0,0,.12);outline:none}
+  .twk-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+    width:14px;height:14px;border-radius:50%;background:#fff;
+    border:.5px solid rgba(0,0,0,.12);box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:default}
+  .twk-slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;
+    background:#fff;border:.5px solid rgba(0,0,0,.12);box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:default}
+
+  .twk-seg{position:relative;display:flex;padding:2px;border-radius:8px;
+    background:rgba(0,0,0,.06);user-select:none}
+  .twk-seg-thumb{position:absolute;top:2px;bottom:2px;border-radius:6px;
+    background:rgba(255,255,255,.9);box-shadow:0 1px 2px rgba(0,0,0,.12);
+    transition:left .15s cubic-bezier(.3,.7,.4,1),width .15s}
+  .twk-seg.dragging .twk-seg-thumb{transition:none}
+  .twk-seg button{appearance:none;position:relative;z-index:1;flex:1;border:0;
+    background:transparent;color:inherit;font:inherit;font-weight:500;min-height:22px;
+    border-radius:6px;cursor:default;padding:4px 6px;line-height:1.2;
+    overflow-wrap:anywhere}
+
+  .twk-toggle{position:relative;width:32px;height:18px;border:0;border-radius:999px;
+    background:rgba(0,0,0,.15);transition:background .15s;cursor:default;padding:0}
+  .twk-toggle[data-on="1"]{background:#34c759}
+  .twk-toggle i{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+  .twk-toggle[data-on="1"] i{transform:translateX(14px)}
+
+  .twk-num{display:flex;align-items:center;box-sizing:border-box;min-width:0;height:26px;padding:0 0 0 8px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:7px;background:rgba(255,255,255,.6)}
+  .twk-num-lbl{font-weight:500;color:rgba(41,38,27,.6);cursor:ew-resize;
+    user-select:none;padding-right:8px}
+  .twk-num input{flex:1;min-width:0;height:100%;border:0;background:transparent;
+    font:inherit;font-variant-numeric:tabular-nums;text-align:right;padding:0 8px 0 0;
+    outline:none;color:inherit;-moz-appearance:textfield}
+  .twk-num input::-webkit-inner-spin-button,.twk-num input::-webkit-outer-spin-button{
+    -webkit-appearance:none;margin:0}
+  .twk-num-unit{padding-right:8px;color:rgba(41,38,27,.45)}
+
+  .twk-btn{appearance:none;height:26px;padding:0 12px;border:0;border-radius:7px;
+    background:rgba(0,0,0,.78);color:#fff;font:inherit;font-weight:500;cursor:default}
+  .twk-btn:hover{background:rgba(0,0,0,.88)}
+  .twk-btn.secondary{background:rgba(0,0,0,.06);color:inherit}
+  .twk-btn.secondary:hover{background:rgba(0,0,0,.1)}
+
+  .twk-swatch{appearance:none;-webkit-appearance:none;width:56px;height:22px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:6px;padding:0;cursor:default;
+    background:transparent;flex-shrink:0}
+  .twk-swatch::-webkit-color-swatch-wrapper{padding:0}
+  .twk-swatch::-webkit-color-swatch{border:0;border-radius:5.5px}
+  .twk-swatch::-moz-color-swatch{border:0;border-radius:5.5px}
+
+  .twk-chips{display:flex;gap:6px}
+  .twk-chip{position:relative;appearance:none;flex:1;min-width:0;height:46px;
+    padding:0;border:0;border-radius:6px;overflow:hidden;cursor:default;
+    box-shadow:0 0 0 .5px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.06);
+    transition:transform .12s cubic-bezier(.3,.7,.4,1),box-shadow .12s}
+  .twk-chip:hover{transform:translateY(-1px);
+    box-shadow:0 0 0 .5px rgba(0,0,0,.18),0 4px 10px rgba(0,0,0,.12)}
+  .twk-chip[data-on="1"]{box-shadow:0 0 0 1.5px rgba(0,0,0,.85),
+    0 2px 6px rgba(0,0,0,.15)}
+  .twk-chip>span{position:absolute;top:0;bottom:0;right:0;width:34%;
+    display:flex;flex-direction:column;box-shadow:-1px 0 0 rgba(0,0,0,.1)}
+  .twk-chip>span>i{flex:1;box-shadow:0 -1px 0 rgba(0,0,0,.1)}
+  .twk-chip>span>i:first-child{box-shadow:none}
+  .twk-chip svg{position:absolute;top:6px;left:6px;width:13px;height:13px;
+    filter:drop-shadow(0 1px 1px rgba(0,0,0,.3))}
+`;
+
+// ── useTweaks ───────────────────────────────────────────────────────────────
+// Single source of truth for tweak values. setTweak persists via the host
+// (__edit_mode_set_keys → host rewrites the EDITMODE block on disk).
+function useTweaks(defaults) {
+  const [values, setValues] = React.useState(defaults);
+  // Accepts either setTweak('key', value) or setTweak({ key: value, ... }) so a
+  // useState-style call doesn't write a "[object Object]" key into the persisted
+  // JSON block.
+  const setTweak = React.useCallback((keyOrEdits, val) => {
+    const edits = typeof keyOrEdits === 'object' && keyOrEdits !== null
+      ? keyOrEdits : { [keyOrEdits]: val };
+    setValues((prev) => ({ ...prev, ...edits }));
+    window.parent.postMessage({ type: '__edit_mode_set_keys', edits }, '*');
+    // Same-window signal so in-page listeners (deck-stage rail thumbnails)
+    // can react — the parent message only reaches the host, not peers.
+    window.dispatchEvent(new CustomEvent('tweakchange', { detail: edits }));
+  }, []);
+  return [values, setTweak];
+}
+
+// ── TweaksPanel ─────────────────────────────────────────────────────────────
+// Floating shell. Registers the protocol listener BEFORE announcing
+// availability — if the announce ran first, the host's activate could land
+// before our handler exists and the toolbar toggle would silently no-op.
+// The close button posts __edit_mode_dismissed so the host's toolbar toggle
+// flips off in lockstep; the host echoes __deactivate_edit_mode back which
+// is what actually hides the panel.
+function TweaksPanel({ title = 'Tweaks', children }) {
+  const [open, setOpen] = React.useState(false);
+  const dragRef = React.useRef(null);
+  const offsetRef = React.useRef({ x: 16, y: 16 });
+  const PAD = 16;
+
+  const clampToViewport = React.useCallback(() => {
+    const panel = dragRef.current;
+    if (!panel) return;
+    const w = panel.offsetWidth, h = panel.offsetHeight;
+    const maxRight = Math.max(PAD, window.innerWidth - w - PAD);
+    const maxBottom = Math.max(PAD, window.innerHeight - h - PAD);
+    offsetRef.current = {
+      x: Math.min(maxRight, Math.max(PAD, offsetRef.current.x)),
+      y: Math.min(maxBottom, Math.max(PAD, offsetRef.current.y)),
+    };
+    panel.style.right = offsetRef.current.x + 'px';
+    panel.style.bottom = offsetRef.current.y + 'px';
+  }, []);
+
+  React.useEffect(() => {
+    if (!open) return;
+    clampToViewport();
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', clampToViewport);
+      return () => window.removeEventListener('resize', clampToViewport);
+    }
+    const ro = new ResizeObserver(clampToViewport);
+    ro.observe(document.documentElement);
+    return () => ro.disconnect();
+  }, [open, clampToViewport]);
+
+  React.useEffect(() => {
+    const onMsg = (e) => {
+      const t = e?.data?.type;
+      if (t === '__activate_edit_mode') setOpen(true);
+      else if (t === '__deactivate_edit_mode') setOpen(false);
+    };
+    window.addEventListener('message', onMsg);
+    window.parent.postMessage({ type: '__edit_mode_available' }, '*');
+    return () => window.removeEventListener('message', onMsg);
+  }, []);
+
+  const dismiss = () => {
+    setOpen(false);
+    window.parent.postMessage({ type: '__edit_mode_dismissed' }, '*');
+  };
+
+  const onDragStart = (e) => {
+    const panel = dragRef.current;
+    if (!panel) return;
+    const r = panel.getBoundingClientRect();
+    const sx = e.clientX, sy = e.clientY;
+    const startRight = window.innerWidth - r.right;
+    const startBottom = window.innerHeight - r.bottom;
+    const move = (ev) => {
+      offsetRef.current = {
+        x: startRight - (ev.clientX - sx),
+        y: startBottom - (ev.clientY - sy),
+      };
+      clampToViewport();
+    };
+    const up = () => {
+      window.removeEventListener('mousemove', move);
+      window.removeEventListener('mouseup', up);
+    };
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', up);
+  };
+
+  if (!open) return null;
+  return (
+    <>
+      <style>{__TWEAKS_STYLE}</style>
+      <div ref={dragRef} className="twk-panel" data-omelette-chrome=""
+           style={{ right: offsetRef.current.x, bottom: offsetRef.current.y }}>
+        <div className="twk-hd" onMouseDown={onDragStart}>
+          <b>{title}</b>
+          <button className="twk-x" aria-label="Close tweaks"
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onClick={dismiss}>✕</button>
+        </div>
+        <div className="twk-body">
+          {children}
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ── Layout helpers ──────────────────────────────────────────────────────────
+
+function TweakSection({ label, children }) {
+  return (
+    <>
+      <div className="twk-sect">{label}</div>
+      {children}
+    </>
+  );
+}
+
+function TweakRow({ label, value, children, inline = false }) {
+  return (
+    <div className={inline ? 'twk-row twk-row-h' : 'twk-row'}>
+      <div className="twk-lbl">
+        <span>{label}</span>
+        {value != null && <span className="twk-val">{value}</span>}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+// ── Controls ────────────────────────────────────────────────────────────────
+
+function TweakSlider({ label, value, min = 0, max = 100, step = 1, unit = '', onChange }) {
+  return (
+    <TweakRow label={label} value={`${value}${unit}`}>
+      <input type="range" className="twk-slider" min={min} max={max} step={step}
+             value={value} onChange={(e) => onChange(Number(e.target.value))} />
+    </TweakRow>
+  );
+}
+
+function TweakToggle({ label, value, onChange }) {
+  return (
+    <div className="twk-row twk-row-h">
+      <div className="twk-lbl"><span>{label}</span></div>
+      <button type="button" className="twk-toggle" data-on={value ? '1' : '0'}
+              role="switch" aria-checked={!!value}
+              onClick={() => onChange(!value)}><i /></button>
+    </div>
+  );
+}
+
+function TweakRadio({ label, value, options, onChange }) {
+  const trackRef = React.useRef(null);
+  const [dragging, setDragging] = React.useState(false);
+  // The active value is read by pointer-move handlers attached for the lifetime
+  // of a drag — ref it so a stale closure doesn't fire onChange for every move.
+  const valueRef = React.useRef(value);
+  valueRef.current = value;
+
+  // Segments wrap mid-word once per-segment width runs out. The track is
+  // ~248px (280 panel − 28 body pad − 4 seg pad), each button loses 12px
+  // to its own padding, and 11.5px system-ui averages ~6.3px/char — so 2
+  // options fit ~16 chars each, 3 fit ~10. Past that (or >3 options), fall
+  // back to a dropdown rather than wrap.
+  const labelLen = (o) => String(typeof o === 'object' ? o.label : o).length;
+  const maxLen = options.reduce((m, o) => Math.max(m, labelLen(o)), 0);
+  const fitsAsSegments = maxLen <= ({ 2: 16, 3: 10 }[options.length] ?? 0);
+  if (!fitsAsSegments) {
+    // <select> emits strings — map back to the original option value so the
+    // fallback stays type-preserving (numbers, booleans) like the segment path.
+    const resolve = (s) => {
+      const m = options.find((o) => String(typeof o === 'object' ? o.value : o) === s);
+      return m === undefined ? s : typeof m === 'object' ? m.value : m;
+    };
+    return <TweakSelect label={label} value={value} options={options}
+                        onChange={(s) => onChange(resolve(s))} />;
+  }
+  const opts = options.map((o) => (typeof o === 'object' ? o : { value: o, label: o }));
+  const idx = Math.max(0, opts.findIndex((o) => o.value === value));
+  const n = opts.length;
+
+  const segAt = (clientX) => {
+    const r = trackRef.current.getBoundingClientRect();
+    const inner = r.width - 4;
+    const i = Math.floor(((clientX - r.left - 2) / inner) * n);
+    return opts[Math.max(0, Math.min(n - 1, i))].value;
+  };
+
+  const onPointerDown = (e) => {
+    setDragging(true);
+    const v0 = segAt(e.clientX);
+    if (v0 !== valueRef.current) onChange(v0);
+    const move = (ev) => {
+      if (!trackRef.current) return;
+      const v = segAt(ev.clientX);
+      if (v !== valueRef.current) onChange(v);
+    };
+    const up = () => {
+      setDragging(false);
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  };
+
+  return (
+    <TweakRow label={label}>
+      <div ref={trackRef} role="radiogroup" onPointerDown={onPointerDown}
+           className={dragging ? 'twk-seg dragging' : 'twk-seg'}>
+        <div className="twk-seg-thumb"
+             style={{ left: `calc(2px + ${idx} * (100% - 4px) / ${n})`,
+                      width: `calc((100% - 4px) / ${n})` }} />
+        {opts.map((o) => (
+          <button key={o.value} type="button" role="radio" aria-checked={o.value === value}>
+            {o.label}
+          </button>
+        ))}
+      </div>
+    </TweakRow>
+  );
+}
+
+function TweakSelect({ label, value, options, onChange }) {
+  return (
+    <TweakRow label={label}>
+      <select className="twk-field" value={value} onChange={(e) => onChange(e.target.value)}>
+        {options.map((o) => {
+          const v = typeof o === 'object' ? o.value : o;
+          const l = typeof o === 'object' ? o.label : o;
+          return <option key={v} value={v}>{l}</option>;
+        })}
+      </select>
+    </TweakRow>
+  );
+}
+
+function TweakText({ label, value, placeholder, onChange }) {
+  return (
+    <TweakRow label={label}>
+      <input className="twk-field" type="text" value={value} placeholder={placeholder}
+             onChange={(e) => onChange(e.target.value)} />
+    </TweakRow>
+  );
+}
+
+function TweakNumber({ label, value, min, max, step = 1, unit = '', onChange }) {
+  const clamp = (n) => {
+    if (min != null && n < min) return min;
+    if (max != null && n > max) return max;
+    return n;
+  };
+  const startRef = React.useRef({ x: 0, val: 0 });
+  const onScrubStart = (e) => {
+    e.preventDefault();
+    startRef.current = { x: e.clientX, val: value };
+    const decimals = (String(step).split('.')[1] || '').length;
+    const move = (ev) => {
+      const dx = ev.clientX - startRef.current.x;
+      const raw = startRef.current.val + dx * step;
+      const snapped = Math.round(raw / step) * step;
+      onChange(clamp(Number(snapped.toFixed(decimals))));
+    };
+    const up = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  };
+  return (
+    <div className="twk-num">
+      <span className="twk-num-lbl" onPointerDown={onScrubStart}>{label}</span>
+      <input type="number" value={value} min={min} max={max} step={step}
+             onChange={(e) => onChange(clamp(Number(e.target.value)))} />
+      {unit && <span className="twk-num-unit">{unit}</span>}
+    </div>
+  );
+}
+
+// Relative-luminance contrast pick — checkmarks drawn over a swatch need to
+// read on both #111 and #fafafa without per-option configuration. Hex input
+// only (#rgb / #rrggbb); named or rgb()/hsl() colors fall through to "light".
+function __twkIsLight(hex) {
+  const h = String(hex).replace('#', '');
+  const x = h.length === 3 ? h.replace(/./g, (c) => c + c) : h.padEnd(6, '0');
+  const n = parseInt(x.slice(0, 6), 16);
+  if (Number.isNaN(n)) return true;
+  const r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  return r * 299 + g * 587 + b * 114 > 148000;
+}
+
+const __TwkCheck = ({ light }) => (
+  <svg viewBox="0 0 14 14" aria-hidden="true">
+    <path d="M3 7.2 5.8 10 11 4.2" fill="none" strokeWidth="2.2"
+          strokeLinecap="round" strokeLinejoin="round"
+          stroke={light ? 'rgba(0,0,0,.78)' : '#fff'} />
+  </svg>
+);
+
+// TweakColor — curated color/palette picker. Each option is either a single
+// hex string or an array of 1-5 hex strings; the card adapts — a lone color
+// renders solid, a palette renders colors[0] as the hero (left ~2/3) with the
+// rest stacked in a sharp column on the right. onChange emits the
+// option in the shape it was passed (string stays string, array stays array).
+// Without options it falls back to the native color input for back-compat.
+function TweakColor({ label, value, options, onChange }) {
+  if (!options || !options.length) {
+    return (
+      <div className="twk-row twk-row-h">
+        <div className="twk-lbl"><span>{label}</span></div>
+        <input type="color" className="twk-swatch" value={value}
+               onChange={(e) => onChange(e.target.value)} />
+      </div>
+    );
+  }
+  // Native <input type=color> emits lowercase hex per the HTML spec, so
+  // compare case-insensitively. String() guards JSON.stringify(undefined),
+  // which returns the primitive undefined (no .toLowerCase).
+  const key = (o) => String(JSON.stringify(o)).toLowerCase();
+  const cur = key(value);
+  return (
+    <TweakRow label={label}>
+      <div className="twk-chips" role="radiogroup">
+        {options.map((o, i) => {
+          const colors = Array.isArray(o) ? o : [o];
+          const [hero, ...rest] = colors;
+          const sup = rest.slice(0, 4);
+          const on = key(o) === cur;
+          return (
+            <button key={i} type="button" className="twk-chip" role="radio"
+                    aria-checked={on} data-on={on ? '1' : '0'}
+                    aria-label={colors.join(', ')} title={colors.join(' · ')}
+                    style={{ background: hero }}
+                    onClick={() => onChange(o)}>
+              {sup.length > 0 && (
+                <span>
+                  {sup.map((c, j) => <i key={j} style={{ background: c }} />)}
+                </span>
+              )}
+              {on && <__TwkCheck light={__twkIsLight(hero)} />}
+            </button>
+          );
+        })}
+      </div>
+    </TweakRow>
+  );
+}
+
+function TweakButton({ label, onClick, secondary = false }) {
+  return (
+    <button type="button" className={secondary ? 'twk-btn secondary' : 'twk-btn'}
+            onClick={onClick}>{label}</button>
+  );
+}
+
+Object.assign(window, {
+  useTweaks, TweaksPanel, TweakSection, TweakRow,
+  TweakSlider, TweakToggle, TweakRadio, TweakSelect,
+  TweakText, TweakNumber, TweakColor, TweakButton,
+});
+
+
+// @ds-adherence-ignore -- omelette starter scaffold (raw elements/hex/px by design)
+
+/* BEGIN USAGE */
+// iOS.jsx — Simplified iOS 26 (Liquid Glass) device frame
+// Based on the iOS 26 UI Kit + Figma status bar spec. No assets, no deps.
+// Exports (to window): IOSDevice, IOSStatusBar, IOSNavBar, IOSGlassPill, IOSList, IOSListRow, IOSKeyboard
+//
+// Usage — wrap your screen content in <IOSDevice> to get the bezel, status bar
+// and home indicator (props: title, dark, keyboard):
+//
+//   <IOSDevice title="Settings">
+//     ...your screen content...
+//   </IOSDevice>
+//   <IOSDevice dark title="Search" keyboard>…</IOSDevice>
+/* END USAGE */
+
+// ─────────────────────────────────────────────────────────────
+// Status bar
+// ─────────────────────────────────────────────────────────────
+function IOSStatusBar({ dark = false, time = '9:41' }) {
+  const c = dark ? '#fff' : '#000';
+  return (
+    <div style={{
+      display: 'flex', gap: 154, alignItems: 'center', justifyContent: 'center',
+      padding: '21px 24px 19px', boxSizing: 'border-box',
+      position: 'relative', zIndex: 20, width: '100%',
+    }}>
+      <div style={{ flex: 1, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: 1.5 }}>
+        <span style={{
+          fontFamily: '-apple-system, "SF Pro", system-ui', fontWeight: 590,
+          fontSize: 17, lineHeight: '22px', color: c,
+        }}>{time}</span>
+      </div>
+      <div style={{ flex: 1, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, paddingTop: 1, paddingRight: 1 }}>
+        <svg width="19" height="12" viewBox="0 0 19 12">
+          <rect x="0" y="7.5" width="3.2" height="4.5" rx="0.7" fill={c}/>
+          <rect x="4.8" y="5" width="3.2" height="7" rx="0.7" fill={c}/>
+          <rect x="9.6" y="2.5" width="3.2" height="9.5" rx="0.7" fill={c}/>
+          <rect x="14.4" y="0" width="3.2" height="12" rx="0.7" fill={c}/>
+        </svg>
+        <svg width="17" height="12" viewBox="0 0 17 12">
+          <path d="M8.5 3.2C10.8 3.2 12.9 4.1 14.4 5.6L15.5 4.5C13.7 2.7 11.2 1.5 8.5 1.5C5.8 1.5 3.3 2.7 1.5 4.5L2.6 5.6C4.1 4.1 6.2 3.2 8.5 3.2Z" fill={c}/>
+          <path d="M8.5 6.8C9.9 6.8 11.1 7.3 12 8.2L13.1 7.1C11.8 5.9 10.2 5.1 8.5 5.1C6.8 5.1 5.2 5.9 3.9 7.1L5 8.2C5.9 7.3 7.1 6.8 8.5 6.8Z" fill={c}/>
+          <circle cx="8.5" cy="10.5" r="1.5" fill={c}/>
+        </svg>
+        <svg width="27" height="13" viewBox="0 0 27 13">
+          <rect x="0.5" y="0.5" width="23" height="12" rx="3.5" stroke={c} strokeOpacity="0.35" fill="none"/>
+          <rect x="2" y="2" width="20" height="9" rx="2" fill={c}/>
+          <path d="M25 4.5V8.5C25.8 8.2 26.5 7.2 26.5 6.5C26.5 5.8 25.8 4.8 25 4.5Z" fill={c} fillOpacity="0.4"/>
+        </svg>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Liquid glass pill — blur + tint + shine
+// ─────────────────────────────────────────────────────────────
+function IOSGlassPill({ children, dark = false, style = {} }) {
+  return (
+    <div style={{
+      height: 44, minWidth: 44, borderRadius: 9999,
+      position: 'relative', overflow: 'hidden',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      boxShadow: dark
+        ? '0 2px 6px rgba(0,0,0,0.35), 0 6px 16px rgba(0,0,0,0.2)'
+        : '0 1px 3px rgba(0,0,0,0.07), 0 3px 10px rgba(0,0,0,0.06)',
+      ...style,
+    }}>
+      {/* blur + tint */}
+      <div style={{
+        position: 'absolute', inset: 0, borderRadius: 9999,
+        backdropFilter: 'blur(12px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(12px) saturate(180%)',
+        background: dark ? 'rgba(120,120,128,0.28)' : 'rgba(255,255,255,0.5)',
+      }} />
+      {/* shine */}
+      <div style={{
+        position: 'absolute', inset: 0, borderRadius: 9999,
+        boxShadow: dark
+          ? 'inset 1.5px 1.5px 1px rgba(255,255,255,0.15), inset -1px -1px 1px rgba(255,255,255,0.08)'
+          : 'inset 1.5px 1.5px 1px rgba(255,255,255,0.7), inset -1px -1px 1px rgba(255,255,255,0.4)',
+        border: dark ? '0.5px solid rgba(255,255,255,0.15)' : '0.5px solid rgba(0,0,0,0.06)',
+      }} />
+      <div style={{ position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center', padding: '0 4px' }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Navigation bar — glass pills + large title
+// ─────────────────────────────────────────────────────────────
+function IOSNavBar({ title = 'Title', dark = false, trailingIcon = true }) {
+  const muted = dark ? 'rgba(255,255,255,0.6)' : '#404040';
+  const text = dark ? '#fff' : '#000';
+  const pillIcon = (content) => (
+    <IOSGlassPill dark={dark}>
+      <div style={{ width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        {content}
+      </div>
+    </IOSGlassPill>
+  );
+  return (
+    <div style={{
+      display: 'flex', flexDirection: 'column', gap: 10,
+      paddingTop: 62, paddingBottom: 10, position: 'relative', zIndex: 5,
+    }}>
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '0 16px',
+      }}>
+        {/* back chevron */}
+        {pillIcon(
+          <svg width="12" height="20" viewBox="0 0 12 20" fill="none" style={{ marginLeft: -1 }}>
+            <path d="M10 2L2 10l8 8" stroke={muted} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        )}
+        {/* trailing ellipsis */}
+        {trailingIcon && pillIcon(
+          <svg width="22" height="6" viewBox="0 0 22 6">
+            <circle cx="3" cy="3" r="2.5" fill={muted}/>
+            <circle cx="11" cy="3" r="2.5" fill={muted}/>
+            <circle cx="19" cy="3" r="2.5" fill={muted}/>
+          </svg>
+        )}
+      </div>
+      {/* large title */}
+      <div style={{
+        padding: '0 16px',
+        fontFamily: '-apple-system, system-ui',
+        fontSize: 34, fontWeight: 700, lineHeight: '41px',
+        color: text, letterSpacing: 0.4,
+      }}>{title}</div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Grouped list (inset card, r:26) + row (52px)
+// ─────────────────────────────────────────────────────────────
+function IOSListRow({ title, detail, icon, chevron = true, isLast = false, dark = false }) {
+  const text = dark ? '#fff' : '#000';
+  const sec = dark ? 'rgba(235,235,245,0.6)' : 'rgba(60,60,67,0.6)';
+  const ter = dark ? 'rgba(235,235,245,0.3)' : 'rgba(60,60,67,0.3)';
+  const sep = dark ? 'rgba(84,84,88,0.65)' : 'rgba(60,60,67,0.12)';
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', minHeight: 52,
+      padding: '0 16px', position: 'relative',
+      fontFamily: '-apple-system, system-ui', fontSize: 17,
+      letterSpacing: -0.43,
+    }}>
+      {icon && (
+        <div style={{
+          width: 30, height: 30, borderRadius: 7, background: icon,
+          marginRight: 12, flexShrink: 0,
+        }} />
+      )}
+      <div style={{ flex: 1, color: text }}>{title}</div>
+      {detail && <span style={{ color: sec, marginRight: 6 }}>{detail}</span>}
+      {chevron && (
+        <svg width="8" height="14" viewBox="0 0 8 14" style={{ flexShrink: 0 }}>
+          <path d="M1 1l6 6-6 6" stroke={ter} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
+        </svg>
+      )}
+      {!isLast && (
+        <div style={{
+          position: 'absolute', bottom: 0, right: 0,
+          left: icon ? 58 : 16, height: 0.5, background: sep,
+        }} />
+      )}
+    </div>
+  );
+}
+
+function IOSList({ header, children, dark = false }) {
+  const hc = dark ? 'rgba(235,235,245,0.6)' : 'rgba(60,60,67,0.6)';
+  const bg = dark ? '#1C1C1E' : '#fff';
+  return (
+    <div>
+      {header && (
+        <div style={{
+          fontFamily: '-apple-system, system-ui', fontSize: 13,
+          color: hc, textTransform: 'uppercase',
+          padding: '8px 36px 6px', letterSpacing: -0.08,
+        }}>{header}</div>
+      )}
+      <div style={{
+        background: bg, borderRadius: 26,
+        margin: '0 16px', overflow: 'hidden',
+      }}>{children}</div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Device frame
+// ─────────────────────────────────────────────────────────────
+function IOSDevice({
+  children, width = 402, height = 874, dark = false,
+  title, keyboard = false,
+}) {
+  return (
+    <div style={{
+      width, height, borderRadius: 48, overflow: 'hidden',
+      position: 'relative', background: dark ? '#000' : '#F2F2F7',
+      boxShadow: '0 40px 80px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.12)',
+      fontFamily: '-apple-system, system-ui, sans-serif',
+      WebkitFontSmoothing: 'antialiased',
+    }}>
+      {/* dynamic island */}
+      <div style={{
+        position: 'absolute', top: 11, left: '50%', transform: 'translateX(-50%)',
+        width: 126, height: 37, borderRadius: 24, background: '#000', zIndex: 50,
+      }} />
+      {/* status bar (absolute) */}
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10 }}>
+        <IOSStatusBar dark={dark} />
+      </div>
+      {/* nav + content */}
+      <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+        {title !== undefined && <IOSNavBar title={title} dark={dark} />}
+        <div style={{ flex: 1, overflow: 'auto' }}>{children}</div>
+        {keyboard && <IOSKeyboard dark={dark} />}
+      </div>
+      {/* home indicator — always on top */}
+      <div style={{
+        position: 'absolute', bottom: 0, left: 0, right: 0, zIndex: 60,
+        height: 34, display: 'flex', justifyContent: 'center', alignItems: 'flex-end',
+        paddingBottom: 8, pointerEvents: 'none',
+      }}>
+        <div style={{
+          width: 139, height: 5, borderRadius: 100,
+          background: dark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.25)',
+        }} />
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Keyboard — iOS 26 liquid glass
+// ─────────────────────────────────────────────────────────────
+function IOSKeyboard({ dark = false }) {
+  const glyph = dark ? 'rgba(255,255,255,0.7)' : '#595959';
+  const sugg = dark ? 'rgba(255,255,255,0.6)' : '#333';
+  const keyBg = dark ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.85)';
+
+  // special-key icons
+  const icons = {
+    shift: <svg width="19" height="17" viewBox="0 0 19 17"><path d="M9.5 1L1 9.5h4.5V16h8V9.5H18L9.5 1z" fill={glyph}/></svg>,
+    del: <svg width="23" height="17" viewBox="0 0 23 17"><path d="M7 1h13a2 2 0 012 2v11a2 2 0 01-2 2H7l-6-7.5L7 1z" fill="none" stroke={glyph} strokeWidth="1.6" strokeLinejoin="round"/><path d="M10 5l7 7M17 5l-7 7" stroke={glyph} strokeWidth="1.6" strokeLinecap="round"/></svg>,
+    ret: <svg width="20" height="14" viewBox="0 0 20 14"><path d="M18 1v6H4m0 0l4-4M4 7l4 4" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>,
+  };
+
+  const key = (content, { w, flex, ret, fs = 25, k } = {}) => (
+    <div key={k} style={{
+      height: 42, borderRadius: 8.5,
+      flex: flex ? 1 : undefined, width: w, minWidth: 0,
+      background: ret ? '#08f' : keyBg,
+      boxShadow: '0 1px 0 rgba(0,0,0,0.075)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontFamily: '-apple-system, "SF Compact", system-ui',
+      fontSize: fs, fontWeight: 458, color: ret ? '#fff' : glyph,
+    }}>{content}</div>
+  );
+
+  const row = (keys, pad = 0) => (
+    <div style={{ display: 'flex', gap: 6.5, justifyContent: 'center', padding: `0 ${pad}px` }}>
+      {keys.map(l => key(l, { flex: true, k: l }))}
+    </div>
+  );
+
+  return (
+    <div style={{
+      position: 'relative', zIndex: 15, borderRadius: 27, overflow: 'hidden',
+      padding: '11px 0 2px',
+      display: 'flex', flexDirection: 'column', alignItems: 'center',
+      boxShadow: dark
+        ? '0 -2px 20px rgba(0,0,0,0.09)'
+        : '0 -1px 6px rgba(0,0,0,0.018), 0 -3px 20px rgba(0,0,0,0.012)',
+    }}>
+      {/* liquid glass bg — same recipe as nav pills */}
+      <div style={{
+        position: 'absolute', inset: 0, borderRadius: 27,
+        backdropFilter: 'blur(12px) saturate(180%)',
+        WebkitBackdropFilter: 'blur(12px) saturate(180%)',
+        background: dark ? 'rgba(120,120,128,0.14)' : 'rgba(255,255,255,0.25)',
+      }} />
+      <div style={{
+        position: 'absolute', inset: 0, borderRadius: 27,
+        boxShadow: dark
+          ? 'inset 1.5px 1.5px 1px rgba(255,255,255,0.15)'
+          : 'inset 1.5px 1.5px 1px rgba(255,255,255,0.7), inset -1px -1px 1px rgba(255,255,255,0.4)',
+        border: dark ? '0.5px solid rgba(255,255,255,0.15)' : '0.5px solid rgba(0,0,0,0.06)',
+        pointerEvents: 'none',
+      }} />
+
+      {/* autocorrect bar */}
+      <div style={{
+        display: 'flex', gap: 20, alignItems: 'center',
+        padding: '8px 22px 13px', width: '100%', boxSizing: 'border-box',
+        position: 'relative',
+      }}>
+        {['"The"', 'the', 'to'].map((w, i) => (
+          <React.Fragment key={i}>
+            {i > 0 && <div style={{ width: 1, height: 25, background: '#ccc', opacity: 0.3 }} />}
+            <div style={{
+              flex: 1, textAlign: 'center',
+              fontFamily: '-apple-system, system-ui', fontSize: 17,
+              color: sugg, letterSpacing: -0.43, lineHeight: '22px',
+            }}>{w}</div>
+          </React.Fragment>
+        ))}
+      </div>
+
+      {/* key layout */}
+      <div style={{
+        display: 'flex', flexDirection: 'column', gap: 13,
+        padding: '0 6.5px', width: '100%', boxSizing: 'border-box',
+        position: 'relative',
+      }}>
+        {row(['q','w','e','r','t','y','u','i','o','p'])}
+        {row(['a','s','d','f','g','h','j','k','l'], 20)}
+        <div style={{ display: 'flex', gap: 14.25, alignItems: 'center' }}>
+          {key(icons.shift, { w: 45, k: 'shift' })}
+          <div style={{ display: 'flex', gap: 6.5, flex: 1 }}>
+            {['z','x','c','v','b','n','m'].map(l => key(l, { flex: true, k: l }))}
+          </div>
+          {key(icons.del, { w: 45, k: 'del' })}
+        </div>
+        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+          {key('ABC', { w: 92.25, fs: 18, k: 'abc' })}
+          {key('', { flex: true, k: 'space' })}
+          {key(icons.ret, { w: 92.25, ret: true, k: 'ret' })}
+        </div>
+      </div>
+
+      {/* bottom spacer (emoji+mic area, icons omitted) */}
+      <div style={{ height: 56, width: '100%', position: 'relative' }} />
+    </div>
+  );
+}
+
+Object.assign(window, {
+  IOSDevice, IOSStatusBar, IOSNavBar, IOSGlassPill, IOSList, IOSListRow, IOSKeyboard,
+});
+
+
+// ALMA — App root: state, navigation, player state machine, countdown + real audio
+const { useState: useStateA, useEffect: useEffectA, useRef: useRefA } = React;
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
+  "accent": "#4839F4",
+  "mandalaMotion": true
+}/*EDITMODE-END*/;
+
+const ACCENTS = ['#4839F4', 'oklch(0.62 0.19 265)', 'oklch(0.64 0.16 195)', 'oklch(0.64 0.17 350)', 'oklch(0.68 0.15 70)'];
+
+// ── Audio engine ────────────────────────────────────────────────────────────
+function useAudioEngine() {
+  const mainRef = useRefA(null);
+  const layerRef = useRefA(null);
+
+  const getMain = () => {
+    if (!mainRef.current) { mainRef.current = new Audio(); mainRef.current.loop = true; mainRef.current.volume = 0.85; }
+    return mainRef.current;
+  };
+  const getLayer = () => {
+    if (!layerRef.current) { layerRef.current = new Audio(); layerRef.current.loop = true; layerRef.current.volume = 0.45; }
+    return layerRef.current;
+  };
+
+  const play = (mainSrc, layerSrc) => {
+    if (mainSrc) {
+      const m = getMain();
+      const abs = new URL(mainSrc, location.href).href;
+      if (m.src !== abs) { m.src = mainSrc; }
+      m.play().catch(() => {});
+    }
+    if (layerSrc !== undefined) {
+      if (!layerSrc) {
+        layerRef.current?.pause();
+      } else {
+        const l = getLayer();
+        const abs = new URL(layerSrc, location.href).href;
+        if (l.src !== abs) { l.src = layerSrc; }
+        l.play().catch(() => {});
+      }
+    }
+  };
+
+  const pause = () => { mainRef.current?.pause(); layerRef.current?.pause(); };
+
+  const stop = () => {
+    if (mainRef.current) { mainRef.current.pause(); mainRef.current.src = ''; }
+    if (layerRef.current) { layerRef.current.pause(); layerRef.current.src = ''; }
+  };
+
+  const setMuted = (muted) => {
+    if (mainRef.current) mainRef.current.muted = muted;
+    if (layerRef.current) layerRef.current.muted = muted;
+  };
+
+  const previewSrc = (src) => {
+    const a = new Audio(src);
+    a.volume = 0.6;
+    a.play().catch(() => {});
+    setTimeout(() => a.pause(), 10000);
+  };
+
+  return { play, pause, stop, setMuted, previewSrc };
+}
+
+function App() {
+  const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const [theme, setTheme] = useStateA(() => localStorage.getItem('alma-theme') || 'moon');
+  const [tab, setTab] = useStateA('sanctuary');
+
+  // player state machine: 'closed' | 'full' | 'mini'
+  const [playerMode, setPlayerMode] = useStateA('closed');
+  const [track, setTrack] = useStateA(null);
+  const [duration, setDuration] = useStateA(15);
+  const [elapsed, setElapsed] = useStateA(0);
+  const [isPlaying, setIsPlaying] = useStateA(false);
+  const [muted, setMuted] = useStateA(false);
+  const [savedFlash, setSavedFlash] = useStateA(false);
+  const [showPaywall, setShowPaywall] = useStateA(false);
+  const [sessionSource, setSessionSource] = useStateA('track'); // 'track' | 'ritual' | 'mixer'
+
+  // sanctuary quick-config
+  const [configTrack, setConfigTrack] = useStateA(null);
+  // mixer working state (lifted so the launch bar can pin at device level)
+  const [mixFocus, setMixFocus] = useStateA(null);
+  const [mixDur, setMixDur] = useStateA(15);
+  const [mixLayer, setMixLayer] = useStateA(null);
+  const [mixBell, setMixBell] = useStateA(null);     // session bell (independent)
+  const [intervalMin, setIntervalMin] = useStateA(5);
+
+  // toast
+  const [toast, setToast] = useStateA('');
+  const toastTimer = useRefA(null);
+  const fireToast = (msg) => {
+    setToast(msg);
+    clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToast(''), 2400);
+  };
+
+  // cloud loading
+  const [loadingId, setLoadingId] = useStateA(null);
+  const [loadedIds, setLoadedIds] = useStateA([]);
+
+  // mutable collections
+  const [rituals, setRituals] = useStateA(SAVED_RITUALS);
+  const [rawAudio, setRawAudio] = useStateA(RAW_AUDIO);
+  const pinned = rawAudio.filter(f => f.pinned);
+
+  // pin file customizer
+  const [editingFile, setEditingFile] = useStateA(null);
+  const onEditFile = (f) => setEditingFile(f);
+  const onSavePinCustomization = (id, patch) => {
+    setRawAudio(ra => {
+      const exists = ra.some(f => f.id === id);
+      if (exists) return ra.map(f => f.id === id ? { ...f, ...patch } : f);
+      // new import — add with chosen customizations, strip internal flag
+      const { _isNew, ...base } = editingFileRef.current || {};
+      return [...ra, { ...base, ...patch }];
+    });
+    fireToast(editingFileRef.current?._isNew ? `${patch.name || 'File'} added to Vault` : 'Pin updated');
+  };
+  // keep a ref so the save handler can read the current editingFile
+  const editingFileRef = React.useRef(null);
+  React.useEffect(() => { editingFileRef.current = editingFile; }, [editingFile]);
+
+  const audio = useAudioEngine();
+
+  useEffectA(() => {
+    document.querySelector('.alma')?.setAttribute('data-theme', theme);
+    localStorage.setItem('alma-theme', theme);
+  }, [theme]);
+
+  useEffectA(() => { audio.setMuted(muted); }, [muted]);
+
+  // countdown engine
+  useEffectA(() => {
+    if (!isPlaying || playerMode === 'closed') return;
+    const total = duration * 60;
+    const id = setInterval(() => {
+      setElapsed(e => {
+        if (e + 1 >= total) { setIsPlaying(false); audio.pause(); return total; }
+        return e + 1;
+      });
+    }, 1000);
+    return () => clearInterval(id);
+  }, [isPlaying, playerMode, duration]);
+
+  // stop audio when player closes
+  useEffectA(() => { if (playerMode === 'closed') audio.stop(); }, [playerMode]);
+
+  // intro/outro bell — play when full player opens or session ends
+  useEffectA(() => {
+    if (playerMode === 'full' && mixBell?.isIntroOutro && mixBell?.audioSrc) {
+      const b = new Audio(mixBell.audioSrc);
+      b.volume = 0.85;
+      setTimeout(() => b.play().catch(() => {}), 600);
+    }
+  }, [playerMode]);
+
+  useEffectA(() => {
+    const total = duration * 60;
+    if (elapsed >= total && elapsed > 0 && mixBell?.isIntroOutro && mixBell?.audioSrc) {
+      const b = new Audio(mixBell.audioSrc);
+      b.volume = 0.85;
+      b.play().catch(() => {});
+    }
+  }, [elapsed]);
+
+  // interval bell — fires each time elapsed crosses a multiple of intervalMin minutes
+  useEffectA(() => {
+    if (!isPlaying || !mixBell?.isInterval || !mixBell?.audioSrc || elapsed === 0) return;
+    const intervalSec = intervalMin * 60;
+    if (elapsed % intervalSec === 0) {
+      const b = new Audio(mixBell.audioSrc);
+      b.volume = 0.85;
+      b.play().catch(() => {});
+    }
+  }, [elapsed]);
+
+  // ── session launch ──
+  const beginSession = (tr, dur, layer, source = 'track') => {
+    setTrack(layer ? { ...tr, sub: `${tr.sub} + ${layer.name}` } : tr);
+    setDuration(dur || tr.dur || 15);
+    setElapsed(0);
+    setIsPlaying(true);
+    setSessionSource(source);
+    setPlayerMode('full');
+    setConfigTrack(null);
+    audio.play(tr.audioSrc, layer?.audioSrc || null);
+  };
+
+  const launchRitual = (r) => {
+    setTrack({ ...r, sub: r.layers });
+    setDuration(r.dur);
+    setElapsed(0);
+    setIsPlaying(true);
+    setSessionSource('ritual');
+    setPlayerMode('full');
+    audio.play(r.audioSrc, r.layerSrc || null);
+  };
+
+  const playFile = (f) => {
+    setTrack({ title: f.name, sub: f.meta, grad: f.color || f.grad, audioSrc: f.audioSrc });
+    setDuration(15);
+    setElapsed(0);
+    setIsPlaying(true);
+    setSessionSource('track');
+    setPlayerMode('full');
+    audio.play(f.audioSrc, null);
+  };
+
+  // ── sanctuary handlers ──
+  const onConfigure = (tr) => setConfigTrack(tr);
+  const onAddLayers = (tr) => {
+    setConfigTrack(null);
+    setMixFocus(tr);
+    setTab('mixer');
+    fireToast(`${tr.title} loaded into the Mixer`);
+  };
+  const onPreview = (tr) => {
+    fireToast(`Pre-listening ${tr.title}…`);
+    if (tr.audioSrc) audio.previewSrc(tr.audioSrc);
+  };
+  const onLoad = (tr) => {
+    if (loadedIds.includes(tr.id) || loadingId) return;
+    setLoadingId(tr.id);
+    setTimeout(() => {
+      setLoadingId(null);
+      setLoadedIds(ids => [...ids, tr.id]);
+      setRawAudio(ra => ra.length < 5 ? [...ra, { id: 'l-' + tr.id, name: tr.title, meta: `${tr.dur} min · loaded`, color: 'seaish', icon: 'music', grad: tr.grad, audioSrc: tr.audioSrc, pinned: false }] : ra);
+      fireToast(`${tr.title} loaded to your Vault`);
+    }, 1500);
+  };
+
+  // ── player handlers ──
+  const togglePlay = () => {
+    setIsPlaying(p => { if (p) { audio.pause(); } else { audio.play(track?.audioSrc); } return !p; });
+  };
+  const collapse = () => setPlayerMode('mini');
+  const expand = () => setPlayerMode('full');
+  const seek = (sec) => setElapsed(Math.round(sec));
+  const saveRitual = () => {
+    if (!track) return;
+    setSavedFlash(true);
+    setRituals(rs => {
+      const name = `${track.title} Ritual`;
+      if (rs.some(r => r.title === name)) return rs;
+      return [{ id: 'sr-' + Date.now(), title: name, layers: track.sub || 'Solo track', dur: duration, grad: track.grad, audioSrc: track.audioSrc }, ...rs];
+    });
+    fireToast('Saved to your Rituals');
+    setTimeout(() => setSavedFlash(false), 1800);
+  };
+
+  // ── mixer handlers ──
+  const onPreviewMix = () => {};
+
+  // ── vault handlers ──
+  const renameRitual = (id, name) => setRituals(rs => rs.map(r => r.id === id ? { ...r, title: name } : r));
+  const deleteRitual = (id) => setRituals(rs => rs.filter(r => r.id !== id));
+  const togglePin = (id) => {
+    setRawAudio(ra => ra.map(f => f.id === id ? { ...f, pinned: !f.pinned } : f));
+    const f = rawAudio.find(x => x.id === id);
+    fireToast(f && f.pinned ? 'Unpinned from Sanctuary' : 'Pinned to Sanctuary');
+  };
+  const deleteFile = (id) => setRawAudio(ra => ra.filter(f => f.id !== id));
+
+  const dark = theme === 'moon';
+
+  return (
+    <IOSDevice dark={dark}>
+      <div className="alma" data-theme={theme} style={{ '--accent': t.accent }}>
+        <div className="scrollbody" key={tab}>
+          {tab === 'sanctuary' && (
+            <Sanctuary
+              theme={theme} onToggleTheme={() => setTheme(tr => tr === 'moon' ? 'sun' : 'moon')}
+              tracks={MASTER_TRACKS} rituals={rituals} pinned={pinned}
+              onConfigure={onConfigure} onPreview={onPreview} onLoad={onLoad}
+              loadingId={loadingId} loadedIds={loadedIds}
+              onLaunchRitual={launchRitual} onPlayFile={playFile}
+              onEditFile={onEditFile} onAddMoreRitual={() => setTab('mixer')}
+              onUpgrade={() => setShowPaywall(true)}
+            />
+          )}
+          {tab === 'mixer' && (
+            <Mixer
+              focus={mixFocus} setFocus={setMixFocus} dur={mixDur} setDur={setMixDur}
+              layer={mixLayer} setLayer={setMixLayer}
+              bell={mixBell} setBell={setMixBell}
+              intervalMin={intervalMin} setIntervalMin={setIntervalMin}
+              tracks={MASTER_TRACKS} onToast={fireToast}
+              onPreviewLayer={() => {}}
+            />
+          )}
+          {tab === 'vault' && (
+            <Vault
+              rituals={rituals} rawAudio={rawAudio}
+              onRename={renameRitual} onDeleteRitual={deleteRitual}
+              onTogglePin={togglePin} onDeleteFile={deleteFile} onLaunchRitual={launchRitual}
+              onEditFile={onEditFile}
+              onGoMixer={() => setTab('mixer')}
+              onImportFile={(f) => setEditingFile({ ...f, _isNew: true })}
+              onUpgrade={() => setShowPaywall(true)}
+            />
+          )}
+        </div>
+
+        {/* mixer launch bar (pinned, stacks above mini-player) */}
+        {tab === 'mixer' && (
+          <MixerActionBar
+            focus={mixFocus} dur={mixDur} layer={mixLayer} bell={mixBell}
+            raised={playerMode === 'mini'}
+            onBegin={beginSession} onPreviewMix={onPreviewMix}
+          />
+        )}
+
+        {/* mini-player (above tab bar) */}
+        <MiniPlayer
+          track={track} duration={duration} elapsed={elapsed} isPlaying={isPlaying}
+          mode={playerMode} onExpand={expand} onTogglePlay={togglePlay}
+          onClose={() => { audio.stop(); setPlayerMode('closed'); }}
+        />
+
+        {/* tab bar */}
+        <TabBar active={tab} onChange={setTab} />
+
+        {/* quick-config sheet */}
+        <QuickConfigSheet
+          track={configTrack} onClose={() => setConfigTrack(null)}
+          onBegin={beginSession} onAddLayers={onAddLayers}
+        />
+
+        {/* pin file customizer sheet */}
+        <PinCustomizerSheet
+          file={editingFile} onClose={() => setEditingFile(null)}
+          onSave={onSavePinCustomization}
+        />
+
+        {/* full player deck */}
+        <FullPlayer
+          track={track} duration={duration} elapsed={elapsed} isPlaying={isPlaying}
+          muted={muted} mode={playerMode} savedFlash={savedFlash} motion={t.mandalaMotion}
+          canSaveRitual={sessionSource === 'mixer'}
+          onTogglePlay={togglePlay} onCollapse={collapse} onSeek={seek}
+          onCustomize={() => track && setConfigTrack(track)}
+          onToggleMute={() => setMuted(m => !m)}
+          onSaveRitual={saveRitual}
+        />
+
+        {/* paywall */}
+        <PaywallSheet open={showPaywall} onClose={() => setShowPaywall(false)} />
+
+        {/* toast */}
+        <Toast message={toast} />
+
+        {/* tweaks */}
+        <TweaksPanel>
+          <TweakSection label="Theme" />
+          <TweakRadio label="Mode" value={theme} options={['moon', 'sun']} onChange={setTheme} />
+          <TweakSection label="Brand" />
+          <TweakColor label="Accent" value={t.accent} options={ACCENTS} onChange={(v) => setTweak('accent', v)} />
+          <TweakToggle label="Mandala motion" value={t.mandalaMotion} onChange={(v) => setTweak('mandalaMotion', v)} />
+        </TweaksPanel>
+      </div>
+    </IOSDevice>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+
+</script>
+  <script>
+    function fitStage() {
+      const s = document.getElementById('stage'); if (!s) return;
+      const pad = 32;
+      const sc = Math.min((innerWidth-pad)/402, (innerHeight-pad)/874, 1);
+      s.style.transform = `scale(${sc})`;
+    }
+    addEventListener('resize', fitStage); fitStage(); setTimeout(fitStage, 300);
+  </script>
+</body>
+</html>
