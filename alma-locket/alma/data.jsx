@@ -9,7 +9,7 @@ const ALMA_GRADIENTS = {
   light:   "url('images/light.webp') center / cover no-repeat",
   weve:    "url('images/weve.webp') center / cover no-repeat",
   sea:     "url('images/sea.webp') center / cover no-repeat",
-  searay:  "url('images/sea light.webp') center / cover no-repeat",
+  searay:  "url('images/sea_light.webp') center / cover no-repeat",
   day:     "url('images/day.webp') center / cover no-repeat",
   morning: "url('images/morning.webp') center / cover no-repeat",
   ocean:   "url('images/ocean.webp') center / cover no-repeat",
@@ -111,7 +111,41 @@ function fmtTime(totalSec) {
   return `${m}:${String(s).padStart(2, '0')}`;
 }
 
+const WEEK_SESSION_DATA = [
+  { day: 'M', min: 15 },
+  { day: 'T', min: 30 },
+  { day: 'W', min: 0 },
+  { day: 'T', min: 45 },
+  { day: 'F', min: 10 },
+  { day: 'S', min: 0 },
+  { day: 'S', min: 0 },
+];
+
+const PROGRESS_STATES = [
+  { name: 'Awakening Bud',    sub: 'Stage I',   grad: 'g1' },
+  { name: 'Unfolding Layers', sub: 'Stage II',  grad: 'g2' },
+  { name: 'First Petals',     sub: 'Stage III', grad: 'g3' },
+  { name: 'Opening Heart',    sub: 'Stage IV',  grad: 'g4' },
+  { name: 'Radiant Flower',   sub: 'Stage V',   grad: 'g5' },
+  { name: 'Sacred Bloom',     sub: 'Stage VI',  grad: 'g6' },
+  { name: 'Infinite Essence', sub: 'Stage VII', grad: 'sun' },
+];
+
+const LIFETIME_STATS = {
+  totalSessions: 47,
+  totalMin: 820,
+};
+
+const WEEKLY_HISTORY = [
+  { week: 'May 12', min: 30  },
+  { week: 'May 19', min: 75  },
+  { week: 'May 26', min: 45  },
+  { week: 'Jun 2',  min: 100 },
+  { week: 'Jun 9',  min: 100 },
+];
+
 Object.assign(window, {
   ALMA_GRADIENTS, MASTER_TRACKS, SAVED_RITUALS,
   AMBIENT_LAYERS, RAW_AUDIO, DURATIONS, PIN_COLORS, PIN_ICONS, fmtTime,
+  WEEK_SESSION_DATA, PROGRESS_STATES, LIFETIME_STATS, WEEKLY_HISTORY,
 });

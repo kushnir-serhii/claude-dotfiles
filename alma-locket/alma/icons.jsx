@@ -120,6 +120,11 @@ const IconPlayFilled = ({ size = 18, style } = {}) => (
   </svg>
 );
 
+const IconUser      = _lucide(<><circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" /></>);
+const IconTarget    = _lucide(<><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></>);
+const IconChevLeft  = _lucide(<path d="M15 18l-6-6 6-6" />);
+const IconBarChart  = _lucide(<><rect x="3" y="12" width="4" height="9" rx="1" /><rect x="9.5" y="7" width="4" height="14" rx="1" /><rect x="16" y="3" width="4" height="18" rx="1" /></>);
+
 Object.assign(window, {
   IconPlay, IconPause, IconMoon, IconSun, IconHeart, IconMute,
   IconChevDown, IconChevRight, IconChevDownSmall, IconDownload, IconCloud,
@@ -127,4 +132,5 @@ Object.assign(window, {
   IconMixer, IconVault, IconCheck, IconClose, IconEdit, IconTrash, IconStar, IconWave,
   IconWaves, IconDroplets, IconFlame, IconLeaf, IconMic, IconMusic, IconBell,
   IconSparkles, IconHeadphones, IconFlower, IconStop, IconPlayFilled,
+  IconUser, IconTarget, IconChevLeft, IconBarChart,
 });

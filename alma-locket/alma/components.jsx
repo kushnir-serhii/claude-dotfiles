@@ -89,6 +89,7 @@ function TabBar({ active, onChange, hasMini }) {
     { id: 'sanctuary', label: 'Sanctuary', Icon: IconHome },
     { id: 'mixer', label: 'Mixer', Icon: IconMixer },
     { id: 'vault', label: 'Vault', Icon: IconVault },
+    { id: 'profile', label: 'Profile', Icon: IconUser },
   ];
   return (
     <div style={{

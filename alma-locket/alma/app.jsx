@@ -254,6 +254,15 @@ function App() {
   };
   const deleteFile = (id) => setRawAudio(ra => ra.filter(f => f.id !== id));
 
+  // profile state
+  const [userName, setUserName] = useStateA(() => localStorage.getItem('alma-name') || 'Your Name');
+  const [goalMin, setGoalMin] = useStateA(() => Number(localStorage.getItem('alma-goal')) || 15);
+  const [weeklyGoalMin, setWeeklyGoalMin] = useStateA(() => Number(localStorage.getItem('alma-weekly-goal')) || 60);
+  const [statsOpen, setStatsOpen] = useStateA(false);
+  useEffectA(() => { localStorage.setItem('alma-name', userName); }, [userName]);
+  useEffectA(() => { localStorage.setItem('alma-goal', String(goalMin)); }, [goalMin]);
+  useEffectA(() => { localStorage.setItem('alma-weekly-goal', String(weeklyGoalMin)); }, [weeklyGoalMin]);
+
   const dark = theme === 'moon';
 
   return (
@@ -286,6 +295,18 @@ function App() {
               onRename={renameRitual} onDeleteRitual={deleteRitual}
               onTogglePin={togglePin} onDeleteFile={deleteFile} onLaunchRitual={launchRitual}
               onEditFile={onEditFile}
+            />
+          )}
+          {tab === 'profile' && (
+            <Profile
+              userName={userName} onSetName={setUserName}
+              goalMin={goalMin} onSetGoal={setGoalMin}
+              weeklyGoalMin={weeklyGoalMin} onSetWeeklyGoal={setWeeklyGoalMin}
+              weekData={WEEK_SESSION_DATA}
+              onToast={fireToast}
+              onLogout={() => fireToast('Logged out')}
+              onDeleteAccount={() => fireToast('Account deleted')}
+              onOpenStats={() => setStatsOpen(true)}
             />
           )}
         </div>
