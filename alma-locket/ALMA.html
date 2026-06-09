@@ -155,6 +155,11 @@
 </head>
 <body>
   <div id="stage"><div id="root"></div></div>
+  <script>
+    if (!localStorage.getItem('alma_onboarded')) {
+      window.location.replace('onboarding.html');
+    }
+  </script>
   <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
   <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
@@ -3282,14 +3287,26 @@ function streakOpacity(min) {
   return 1;
 }
 
-function Profile({ userName, onSetName, goalMin, onSetGoal, weeklyGoalMin, onSetWeeklyGoal, weekData, onToast, onLogout, onDeleteAccount, onOpenStats }) {
+function Profile({ userName, onSetName, goalMin, onSetGoal, weeklyGoalMin, onSetWeeklyGoal, weekData, onToast, onLogout, onDeleteAccount, onOpenStats, onSwitchAccount }) {
   const [editingName, setEditingName] = useStateProf(false);
   const [nameInput, setNameInput] = useStateProf(userName);
   const [showGoalPicker, setShowGoalPicker] = useStateProf(false);
+  const [customGoalInput, setCustomGoalInput] = useStateProf('');
+  const [showCustomGoal, setShowCustomGoal] = useStateProf(false);
+  const customGoalRef = useRefProf(null);
   const [showWeeklyGoalPicker, setShowWeeklyGoalPicker] = useStateProf(false);
+  const [customWeeklyGoalInput, setCustomWeeklyGoalInput] = useStateProf('');
+  const [showCustomWeeklyGoal, setShowCustomWeeklyGoal] = useStateProf(false);
+  const customWeeklyGoalRef = useRefProf(null);
   const [confirmDelete, setConfirmDelete] = useStateProf(false);
+  const [showSwitchAccount, setShowSwitchAccount] = useStateProf(false);
   const nameRef = useRefProf(null);
-  const WEEKLY_GOAL_OPTIONS = [30, 60, 90, 120, 180];
+
+  const MOCK_ACCOUNTS = [
+    { id: 'a1', name: userName,      email: 's1983kushnir@gmail.com', active: true  },
+    { id: 'a2', name: 'Work Profile', email: 'work@gmail.com',         active: false },
+  ];
+  const WEEKLY_GOAL_OPTIONS = [30, 60, 90];
 
   useEffectProf(() => { if (editingName) nameRef.current?.focus(); }, [editingName]);
 
@@ -3308,7 +3325,10 @@ function Profile({ userName, onSetName, goalMin, onSetGoal, weeklyGoalMin, onSet
     setEditingName(false);
   };
 
-  const GOAL_OPTIONS = [5, 10, 15, 20, 30];
+  const GOAL_OPTIONS = [10, 15, 30];
+
+  useEffectProf(() => { if (showCustomGoal) customGoalRef.current?.focus(); }, [showCustomGoal]);
+  useEffectProf(() => { if (showCustomWeeklyGoal) customWeeklyGoalRef.current?.focus(); }, [showCustomWeeklyGoal]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', paddingBottom: 100 }}>
@@ -3332,9 +3352,7 @@ function Profile({ userName, onSetName, goalMin, onSetGoal, weeklyGoalMin, onSet
           <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text)', letterSpacing: -0.3 }}>
             {progState.name}
           </div>
-          <div style={{ fontSize: 13, color: 'var(--text-2)', letterSpacing: 0.2 }}>
-            {progState.sub}
-          </div>
+          
           <div style={{
             marginTop: 4, paddingInline: 12, paddingBlock: 4, borderRadius: 20,
             background: 'var(--surface-2)', border: '1px solid var(--hairline)',
@@ -3468,21 +3486,66 @@ function Profile({ userName, onSetName, goalMin, onSetGoal, weeklyGoalMin, onSet
               </button>
             </div>
             {showGoalPicker && (
-              <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-                {GOAL_OPTIONS.map(opt => {
-                  const active = goalMin === opt;
-                  return (
-                    <button key={opt} className="press" onClick={() => { onSetGoal(opt); setShowGoalPicker(false); }} style={{
-                      flex: 1, padding: '9px 0', borderRadius: 12,
-                      background: active ? 'var(--text)' : 'var(--surface-2)',
-                      color: active ? 'var(--bg-0)' : 'var(--text-2)',
-                      border: active ? 'none' : '1px solid var(--hairline)',
-                      fontSize: 13, fontWeight: 600,
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12 }}>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  {GOAL_OPTIONS.map(opt => {
+                    const active = goalMin === opt && !showCustomGoal;
+                    return (
+                      <button key={opt} className="press" onClick={() => { onSetGoal(opt); setShowGoalPicker(false); setShowCustomGoal(false); }} style={{
+                        flex: 1, padding: '9px 0', borderRadius: 12,
+                        background: active ? 'var(--text)' : 'var(--surface-2)',
+                        color: active ? 'var(--bg-0)' : 'var(--text-2)',
+                        border: active ? 'none' : '1px solid var(--hairline)',
+                        fontSize: 13, fontWeight: 600,
+                      }}>
+                        {opt}m
+                      </button>
+                    );
+                  })}
+                  <button className="press" onClick={() => { setShowCustomGoal(p => !p); setCustomGoalInput(String(goalMin)); }} style={{
+                    flex: 1, padding: '9px 0', borderRadius: 12,
+                    background: showCustomGoal ? 'var(--text)' : 'var(--surface-2)',
+                    color: showCustomGoal ? 'var(--bg-0)' : 'var(--text-2)',
+                    border: showCustomGoal ? 'none' : '1px solid var(--hairline)',
+                    fontSize: 13, fontWeight: 600,
+                  }}>
+                    Custom
+                  </button>
+                </div>
+                {showCustomGoal && (
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <input
+                      ref={customGoalRef}
+                      type="number" min="1" max="180"
+                      value={customGoalInput}
+                      onChange={e => setCustomGoalInput(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                          const v = Math.max(1, Math.min(180, parseInt(customGoalInput) || goalMin));
+                          onSetGoal(v); setShowGoalPicker(false); setShowCustomGoal(false);
+                        }
+                        if (e.key === 'Escape') { setShowCustomGoal(false); }
+                      }}
+                      placeholder="minutes"
+                      style={{
+                        flex: 1, padding: '9px 14px', borderRadius: 12,
+                        background: 'var(--surface-2)', border: '1px solid var(--hairline-strong)',
+                        color: 'var(--text)', fontSize: 14, fontWeight: 500, outline: 'none',
+                        fontFamily: 'var(--font)',
+                      }}
+                    />
+                    <button className="press" onClick={() => {
+                      const v = Math.max(1, Math.min(180, parseInt(customGoalInput) || goalMin));
+                      onSetGoal(v); setShowGoalPicker(false); setShowCustomGoal(false);
+                    }} style={{
+                      padding: '9px 16px', borderRadius: 12,
+                      background: 'var(--accent)', color: '#fff',
+                      fontSize: 13, fontWeight: 600, flexShrink: 0,
                     }}>
-                      {opt}m
+                      Set
                     </button>
-                  );
-                })}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -3510,21 +3573,66 @@ function Profile({ userName, onSetName, goalMin, onSetGoal, weeklyGoalMin, onSet
               </button>
             </div>
             {showWeeklyGoalPicker && (
-              <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-                {WEEKLY_GOAL_OPTIONS.map(opt => {
-                  const active = weeklyGoalMin === opt;
-                  return (
-                    <button key={opt} className="press" onClick={() => { onSetWeeklyGoal(opt); setShowWeeklyGoalPicker(false); }} style={{
-                      flex: 1, padding: '9px 0', borderRadius: 12,
-                      background: active ? 'var(--text)' : 'var(--surface-2)',
-                      color: active ? 'var(--bg-0)' : 'var(--text-2)',
-                      border: active ? 'none' : '1px solid var(--hairline)',
-                      fontSize: 12, fontWeight: 600,
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12 }}>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  {WEEKLY_GOAL_OPTIONS.map(opt => {
+                    const active = weeklyGoalMin === opt && !showCustomWeeklyGoal;
+                    return (
+                      <button key={opt} className="press" onClick={() => { onSetWeeklyGoal(opt); setShowWeeklyGoalPicker(false); setShowCustomWeeklyGoal(false); }} style={{
+                        flex: 1, padding: '9px 0', borderRadius: 12,
+                        background: active ? 'var(--text)' : 'var(--surface-2)',
+                        color: active ? 'var(--bg-0)' : 'var(--text-2)',
+                        border: active ? 'none' : '1px solid var(--hairline)',
+                        fontSize: 12, fontWeight: 600,
+                      }}>
+                        {fmtWeekMin(opt)}
+                      </button>
+                    );
+                  })}
+                  <button className="press" onClick={() => { setShowCustomWeeklyGoal(p => !p); setCustomWeeklyGoalInput(String(weeklyGoalMin)); }} style={{
+                    flex: 1, padding: '9px 0', borderRadius: 12,
+                    background: showCustomWeeklyGoal ? 'var(--text)' : 'var(--surface-2)',
+                    color: showCustomWeeklyGoal ? 'var(--bg-0)' : 'var(--text-2)',
+                    border: showCustomWeeklyGoal ? 'none' : '1px solid var(--hairline)',
+                    fontSize: 12, fontWeight: 600,
+                  }}>
+                    Custom
+                  </button>
+                </div>
+                {showCustomWeeklyGoal && (
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <input
+                      ref={customWeeklyGoalRef}
+                      type="number" min="1" max="600"
+                      value={customWeeklyGoalInput}
+                      onChange={e => setCustomWeeklyGoalInput(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter') {
+                          const v = Math.max(1, Math.min(600, parseInt(customWeeklyGoalInput) || weeklyGoalMin));
+                          onSetWeeklyGoal(v); setShowWeeklyGoalPicker(false); setShowCustomWeeklyGoal(false);
+                        }
+                        if (e.key === 'Escape') { setShowCustomWeeklyGoal(false); }
+                      }}
+                      placeholder="minutes"
+                      style={{
+                        flex: 1, padding: '9px 14px', borderRadius: 12,
+                        background: 'var(--surface-2)', border: '1px solid var(--hairline-strong)',
+                        color: 'var(--text)', fontSize: 14, fontWeight: 500, outline: 'none',
+                        fontFamily: 'var(--font)',
+                      }}
+                    />
+                    <button className="press" onClick={() => {
+                      const v = Math.max(1, Math.min(600, parseInt(customWeeklyGoalInput) || weeklyGoalMin));
+                      onSetWeeklyGoal(v); setShowWeeklyGoalPicker(false); setShowCustomWeeklyGoal(false);
+                    }} style={{
+                      padding: '9px 16px', borderRadius: 12,
+                      background: 'var(--accent)', color: '#fff',
+                      fontSize: 13, fontWeight: 600, flexShrink: 0,
                     }}>
-                      {fmtWeekMin(opt)}
+                      Set
                     </button>
-                  );
-                })}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -3578,6 +3686,24 @@ function Profile({ userName, onSetName, goalMin, onSetGoal, weeklyGoalMin, onSet
           background: 'var(--surface)', border: '1px solid var(--hairline)',
           borderRadius: 20, overflow: 'hidden',
         }}>
+          <button className="press" onClick={() => setShowSwitchAccount(true)} style={{
+            width: '100%', padding: '15px 18px', display: 'flex', alignItems: 'center',
+            justifyContent: 'space-between', gap: 14, borderBottom: '1px solid var(--hairline)',
+            background: 'transparent', color: 'var(--text-2)',
+          }}>
+            <span style={{ fontSize: 15, fontWeight: 500 }}>Switch Account</span>
+            <IconChevRight size={16} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
+          </button>
+
+          <button className="press" onClick={() => { window.location.href = 'onboarding.html'; }} style={{
+            width: '100%', padding: '15px 18px', display: 'flex', alignItems: 'center',
+            justifyContent: 'space-between', gap: 14, borderBottom: '1px solid var(--hairline)',
+            background: 'transparent', color: 'var(--text-2)',
+          }}>
+            <span style={{ fontSize: 15, fontWeight: 500 }}>View Onboarding</span>
+            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-3)', background: 'var(--surface-2)', border: '1px solid var(--hairline)', borderRadius: 6, padding: '3px 7px' }}>TEMP</span>
+          </button>
+
           <button className="press" onClick={() => { onLogout(); }} style={{
             width: '100%', padding: '15px 18px', display: 'flex', alignItems: 'center',
             gap: 14, borderBottom: '1px solid var(--hairline)',
@@ -3620,6 +3746,81 @@ function Profile({ userName, onSetName, goalMin, onSetGoal, weeklyGoalMin, onSet
         </div>
 
       </div>
+
+      {/* ── Switch Account sheet ── */}
+      {showSwitchAccount && (
+        <div style={{
+          position: 'absolute', inset: 0, zIndex: 60,
+          background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)',
+          display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
+          animation: 'almaFade 200ms var(--ease)',
+        }} onClick={() => setShowSwitchAccount(false)}>
+          <div onClick={e => e.stopPropagation()} style={{
+            background: 'var(--bg-1)', borderRadius: '24px 24px 0 0',
+            padding: '20px 20px 48px',
+            display: 'flex', flexDirection: 'column', gap: 12,
+            animation: 'almaFadeUp 250ms var(--ease)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+              <span style={{ fontSize: 17, fontWeight: 700, color: 'var(--text)', letterSpacing: -0.2 }}>Switch Account</span>
+              <button className="press" onClick={() => setShowSwitchAccount(false)} style={{
+                width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center',
+                justifyContent: 'center', background: 'var(--surface-2)', border: '1px solid var(--hairline)',
+                color: 'var(--text-3)',
+              }}>
+                <IconClose size={16} />
+              </button>
+            </div>
+
+            {MOCK_ACCOUNTS.map(acc => (
+              <button key={acc.id} className="press" onClick={() => {
+                if (!acc.active) { onSwitchAccount?.(acc); onToast(`Switched to ${acc.name}`); }
+                setShowSwitchAccount(false);
+              }} style={{
+                width: '100%', display: 'flex', alignItems: 'center', gap: 14,
+                padding: '14px 16px', borderRadius: 16, textAlign: 'left',
+                background: acc.active ? 'var(--accent-soft)' : 'var(--surface)',
+                border: acc.active ? '1px solid var(--accent-glow)' : '1px solid var(--hairline)',
+              }}>
+                <div style={{
+                  width: 42, height: 42, borderRadius: '50%', flexShrink: 0,
+                  background: acc.active ? 'var(--accent)' : 'var(--surface-2)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  color: acc.active ? '#fff' : 'var(--text-3)',
+                }}>
+                  <IconUser size={20} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)', marginBottom: 2 }}>{acc.name}</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{acc.email}</div>
+                </div>
+                {acc.active && (
+                  <div style={{
+                    fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6,
+                    color: 'var(--accent)', background: 'var(--accent-soft)',
+                    padding: '3px 8px', borderRadius: 8, flexShrink: 0,
+                  }}>Active</div>
+                )}
+              </button>
+            ))}
+
+            <button className="press" onClick={() => { onToast('Add account coming soon'); setShowSwitchAccount(false); }} style={{
+              width: '100%', padding: '13px 16px', borderRadius: 16,
+              background: 'var(--surface)', border: '1px solid var(--hairline)',
+              display: 'flex', alignItems: 'center', gap: 12, color: 'var(--text-2)',
+            }}>
+              <div style={{
+                width: 42, height: 42, borderRadius: '50%', flexShrink: 0,
+                background: 'var(--surface-2)', border: '1px dashed var(--hairline-strong)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-3)',
+              }}>
+                <IconPlus size={18} />
+              </div>
+              <span style={{ fontSize: 15, fontWeight: 500 }}>Add Account</span>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -3947,9 +4148,10 @@ function App() {
               weeklyGoalMin={weeklyGoalMin} onSetWeeklyGoal={setWeeklyGoalMin}
               weekData={WEEK_SESSION_DATA}
               onToast={fireToast}
-              onLogout={() => fireToast('Logged out')}
+              onLogout={() => { localStorage.removeItem('alma_onboarded'); window.location.href = 'onboarding.html'; }}
               onDeleteAccount={() => fireToast('Account deleted')}
               onOpenStats={() => setStatsOpen(true)}
+              onSwitchAccount={(acc) => fireToast(`Switched to ${acc.name}`)}
             />
           )}
         </div>
