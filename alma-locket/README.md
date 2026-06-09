@@ -118,40 +118,33 @@ The `ALMA_GRADIENTS` map provides backgrounds for track orbs:
 
 ```
 alma-locket/
-├── ALMA.html              ← Single runnable file (all JSX inlined, CDN deps)
-└── alma/
-    ├── alma.css           ← Design tokens, base styles, animations
-    ├── data.jsx           ← Constants: tracks, rituals, layers, user data, gradients
-    ├── icons.jsx          ← All SVG icon components (Lucide factory)
-    ├── components.jsx     ← Shared UI: Orb, TabBar, Toast, DurationPills, etc.
-    ├── mandala.jsx        ← Animated mandala SVG (used in FullPlayer)
-    ├── player.jsx         ← FullPlayer + MiniPlayer screens
-    ├── sanctuary.jsx      ← Sanctuary screen + QuickConfigSheet
-    ├── mixer.jsx          ← Mixer screen + MixerActionBar
-    ├── vault.jsx          ← Vault screen
-    ├── pin-customizer.jsx ← PinCustomizerSheet (color + icon picker for files)
-    ├── tweaks-panel.jsx   ← Dev tweaks overlay (accent color, mandala toggle)
-    ├── stats.jsx          ← Statistics screen + ProgressBar + StatTile
-    ├── profile.jsx        ← Profile screen
-    ├── app.jsx            ← App root: state, navigation, audio engine
-    ├── ios-frame.jsx      ← IOSDevice wrapper (phone frame + status bar)
-    └── img/
-        ├── gradient1–6.webp   ← Ritual/progress gradient covers
-        ├── lotus/
-        │   └── lotus_1–7.webp ← Day-of-week hero images for Profile
-        └── *.webp             ← Atmospheric track artwork
+├── ALMA.html          ← The entire app — single self-contained file
+├── images/            ← Track artwork (referenced by ALMA_GRADIENTS in the HTML)
+│   ├── *.webp         ← Atmospheric photo covers for master tracks
+│   └── mandala/       ← SVG mandala assets
+├── alma/
+│   └── img/           ← Images referenced by path inside the app
+│       ├── gradient1–6.webp   ← Ritual/progress gradient covers
+│       └── lotus/
+│           └── lotus_1–7.webp ← Day-of-week hero images for Profile
+└── nature/            ← Audio files
+    ├── master-tracks/ ← Main meditation tracks (.mp3)
+    ├── effects/       ← Bells, binaural beats, bowls (.mp3/.wav)
+    └── *.mp3/.wav     ← Ambient layers (rain, ocean, forest, fire)
 ```
 
-### Important: single-file architecture
+### Single-file architecture
 
-`ALMA.html` is **the authoritative running file**. All `.jsx` source files are mirrors kept in sync with it. Every component is inlined in order inside one `<script type="text/babel">` block:
+`ALMA.html` is the entire app. It contains:
+- All CSS inlined in a `<style>` block
+- All components inlined in one `<script type="text/babel">` block, in dependency order:
 
 ```
 data → icons → components → mandala → player → sanctuary →
 mixer → vault → tweaks → ios-frame → stats → profile → app
 ```
 
-When editing, change `ALMA.html` and keep the corresponding `.jsx` mirror in sync. The `.jsx` files are for readability and version control diffs — they are not imported or bundled.
+React 18 and Babel are loaded from CDN — no install, no build step. The `alma/img/` and `images/` folders are the only external dependencies the HTML file references.
 
 ---
 
@@ -169,7 +162,7 @@ Because all components share one Babel script block, `const { useState }` can on
 | … | pattern repeats per section |
 
 ### Audio engine
-`useAudioEngine()` in `app.jsx` manages two `<audio>` elements (main track + ambient layer). Volumes are fixed at 0.85 (main) and 0.45 (layer). Bells use short-lived `new Audio()` instances so they never interrupt the main session.
+`useAudioEngine()` manages two `<audio>` elements (main track + ambient layer). Volumes are fixed at 0.85 (main) and 0.45 (layer). Bells use short-lived `new Audio()` instances so they never interrupt the main session.
 
 ### State persistence
 User preferences stored in `localStorage`:
@@ -192,7 +185,7 @@ Toast            z-index: 80
 
 ## Data model (prototype/mock)
 
-All data is hardcoded in `data.jsx`. In a real app these would come from an API or local database.
+All data is hardcoded inside `ALMA.html`. In a real app these would come from an API or local database.
 
 ```
 MASTER_TRACKS     — curated audio tracks available in the library
@@ -209,11 +202,10 @@ PROGRESS_STATES   — 7 stage titles mapped to lotus images (one per day of week
 
 ## Extending the prototype
 
-When adding a new screen or feature:
+When adding a new screen or feature, everything happens inside `ALMA.html`:
 
-1. Add any new data constants to `data.jsx` and the `Object.assign(window, {...})` at the bottom
-2. Add any new icons to `icons.jsx` using `_lucide(<path ... />)`
-3. Write the component in a new `.jsx` mirror file
-4. Paste it into `ALMA.html` in the correct position in the inline script block (maintain dependency order)
-5. Wire it into `app.jsx` (new tab, new state, or new overlay)
-6. Use unique hook aliases (`useStateFoo`) to avoid block-scope conflicts
+1. Add new data constants in the data section; include them in `Object.assign(window, {...})`
+2. Add new icons using `_lucide(<path ... />)` in the icons section
+3. Write the new component in the correct position in the script block (maintain dependency order)
+4. Wire it into the App component (new tab, new state, or new overlay)
+5. Use unique hook aliases (`useStateFoo`) to avoid block-scope conflicts with other sections
