@@ -30,8 +30,8 @@
   --surface-press: rgba(255,255,255,0.10);
   --surface-solid: #211B18;
   --text: #F4F1EC;
-  --text-2: #ACA59D;          /* warm neutral gray */
-  --text-3: #837C73;          /* dim warm gray */
+  --text-2: #A8AAAF;
+  --text-3: #7A7D85;
   --hairline: rgba(255,255,255,0.085);
   --hairline-strong: rgba(255,255,255,0.14);
   --accent-soft: color-mix(in srgb, var(--accent) 16%, transparent);
@@ -64,7 +64,8 @@
   --statusbar: dark;
 }
 
-* { box-sizing: border-box; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body, #stage, #root { height: 100%; width: 100%; }
 
 .alma {
   font-family: var(--font);
@@ -94,13 +95,13 @@
 .scrollbody::-webkit-scrollbar { display: none; }
 
 /* generic pressable */
-.press { transition: transform 140ms var(--ease), background 160ms var(--ease), opacity 160ms var(--ease); }
-.press:active { transform: scale(0.96); }
+.press { transition: background 160ms var(--ease), opacity 120ms var(--ease); }
+.press:active { opacity: 0.55; }
 
 /* horizontal carousels */
 .hscroll {
   display: flex;
-  gap: 14px;
+  gap: 16px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-padding-left: 20px;
@@ -114,7 +115,7 @@
 
 /* section label */
 .eyebrow {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   letter-spacing: 1.4px;
   text-transform: uppercase;
@@ -126,6 +127,10 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 @keyframes almaFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes almaSuccessIn {
+  from { opacity: 0; transform: scale(0.92) translateY(12px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
 
 /* mandala motion */
 @keyframes spinCW  { to { transform: rotate(360deg); } }
@@ -300,6 +305,13 @@ const PROGRESS_STATES = [
 const LIFETIME_STATS = {
   totalSessions: 47,
   totalMin: 820,
+  memberSince: 'Jan 2025',
+};
+
+const MONTH_DATA = {
+  activeDays: 14,
+  totalMin: 350,
+  bestWeekMin: 100,
 };
 
 const WEEKLY_HISTORY = [
@@ -426,6 +438,7 @@ const IconMic       = _lucide(<><rect x="9" y="2" width="6" height="12" rx="3" /
 const IconMusic     = _lucide(<><path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" /></>);
 const IconBell      = _lucide(<><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" /></>);
 const IconSparkles  = _lucide(<><path d="M9.94 14.34 7.5 21l-2.44-6.66L0 12l5.06-2.34L7.5 3l2.44 6.66L15 12z" transform="translate(2 0)" /><path d="M19 3v4M21 5h-4M18 17v3M19.5 18.5h-3" /></>);
+const IconSettings  = _lucide(<><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></>);
 const IconHeadphones= _lucide(<><path d="M3 18v-6a9 9 0 0 1 18 0v6" /><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z" /><path d="M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" /></>);
 const IconFlower    = _lucide(<><circle cx="12" cy="12" r="3" /><path d="M12 16.5A4.5 4.5 0 1 1 7.5 12 4.5 4.5 0 1 1 12 7.5a4.5 4.5 0 1 1 4.5 4.5 4.5 4.5 0 1 1-4.5 4.5" /><path d="M12 7.5V9M7.5 12H9M12 16.5V15M16.5 12H15" /></>);
 const IconStop = ({ size = 18, style } = {}) => (
@@ -511,7 +524,7 @@ function DurationPills({ value, onChange, options = DURATIONS, dense = false }) 
             background: active ? 'var(--text)' : 'var(--surface)',
             color: active ? 'var(--bg-0)' : 'var(--text-2)',
             border: active ? 'none' : '1px solid var(--hairline)',
-            fontSize: 15, fontWeight: 600, letterSpacing: 0.2,
+            fontSize: 16, fontWeight: 600, letterSpacing: 0.2,
             transition: 'background 200ms var(--ease), color 200ms var(--ease)',
             whiteSpace: 'nowrap',
           }}>
@@ -529,7 +542,7 @@ function SectionHead({ title, counter, onMore, style = {} }) {
     <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, ...style }}>
       <h2 style={{ margin: 0, fontSize: 22, fontWeight: 600, letterSpacing: -0.3, color: 'var(--text)', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>{title}</h2>
       {counter != null && (
-        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-3)', letterSpacing: 0.3, flexShrink: 0, whiteSpace: 'nowrap' }}>{counter}</span>
+        <span style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-3)', letterSpacing: 0.3, flexShrink: 0, whiteSpace: 'nowrap' }}>{counter}</span>
       )}
       {onMore && (
         <button className="press" onClick={onMore} style={{ display: 'flex', alignItems: 'center', color: 'var(--text-3)' }}>
@@ -551,8 +564,10 @@ function TabBar({ active, onChange, hasMini }) {
   return (
     <div style={{
       position: 'absolute', left: 0, right: 0, bottom: 0, zIndex: 40,
-      paddingBottom: 30, paddingTop: 12,
-      background: 'linear-gradient(to top, var(--bg-1) 62%, transparent)',
+      paddingBottom: 32, paddingTop: 16,
+      background: 'linear-gradient(to top, var(--bg-1) 40%, transparent)',
+      backdropFilter: 'blur(16px)',
+      WebkitBackdropFilter: 'blur(16px)',
     }}>
       <div style={{
         display: 'flex', justifyContent: 'space-around', alignItems: 'center',
@@ -562,11 +577,11 @@ function TabBar({ active, onChange, hasMini }) {
           const on = active === id;
           return (
             <button key={id} className="press" onClick={() => onChange(id)} style={{
-              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5,
+              display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
               color: on ? 'var(--text)' : 'var(--text-3)', flex: 1,
             }}>
               <Icon size={24} strokeWidth={on ? 2 : 1.7} />
-              <span style={{ fontSize: 12, fontWeight: on ? 600 : 500, letterSpacing: 0.2 }}>{label}</span>
+              <span style={{ fontSize: 16, fontWeight: on ? 600 : 500, letterSpacing: 0.2 }}>{label}</span>
             </button>
           );
         })}
@@ -583,7 +598,7 @@ function AlmaHeader({ theme, onToggleTheme, sub }) {
         <div style={{
           fontSize: 34, fontWeight: 600, letterSpacing: 6, color: 'var(--text)', lineHeight: 1,
         }}>ALMA</div>
-        {sub && <div style={{ fontSize: 14, color: 'var(--text-2)', marginTop: 8, letterSpacing: 0.2 }}>{sub}</div>}
+        {sub && <div style={{ fontSize: 16, color: 'var(--text-2)', marginTop: 8, letterSpacing: 0.2 }}>{sub}</div>}
       </div>
       <ThemeToggle theme={theme} onToggle={onToggleTheme} />
     </div>
@@ -616,19 +631,25 @@ function ThemeToggle({ theme, onToggle }) {
 }
 
 // Toast notification
-function Toast({ message }) {
+function Toast({ message, action, onAction }) {
   if (!message) return null;
   return (
     <div style={{
       position: 'absolute', bottom: 150, left: '50%', transform: 'translateX(-50%)',
       zIndex: 90, background: 'var(--surface-solid)', color: 'var(--text)',
-      padding: '13px 20px', borderRadius: 16, fontSize: 14, fontWeight: 500,
+      padding: '13px 20px', borderRadius: 16, fontSize: 16, fontWeight: 500,
       boxShadow: 'var(--shadow)', border: '1px solid var(--hairline-strong)',
       whiteSpace: 'nowrap', animation: 'almaFadeUp 300ms var(--ease) both',
-      display: 'flex', alignItems: 'center', gap: 9,
+      display: 'flex', alignItems: 'center', gap: 10,
     }}>
-      <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--text)' }} />
+      <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--text)', flexShrink: 0 }} />
       {message}
+      {action && (
+        <button onClick={onAction} style={{
+          marginLeft: 4, padding: '2px 0', background: 'none', border: 'none', cursor: 'pointer',
+          color: 'var(--accent)', fontSize: 16, fontWeight: 600, fontFamily: 'var(--font)',
+        }}>{action}</button>
+      )}
     </div>
   );
 }
@@ -895,7 +916,7 @@ function Scrubber({ elapsed, total, onSeek }) {
           }} />
         </div>
       </div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.65)', fontVariantNumeric: 'tabular-nums' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 4, fontSize: 16, fontWeight: 500, color: 'rgba(255,255,255,0.65)', fontVariantNumeric: 'tabular-nums' }}>
         <span>{fmtTime(elapsed)}</span>
         <span>-{fmtTime(Math.max(0, total - elapsed))}</span>
       </div>
@@ -905,9 +926,11 @@ function Scrubber({ elapsed, total, onSeek }) {
 
 // ── Full Player Deck ──
 function FullPlayer({ track, duration, elapsed, isPlaying, muted, mode, motion = true,
-  onTogglePlay, onCollapse, onSeek, onCustomize, onToggleMute, onSaveRitual, savedFlash, canSaveRitual }) {
+  onTogglePlay, onCollapse, onSeek, onCustomize, onToggleMute, onSaveRitual, savedFlash, canSaveRitual,
+  onDone, onRepeat }) {
   const total = duration * 60;
   const remaining = Math.max(0, total - elapsed);
+  const done = total > 0 && elapsed >= total;
   const open = mode === 'full';
 
   // drag-to-dismiss
@@ -961,56 +984,96 @@ function FullPlayer({ track, duration, elapsed, isPlaying, muted, mode, motion =
         position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column',
         padding: '128px 30px 42px', color: '#fff',
       }}>
-        {/* mandala + countdown */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 0, gap: 28 }}>
-          <PlayerMandala />
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 72, fontWeight: 300, letterSpacing: 1, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
-              {fmtTime(remaining)}
+
+        {done ? (
+          /* ── Success state ── */
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 36, animation: 'almaSuccessIn 600ms var(--ease-spring) both' }}>
+            {/* mandala + check */}
+            <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <PlayerMandala size={200} />
+              <div style={{ position: 'absolute', display: 'flex', alignItems: 'center', justifyContent: 'center', animation: 'almaSuccessIn 500ms 300ms var(--ease-spring) both', opacity: 0 }}>
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.95)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="20 6 9 17 4 12"/>
+                </svg>
+              </div>
             </div>
-            <div style={{ fontSize: 13, fontWeight: 500, letterSpacing: 1.5, color: 'rgba(255,255,255,0.6)', marginTop: 12, textTransform: 'uppercase' }}>
-              {duration} min session
+            {/* stats */}
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 16, fontWeight: 600, letterSpacing: 1.8, color: 'rgba(255,255,255,0.45)', textTransform: 'uppercase', marginBottom: 12 }}>Session complete</div>
+              <div style={{ fontSize: 72, fontWeight: 300, letterSpacing: 1, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>{duration}</div>
+              <div style={{ fontSize: 16, fontWeight: 500, letterSpacing: 1.5, color: 'rgba(255,255,255,0.55)', marginTop: 10, textTransform: 'uppercase' }}>minutes</div>
             </div>
           </div>
-        </div>
+        ) : (
+          /* ── Playing state ── */
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: 0, gap: 28 }}>
+            <PlayerMandala />
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ fontSize: 72, fontWeight: 300, letterSpacing: 1, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
+                {fmtTime(remaining)}
+              </div>
+              <div style={{ fontSize: 16, fontWeight: 500, letterSpacing: 1.5, color: 'rgba(255,255,255,0.6)', marginTop: 12, textTransform: 'uppercase' }}>
+                {duration} min session
+              </div>
+            </div>
+          </div>
+        )}
 
-        {/* title */}
-        <div style={{ textAlign: 'center', marginBottom: 22 }}>
-          <div style={{ fontSize: 27, fontWeight: 600, letterSpacing: -0.3 }}>{track?.title}</div>
-          <div style={{ fontSize: 15, color: 'rgba(255,255,255,0.6)', marginTop: 4 }}>{track?.sub || track?.layers}</div>
-        </div>
+        {/* title — hidden in success state */}
+        {!done && (
+          <div style={{ textAlign: 'center', marginBottom: 24 }}>
+            <div style={{ fontSize: 28, fontWeight: 600, letterSpacing: -0.3 }}>{track?.title}</div>
+            <div style={{ fontSize: 16, color: 'rgba(255,255,255,0.6)', marginTop: 4 }}>{track?.sub || track?.layers}</div>
+          </div>
+        )}
 
-        {/* scrubber */}
-        <div style={{ marginBottom: 22 }}>
-          <Scrubber elapsed={elapsed} total={total} onSeek={onSeek} />
-        </div>
+        {/* scrubber — hidden in success state */}
+        {!done && (
+          <div style={{ marginBottom: 24 }}>
+            <Scrubber elapsed={elapsed} total={total} onSeek={onSeek} />
+          </div>
+        )}
 
-        {/* controls */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 28, marginBottom: 26 }}>
-          <CircleBtn onClick={onCustomize}><IconSliders size={22} /></CircleBtn>
-          <button className="press" onClick={onTogglePlay} aria-label={isPlaying ? 'Pause' : 'Play'} style={{
-            width: 78, height: 78, borderRadius: '50%', background: '#fff', color: '#16100C',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 10px 30px rgba(0,0,0,0.35)',
-          }}>
-            {isPlaying ? <IconPause size={34} /> : <IconPlay size={32} style={{ marginLeft: 3 }} />}
-          </button>
-          <CircleBtn onClick={onToggleMute} active={muted}><IconMute size={22} /></CircleBtn>
-        </div>
-
-        {/* save as ritual — only shown when playing a mixer session */}
-        {canSaveRitual && (
-          <button className="press" onClick={onSaveRitual} style={{
-            alignSelf: 'center', display: 'flex', alignItems: 'center', gap: 9,
-            padding: '13px 24px', borderRadius: 30,
-            background: savedFlash ? '#fff' : 'rgba(255,255,255,0.10)',
-            border: '1px solid rgba(255,255,255,0.18)',
-            color: savedFlash ? '#16100C' : '#fff',
-            fontSize: 15, fontWeight: 600, transition: 'background 240ms var(--ease), color 240ms var(--ease)',
-          }}>
-            {savedFlash ? <IconCheck size={18} /> : <IconStar size={18} />}
-            {savedFlash ? 'Saved to Rituals' : 'Save as Ritual'}
-          </button>
+        {/* controls — swap to Done / Start again in success state */}
+        {done ? (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'stretch', gap: 12, animation: 'almaSuccessIn 500ms 200ms var(--ease-spring) both', opacity: 0 }}>
+            <button className="press" onClick={onDone} style={{
+              padding: '17px 32px', borderRadius: 100, border: 'none', cursor: 'pointer',
+              background: '#fff', color: '#16100C', fontSize: 16, fontWeight: 600,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>Done</button>
+            <button className="press" onClick={onRepeat} style={{
+              background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.45)',
+              fontSize: 16, fontWeight: 500, cursor: 'pointer', padding: '8px 0',
+            }}>Start again</button>
+          </div>
+        ) : (
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 28, marginBottom: 24 }}>
+              <CircleBtn onClick={onCustomize}><IconSliders size={22} /></CircleBtn>
+              <button className="press" onClick={onTogglePlay} aria-label={isPlaying ? 'Pause' : 'Play'} style={{
+                width: 78, height: 78, borderRadius: '50%', background: '#fff', color: '#16100C',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.35)',
+              }}>
+                {isPlaying ? <IconPause size={34} /> : <IconPlay size={32} style={{ marginLeft: 4 }} />}
+              </button>
+              <CircleBtn onClick={onToggleMute} active={muted}><IconMute size={22} /></CircleBtn>
+            </div>
+            {canSaveRitual && (
+              <button className="press" onClick={onSaveRitual} style={{
+                alignSelf: 'center', display: 'flex', alignItems: 'center', gap: 8, width: '100%', justifyContent: 'center',
+                padding: '13px 24px', borderRadius: 30,
+                background: savedFlash ? '#fff' : 'rgba(255,255,255,0.10)',
+                border: '1px solid rgba(255,255,255,0.18)',
+                color: savedFlash ? '#16100C' : '#fff',
+                fontSize: 16, fontWeight: 600, transition: 'background 240ms var(--ease), color 240ms var(--ease)',
+              }}>
+                {savedFlash ? <IconCheck size={18} /> : <IconStar size={18} />}
+                {savedFlash ? 'Saved to Rituals' : 'Save as Ritual'}
+              </button>
+            )}
+          </div>
         )}
       </div>
     </div>
@@ -1063,7 +1126,7 @@ function MiniPlayer({ track, duration, elapsed, isPlaying, mode, onExpand, onTog
     >
       <div className="press" onClick={onExpand} style={{
         position: 'relative', display: 'flex', alignItems: 'center', gap: 12,
-        padding: 8, paddingRight: 18, borderRadius: 20, overflow: 'hidden',
+        padding: 8, paddingRight: 20, borderRadius: 20, overflow: 'hidden',
         background: 'var(--surface-solid)', border: '1px solid var(--hairline-strong)',
         boxShadow: 'var(--shadow)', cursor: 'pointer',
       }}>
@@ -1075,8 +1138,8 @@ function MiniPlayer({ track, duration, elapsed, isPlaying, mode, onExpand, onTog
           {isPlaying ? <IconPause size={20} /> : <IconPlay size={18} style={{ marginLeft: 2 }} />}
         </button>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{track?.title}</div>
-          <div style={{ fontSize: 12.5, color: 'var(--text-2)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{fmtTime(Math.max(0, total - elapsed))} left · {track?.sub || track?.layers}</div>
+          <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{track?.title}</div>
+          <div style={{ fontSize: 16, color: 'var(--text-2)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{fmtTime(Math.max(0, total - elapsed))} left · {track?.sub || track?.layers}</div>
         </div>
         <Orb grad={track?.grad} size={32} radius={10} />
         {/* thin progress along bottom edge — grayscale */}
@@ -1115,23 +1178,23 @@ function MasterCard({ track, onSelect, onPreview, onLoad, loading, justLoaded })
           <div style={{
             position: 'absolute', left: 10, bottom: 10, padding: '4px 9px', borderRadius: 20,
             background: 'rgba(10,8,6,0.42)', backdropFilter: 'blur(6px)', color: '#fff',
-            fontSize: 12, fontWeight: 600, letterSpacing: 0.2, whiteSpace: 'nowrap',
+            fontSize: 16, fontWeight: 600, letterSpacing: 0.2, whiteSpace: 'nowrap',
           }}>{track.dur} min</div>
         )}
       </Orb>
-      <div style={{ marginTop: 11 }}>
-        <div style={{ fontSize: 15.5, fontWeight: 600, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{track.title}</div>
-        <div style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{track.sub}</div>
+      <div style={{ marginTop: 12 }}>
+        <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{track.title}</div>
+        <div style={{ fontSize: 16, color: 'var(--text-3)', marginTop: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{track.sub}</div>
       </div>
       {!downloaded && (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 12 }}>
           <button className="press" onClick={(e) => { e.stopPropagation(); onPreview(track); }} style={{
-            display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, fontWeight: 600, color: 'var(--text-2)',
+            display: 'flex', alignItems: 'center', gap: 8, fontSize: 16, fontWeight: 600, color: 'var(--text-2)',
           }}>
             <IconPreview size={16} /> Pre-listen
           </button>
           <button className="press" onClick={(e) => { e.stopPropagation(); onLoad(track); }} aria-label="Load to Vault" style={{
-            width: 36, height: 36, borderRadius: '50%', border: '1px solid var(--hairline-strong)',
+            width: 40, height: 40, borderRadius: '50%', border: '1px solid var(--hairline-strong)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             color: justLoaded ? 'var(--text)' : 'var(--text-2)',
             background: loading ? 'var(--surface-2)' : 'transparent',
@@ -1165,11 +1228,11 @@ function RitualCard({ ritual, onLaunch }) {
         <div style={{
           position: 'absolute', top: 12, right: 12, padding: '4px 10px', borderRadius: 20,
           background: 'rgba(10,8,6,0.42)', backdropFilter: 'blur(6px)', color: '#fff',
-          fontSize: 12, fontWeight: 600, letterSpacing: 0.2, whiteSpace: 'nowrap',
+          fontSize: 16, fontWeight: 600, letterSpacing: 0.2, whiteSpace: 'nowrap',
         }}>{ritual.dur} min</div>
         <div style={{ position: 'absolute', left: 14, bottom: 12, right: 14 }}>
           <div style={{ fontSize: 16, fontWeight: 600, color: '#fff', letterSpacing: -0.1 }}>{ritual.title}</div>
-          <div style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.78)', marginTop: 2 }}>{ritual.layers}</div>
+          <div style={{ fontSize: 16, color: 'rgba(255,255,255,0.78)', marginTop: 2 }}>{ritual.layers}</div>
         </div>
       </div>
     </div>
@@ -1181,13 +1244,13 @@ function PinnedRow({ file, onSelect, onEdit, divider }) {
   return (
     <>
       <div className="press" onClick={() => onSelect(file)} style={{
-        display: 'flex', alignItems: 'center', gap: 14, padding: '7px 0',
+        display: 'flex', alignItems: 'center', gap: 16, padding: '7px 0',
         cursor: 'pointer',
       }}>
         <PinOrb color={file.color} icon={file.icon} size={48} radius={13} />
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 15, fontWeight: 500, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{file.name}</div>
-          <div style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 1 }}>{file.meta}</div>
+          <div style={{ fontSize: 16, fontWeight: 500, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{file.name}</div>
+          <div style={{ fontSize: 16, color: 'var(--text-3)', marginTop: 1 }}>{file.meta}</div>
         </div>
         <button className="press" onClick={(e) => { e.stopPropagation(); onEdit(file); }} aria-label="Customize" style={{
           width: 34, height: 34, borderRadius: '50%', flexShrink: 0,
@@ -1211,7 +1274,7 @@ function AddMoreRitualCard({ onClick }) {
       border: '1.5px dashed var(--hairline-strong)',
       background: 'transparent', color: 'var(--text-2)',
       display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      gap: 10, padding: 16,
+      gap: 12, padding: 16,
     }}>
       <span style={{
         width: 44, height: 44, borderRadius: '50%',
@@ -1222,8 +1285,8 @@ function AddMoreRitualCard({ onClick }) {
         <IconPlus size={20} />
       </span>
       <div style={{ textAlign: 'center' }}>
-        <div style={{ fontSize: 14.5, fontWeight: 600, color: 'var(--text)' }}>Create a Ritual</div>
-        <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 2 }}>Build one in the Mixer</div>
+        <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)' }}>Create a Ritual</div>
+        <div style={{ fontSize: 16, color: 'var(--text-3)', marginTop: 2 }}>Build one in the Mixer</div>
       </div>
     </button>
   );
@@ -1278,10 +1341,10 @@ function Sanctuary({ theme, onToggleTheme, tracks, rituals, pinned, onConfigure,
             <PlayerMandala />
           </div>
           <div style={{ position: 'absolute', left: 20, top: '50%', transform: 'translateY(-50%)', textAlign: 'left' }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2.5, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', marginBottom: 4 }}>ALMA Pro</div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: '#fff', letterSpacing: -0.3, lineHeight: 1.2, marginBottom: 8 }}>Unlock everything</div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 13px', borderRadius: 20, background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(6px)', border: '1px solid rgba(255,255,255,0.22)' }}>
-              <span style={{ fontSize: 12.5, fontWeight: 600, color: '#fff', whiteSpace: 'nowrap' }}>Start free trial →</span>
+            <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: 2.5, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', marginBottom: 4 }}>ALMA Pro</div>
+            <div style={{ fontSize: 16, fontWeight: 700, color: '#fff', letterSpacing: -0.3, lineHeight: 1.2, marginBottom: 8 }}>Unlock everything</div>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '5px 13px', borderRadius: 20, background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(6px)', border: '1px solid rgba(255,255,255,0.22)' }}>
+              <span style={{ fontSize: 16, fontWeight: 600, color: '#fff', whiteSpace: 'nowrap' }}>Start free trial →</span>
             </div>
           </div>
         </button>
@@ -1315,30 +1378,30 @@ function QuickConfigSheet({ track, onClose, onBegin, onAddLayers }) {
         <div style={{ width: 40, height: 5, borderRadius: 3, background: 'var(--hairline-strong)', margin: '0 auto 22px' }} />
         {track && (
           <>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 15, marginBottom: 26 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
               <Orb grad={track.grad} size={64} radius={18} glow />
               <div>
                 <div className="eyebrow" style={{ marginBottom: 4 }}>Configure session</div>
-                <div style={{ fontSize: 21, fontWeight: 600, color: 'var(--text)' }}>{track.title}</div>
-                <div style={{ fontSize: 14, color: 'var(--text-2)', marginTop: 1 }}>{track.sub}</div>
+                <div style={{ fontSize: 22, fontWeight: 600, color: 'var(--text)' }}>{track.title}</div>
+                <div style={{ fontSize: 16, color: 'var(--text-2)', marginTop: 1 }}>{track.sub}</div>
               </div>
             </div>
 
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-2)', marginBottom: 11 }}>Duration</div>
-            <DurationPills value={dur} onChange={setDur} dense />
+            <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-2)', marginBottom: 12 }}>Duration</div>
+            <MixerDurationPicker value={dur} onChange={setDur} />
 
             <button className="press" onClick={() => onBegin(track, dur)} style={{
-              width: '100%', marginTop: 26, padding: '17px', borderRadius: 18,
+              width: '100%', marginTop: 24, padding: '17px', borderRadius: 18,
               background: 'var(--accent)', color: 'var(--on-accent)',
-              fontSize: 17, fontWeight: 600, boxShadow: '0 10px 26px -8px var(--accent-glow)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, whiteSpace: 'nowrap',
+              fontSize: 16, fontWeight: 600, boxShadow: '0 10px 26px -8px var(--accent-glow)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, whiteSpace: 'nowrap',
             }}>
               <IconPlay size={18} /> Begin Session
             </button>
 
             <button className="press" onClick={() => onAddLayers(track)} style={{
-              width: '100%', marginTop: 14, color: 'var(--text-2)', fontSize: 15, fontWeight: 500,
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, whiteSpace: 'nowrap',
+              width: '100%', marginTop: 16, color: 'var(--text-2)', fontSize: 16, fontWeight: 500,
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, whiteSpace: 'nowrap',
             }}>
               Add Ambient Layers & Effects <IconChevRight size={16} />
             </button>
@@ -1384,7 +1447,7 @@ function MixerDurationPicker({ value, onChange }) {
             background: active ? 'var(--text)' : 'var(--surface)',
             color: active ? 'var(--bg-0)' : 'var(--text-2)',
             border: active ? 'none' : '1px solid var(--hairline)',
-            fontSize: 15, fontWeight: 600,
+            fontSize: 16, fontWeight: 600,
             transition: 'background 200ms var(--ease), color 200ms var(--ease)',
           }}>{min} min</button>
         );
@@ -1402,7 +1465,7 @@ function MixerDurationPicker({ value, onChange }) {
             placeholder="min"
             style={{
               width: '100%', background: 'transparent', border: 'none', outline: 'none',
-              color: 'var(--bg-0)', fontSize: 15, fontWeight: 600,
+              color: 'var(--bg-0)', fontSize: 16, fontWeight: 600,
               textAlign: 'center', fontFamily: 'var(--font)',
             }}
           />
@@ -1411,15 +1474,17 @@ function MixerDurationPicker({ value, onChange }) {
         <button className="press" onClick={activateCustom} style={{
           flex: '1 1 0', padding: '11px 8px', borderRadius: 14,
           background: 'var(--surface)', color: 'var(--text-2)',
-          border: '1px solid var(--hairline)', fontSize: 15, fontWeight: 600,
+          border: '1px solid var(--hairline)', fontSize: 16, fontWeight: 600,
         }}>Custom</button>
       )}
     </div>
   );
 }
 
-function Mixer({ focus, setFocus, dur, setDur, layer, setLayer, bell, setBell, intervalMin, setIntervalMin, tracks, onToast, onPreviewLayer }) {
+function Mixer({ focus, setFocus, dur, setDur, layer, setLayer, bell, setBell, intervalMin, setIntervalMin, overlay, setOverlay, tracks, rawAudio, onToast, onPreviewLayer, onAddToVault }) {
   const [dropOpen, setDropOpen] = useStateM(false);
+  const [overlayDropOpen, setOverlayDropOpen] = useStateM(false);
+  const overlayFileRef = useRefM(null);
   const [previewing, setPreviewing] = useStateM(null);
   const previewAudioRef = useRefM(null);
 
@@ -1457,37 +1522,37 @@ function Mixer({ focus, setFocus, dur, setDur, layer, setLayer, bell, setBell, i
 
   return (
     <div style={{ padding: '24px 20px 220px', animation: 'almaFade 400ms var(--ease)' }}>
-      <div style={{ textAlign: 'center', marginBottom: 6 }}>
+      <div style={{ textAlign: 'center', marginBottom: 8 }}>
         <div className="eyebrow">Enhancement Studio</div>
         <h1 style={{ margin: '6px 0 0', fontSize: 28, fontWeight: 600, letterSpacing: -0.4 }}>Mixer</h1>
       </div>
 
       {/* A — Primary Focus Track */}
       <section style={{ marginTop: 24 }}>
-        <div className="eyebrow" style={{ marginBottom: 10 }}>Primary Focus Track</div>
+        <div className="eyebrow" style={{ marginBottom: 12 }}>Primary Focus Track</div>
         <div style={{
           borderRadius: 22, background: 'var(--surface)', border: '1px solid var(--hairline)',
           padding: 14, position: 'relative',
         }}>
           {focus ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
               <Orb grad={focus.grad} size={56} radius={16} glow />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 17, fontWeight: 600, color: 'var(--text)' }}>{focus.title}</div>
-                <div style={{ fontSize: 13.5, color: 'var(--text-2)', marginTop: 1 }}>{focus.sub} · {focus.dur} min</div>
+                <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)' }}>{focus.title}</div>
+                <div style={{ fontSize: 16, color: 'var(--text-2)', marginTop: 1 }}>{focus.sub} · {focus.dur} min</div>
               </div>
               <button className="press" onClick={() => setDropOpen(o => !o)} style={{
                 padding: '9px 15px', borderRadius: 13, background: 'var(--surface-2)',
-                border: '1px solid var(--hairline)', color: 'var(--text-2)', fontSize: 14, fontWeight: 600,
-                display: 'flex', alignItems: 'center', gap: 5, whiteSpace: 'nowrap',
+                border: '1px solid var(--hairline)', color: 'var(--text-2)', fontSize: 16, fontWeight: 600,
+                display: 'flex', alignItems: 'center', gap: 4, whiteSpace: 'nowrap',
               }}>Change <IconChevDown size={15} style={{ transform: dropOpen ? 'rotate(180deg)' : 'none', transition: 'transform 200ms' }} /></button>
             </div>
           ) : (
             <button className="press" onClick={() => setDropOpen(o => !o)} style={{
               width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-              color: 'var(--text-2)', fontSize: 15.5, fontWeight: 500, padding: '6px 4px', gap: 10,
+              color: 'var(--text-2)', fontSize: 16, fontWeight: 500, padding: '6px 4px', gap: 12,
             }}>
-              <span style={{ display: 'flex', alignItems: 'center', gap: 11, minWidth: 0 }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
                 <span style={{ width: 56, height: 56, borderRadius: 16, border: '1.5px dashed var(--hairline-strong)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <IconPlus size={22} />
                 </span>
@@ -1506,8 +1571,8 @@ function Mixer({ focus, setFocus, dur, setDur, layer, setLayer, bell, setBell, i
                 }}>
                   <Orb grad={t.grad} size={40} radius={11} />
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)' }}>{t.title}</div>
-                    <div style={{ fontSize: 12.5, color: 'var(--text-3)' }}>{t.sub} · {t.dur} min</div>
+                    <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)' }}>{t.title}</div>
+                    <div style={{ fontSize: 16, color: 'var(--text-3)' }}>{t.sub} · {t.dur} min</div>
                   </div>
                   {focus?.id === t.id && <IconCheck size={18} style={{ color: 'var(--text-2)' }} />}
                 </button>
@@ -1518,16 +1583,16 @@ function Mixer({ focus, setFocus, dur, setDur, layer, setLayer, bell, setBell, i
       </section>
 
       {/* B — Session Timer */}
-      <section style={{ marginTop: 26 }}>
-        <div className="eyebrow" style={{ marginBottom: 11 }}>Session Length</div>
+      <section style={{ marginTop: 24 }}>
+        <div className="eyebrow" style={{ marginBottom: 12 }}>Session Length</div>
         <MixerDurationPicker value={dur} onChange={setDur} />
       </section>
 
       {/* C — Ambient Layers & Effects */}
-      <section style={{ marginTop: 26 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 11, gap: 10 }}>
+      <section style={{ marginTop: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, gap: 12 }}>
           <div className="eyebrow">Ambient Layers & Effects</div>
-          <span style={{ fontSize: 12, color: 'var(--text-3)', display: 'flex', alignItems: 'center', gap: 5, flexShrink: 0, whiteSpace: 'nowrap' }}>
+          <span style={{ fontSize: 16, color: 'var(--text-3)', display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0, whiteSpace: 'nowrap' }}>
             <IconLayers size={14} /> one at a time
           </span>
         </div>
@@ -1536,9 +1601,9 @@ function Mixer({ focus, setFocus, dur, setDur, layer, setLayer, bell, setBell, i
           { label: 'Nature', ids: ['a1','a2','a3','a4'] },
           { label: 'Frequencies', ids: ['a5','a6','a7'] },
         ].map(group => (
-          <div key={group.label} style={{ marginBottom: 18 }}>
-            <div style={{ fontSize: 12, fontWeight: 500, letterSpacing: 0.2, color: 'var(--text-3)', marginBottom: 8 }}>{group.label}</div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+          <div key={group.label} style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: 16, fontWeight: 500, letterSpacing: 0.2, color: 'var(--text-3)', marginBottom: 8 }}>{group.label}</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {AMBIENT_LAYERS.filter(l => group.ids.includes(l.id)).map(l => {
             const on = layer?.id === l.id;
             return (
@@ -1549,17 +1614,17 @@ function Mixer({ focus, setFocus, dur, setDur, layer, setLayer, bell, setBell, i
                 transition: 'background 220ms var(--ease), border-color 220ms var(--ease)',
                 overflow: 'hidden',
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 13, padding: '12px 14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px' }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)' }}>{l.name}</div>
-                    <div style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 2 }}>{l.desc}</div>
+                    <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)' }}>{l.name}</div>
+                    <div style={{ fontSize: 16, color: 'var(--text-3)', marginTop: 2 }}>{l.desc}</div>
                   </div>
                   <button className="press" onClick={() => previewLayer(l)} aria-label={previewing === l.id ? 'Stop' : 'Listen'} style={{
                     width: 90, height: 40, borderRadius: 20, flexShrink: 0,
                     border: '1px solid var(--hairline-strong)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                     color: previewing === l.id ? 'var(--text)' : 'var(--text-2)',
-                    fontSize: 13, fontWeight: 600,
+                    fontSize: 16, fontWeight: 600,
                   }}>
                     {previewing === l.id ? <IconStop size={14} /> : <IconPlayFilled size={14} />}
                     {previewing === l.id ? 'Stop' : 'Listen'}
@@ -1580,8 +1645,8 @@ function Mixer({ focus, setFocus, dur, setDur, layer, setLayer, bell, setBell, i
                 {/* Interval picker — shown when Interval Bell is active */}
                 {on && l.isInterval && (
                   <div style={{ padding: '0 14px 14px', animation: 'almaFadeUp 200ms var(--ease)' }}>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-3)', marginBottom: 8, letterSpacing: 0.5 }}>RING EVERY</div>
-                    <div style={{ display: 'flex', gap: 7 }}>
+                    <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-3)', marginBottom: 8, letterSpacing: 0.5 }}>RING EVERY</div>
+                    <div style={{ display: 'flex', gap: 8 }}>
                       {[1, 3, 5, 10, 15].map(m => {
                         const active = intervalMin === m;
                         return (
@@ -1590,7 +1655,7 @@ function Mixer({ focus, setFocus, dur, setDur, layer, setLayer, bell, setBell, i
                             background: active ? 'var(--text)' : 'var(--surface-2)',
                             color: active ? 'var(--bg-0)' : 'var(--text-2)',
                             border: active ? 'none' : '1px solid var(--hairline)',
-                            fontSize: 13, fontWeight: 600,
+                            fontSize: 16, fontWeight: 600,
                             transition: 'background 180ms var(--ease), color 180ms var(--ease)',
                           }}>{m}m</button>
                         );
@@ -1606,13 +1671,92 @@ function Mixer({ focus, setFocus, dur, setDur, layer, setLayer, bell, setBell, i
         ))}
       </section>
 
-      {/* D — Session Bells */}
-      <section style={{ marginTop: 26 }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 11, gap: 10 }}>
-          <div className="eyebrow">Session Bells</div>
-          <span style={{ fontSize: 12, color: 'var(--text-3)', flexShrink: 0, whiteSpace: 'nowrap' }}>intro · outro · interval</span>
+      {/* D — Your Audio Overlay */}
+      <section style={{ marginTop: 24 }}>
+        <div className="eyebrow" style={{ marginBottom: 12 }}>Your Audio Overlay</div>
+        <div style={{
+          borderRadius: 22, background: 'var(--surface)', border: '1px solid var(--hairline)',
+          padding: 14, position: 'relative',
+        }}>
+          {overlay ? (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <PinOrb color={overlay.color} icon={overlay.icon} size={56} radius={16} />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{overlay.name}</div>
+                <div style={{ fontSize: 16, color: 'var(--text-2)', marginTop: 1 }}>{overlay.meta}</div>
+              </div>
+              <button className="press" onClick={() => setOverlayDropOpen(o => !o)} style={{
+                padding: '9px 15px', borderRadius: 13, background: 'var(--surface-2)',
+                border: '1px solid var(--hairline)', color: 'var(--text-2)', fontSize: 16, fontWeight: 600,
+                display: 'flex', alignItems: 'center', gap: 4, whiteSpace: 'nowrap',
+              }}>Change <IconChevDown size={15} style={{ transform: overlayDropOpen ? 'rotate(180deg)' : 'none', transition: 'transform 200ms' }} /></button>
+            </div>
+          ) : (
+            <button className="press" onClick={() => setOverlayDropOpen(o => !o)} style={{
+              width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              color: 'var(--text-2)', fontSize: 16, fontWeight: 500, padding: '6px 4px', gap: 12,
+            }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
+                <span style={{ width: 56, height: 56, borderRadius: 16, border: '1.5px dashed var(--hairline-strong)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <IconPlus size={22} />
+                </span>
+                <span style={{ whiteSpace: 'nowrap' }}>Add your own audio</span>
+              </span>
+              <IconChevDown size={18} style={{ flexShrink: 0, transform: overlayDropOpen ? 'rotate(180deg)' : 'none', transition: 'transform 200ms' }} />
+            </button>
+          )}
+
+          {overlayDropOpen && (
+            <div style={{ marginTop: 12, paddingTop: 12, borderTop: '1px solid var(--hairline)', display: 'flex', flexDirection: 'column', gap: 2, animation: 'almaFadeUp 220ms var(--ease)' }}>
+              {(rawAudio && rawAudio.length > 0) ? rawAudio.map(f => (
+                <button key={f.id} className="press" onClick={() => { setOverlay(f); setOverlayDropOpen(false); }} style={{
+                  display: 'flex', alignItems: 'center', gap: 12, padding: 8, borderRadius: 13,
+                  background: overlay?.id === f.id ? 'var(--surface-2)' : 'transparent', textAlign: 'left',
+                }}>
+                  <PinOrb color={f.color} icon={f.icon} size={40} radius={11} />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{f.name}</div>
+                    <div style={{ fontSize: 16, color: 'var(--text-3)' }}>{f.meta}</div>
+                  </div>
+                  {overlay?.id === f.id && <IconCheck size={18} style={{ color: 'var(--text-2)', flexShrink: 0 }} />}
+                </button>
+              )) : (
+                <div style={{ padding: '8px 8px 4px', fontSize: 16, color: 'var(--text-3)' }}>No files in your Vault yet</div>
+              )}
+              <div style={{ height: 1, background: 'var(--hairline)', margin: '4px 0' }} />
+              <button className="press" onClick={() => overlayFileRef.current?.click()} style={{
+                display: 'flex', alignItems: 'center', gap: 12, padding: 8, borderRadius: 13,
+                color: 'var(--text-2)', fontSize: 16, fontWeight: 500, textAlign: 'left',
+              }}>
+                <span style={{ width: 40, height: 40, borderRadius: 11, background: 'var(--surface-2)', border: '1px solid var(--hairline)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <IconPlus size={18} />
+                </span>
+                Import from phone
+              </button>
+              <input ref={overlayFileRef} type="file" accept="audio/*" style={{ display: 'none' }} onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                const url = URL.createObjectURL(file);
+                const name = file.name.replace(/\.[^.]+$/, '');
+                const ext = file.type.includes('wav') ? 'WAV' : 'MP3';
+                const newFile = { id: 'imp-' + Date.now(), name, meta: `${ext} · Imported`, color: 'blu', icon: 'music', pinned: false, audioSrc: url };
+                onAddToVault(newFile);
+                setOverlay(newFile);
+                setOverlayDropOpen(false);
+                e.target.value = '';
+              }} />
+            </div>
+          )}
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 9 }}>
+      </section>
+
+      {/* E — Session Bells */}
+      <section style={{ marginTop: 24 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12, gap: 12 }}>
+          <div className="eyebrow">Session Bells</div>
+          <span style={{ fontSize: 16, color: 'var(--text-3)', flexShrink: 0, whiteSpace: 'nowrap' }}>intro · outro · interval</span>
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
           {AMBIENT_LAYERS.filter(l => ['a8','a9'].includes(l.id)).map(l => {
             const on = bell?.id === l.id;
             return (
@@ -1623,17 +1767,17 @@ function Mixer({ focus, setFocus, dur, setDur, layer, setLayer, bell, setBell, i
                 transition: 'background 220ms var(--ease), border-color 220ms var(--ease)',
                 overflow: 'hidden',
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 13, padding: '12px 14px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px' }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)' }}>{l.name}</div>
-                    <div style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 2 }}>{l.desc}</div>
+                    <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)' }}>{l.name}</div>
+                    <div style={{ fontSize: 16, color: 'var(--text-3)', marginTop: 2 }}>{l.desc}</div>
                   </div>
                   <button className="press" onClick={() => previewLayer(l)} aria-label={previewing === l.id ? 'Stop' : 'Listen'} style={{
                     width: 90, height: 40, borderRadius: 20, flexShrink: 0,
                     border: '1px solid var(--hairline-strong)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
                     color: previewing === l.id ? 'var(--text)' : 'var(--text-2)',
-                    fontSize: 13, fontWeight: 600,
+                    fontSize: 16, fontWeight: 600,
                   }}>
                     {previewing === l.id ? <IconStop size={14} /> : <IconPlayFilled size={14} />}
                     {previewing === l.id ? 'Stop' : 'Listen'}
@@ -1653,8 +1797,8 @@ function Mixer({ focus, setFocus, dur, setDur, layer, setLayer, bell, setBell, i
                 </div>
                 {on && l.isInterval && (
                   <div style={{ padding: '0 14px 14px', animation: 'almaFadeUp 200ms var(--ease)' }}>
-                    <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-3)', marginBottom: 8, letterSpacing: 0.5 }}>RING EVERY</div>
-                    <div style={{ display: 'flex', gap: 7 }}>
+                    <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-3)', marginBottom: 8, letterSpacing: 0.5 }}>RING EVERY</div>
+                    <div style={{ display: 'flex', gap: 8 }}>
                       {[1, 3, 5, 10, 15].map(m => {
                         const active = intervalMin === m;
                         return (
@@ -1663,7 +1807,7 @@ function Mixer({ focus, setFocus, dur, setDur, layer, setLayer, bell, setBell, i
                             background: active ? 'var(--text)' : 'var(--surface-2)',
                             color: active ? 'var(--bg-0)' : 'var(--text-2)',
                             border: active ? 'none' : '1px solid var(--hairline)',
-                            fontSize: 13, fontWeight: 600,
+                            fontSize: 16, fontWeight: 600,
                             transition: 'background 180ms var(--ease), color 180ms var(--ease)',
                           }}>{m}m</button>
                         );
@@ -1731,14 +1875,14 @@ function MixerActionBar({ focus, dur, layer, bell, raised, onBegin, onPreviewMix
       transition: 'bottom 360ms var(--ease-spring)',
     }}>
       <div style={{
-        display: 'flex', gap: 11, padding: 10, borderRadius: 22,
+        display: 'flex', gap: 12, padding: 10, borderRadius: 22,
         background: 'var(--surface-solid)', border: '1px solid var(--hairline-strong)', boxShadow: 'var(--shadow)',
       }}>
         <button className="press" onClick={handlePreview} disabled={!focus} style={{
           flex: '0 0 130px', padding: '15px 0', borderRadius: 15,
           background: 'var(--surface-2)', border: '1px solid var(--hairline)',
-          color: focus ? 'var(--text)' : 'var(--text-3)', fontSize: 14.5, fontWeight: 600,
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7,
+          color: focus ? 'var(--text)' : 'var(--text-3)', fontSize: 16, fontWeight: 600,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
           opacity: focus ? 1 : 0.5, whiteSpace: 'nowrap',
         }}>
           {isPreviewing ? <IconStop size={18} /> : <IconWave size={18} />}
@@ -1774,7 +1918,7 @@ function SegTabs({ tabs, active, onChange }) {
         const on = active === t.id;
         return (
           <button key={t.id} className="press" onClick={() => onChange(t.id)} style={{
-            flex: 1, padding: '11px', borderRadius: 12, fontSize: 14.5, fontWeight: 600,
+            flex: 1, padding: '11px', borderRadius: 12, fontSize: 16, fontWeight: 600,
             background: on ? 'var(--text)' : 'transparent',
             color: on ? 'var(--bg-0)' : 'var(--text-2)',
             transition: 'background 220ms var(--ease), color 220ms var(--ease)',
@@ -1790,7 +1934,7 @@ function RitualVaultRow({ ritual, onRename, onLaunch, onDelete }) {
   const [val, setVal] = useStateV(ritual.title);
   const commit = () => { onRename(ritual.id, val.trim() || ritual.title); setEditing(false); };
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 13, padding: '11px 12px' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 12px' }}>
       <Orb grad={ritual.grad} size={46} radius={13} />
       <div style={{ flex: 1, minWidth: 0 }}>
         {editing ? (
@@ -1798,13 +1942,13 @@ function RitualVaultRow({ ritual, onRename, onLaunch, onDelete }) {
             onBlur={commit} onKeyDown={e => e.key === 'Enter' && commit()}
             style={{
               width: '100%', background: 'var(--surface-2)', border: '1px solid var(--accent)',
-              borderRadius: 9, padding: '6px 9px', color: 'var(--text)', fontSize: 15, fontWeight: 600,
+              borderRadius: 9, padding: '6px 9px', color: 'var(--text)', fontSize: 16, fontWeight: 600,
               fontFamily: 'var(--font)', outline: 'none',
             }} />
         ) : (
-          <div style={{ fontSize: 15.5, fontWeight: 600, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ritual.title}</div>
+          <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{ritual.title}</div>
         )}
-        <div style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 2 }}>{ritual.layers} · {ritual.dur} min</div>
+        <div style={{ fontSize: 16, color: 'var(--text-3)', marginTop: 2 }}>{ritual.layers} · {ritual.dur} min</div>
       </div>
       <button className="press" onClick={() => editing ? commit() : setEditing(true)} aria-label="Rename" style={iconBtn}>
         {editing ? <IconCheck size={16} style={{ color: 'var(--accent)' }} /> : <IconEdit size={16} />}
@@ -1817,15 +1961,26 @@ function RitualVaultRow({ ritual, onRename, onLaunch, onDelete }) {
 }
 
 function RawRow({ file, onTogglePin, onDelete, onEdit }) {
+  const download = () => {
+    if (!file.audioSrc) return;
+    const ext = file.meta?.toLowerCase().includes('wav') ? '.wav' : '.mp3';
+    const a = document.createElement('a');
+    a.href = file.audioSrc;
+    a.download = file.name + ext;
+    a.click();
+  };
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 13, padding: '11px 12px' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '11px 12px' }}>
       <PinOrb color={file.color} icon={file.icon} size={46} radius={13} />
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 15, fontWeight: 500, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{file.name}</div>
-        <div style={{ fontSize: 12.5, color: 'var(--text-3)', marginTop: 1 }}>{file.meta}</div>
+        <div style={{ fontSize: 16, fontWeight: 500, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{file.name}</div>
+        <div style={{ fontSize: 16, color: 'var(--text-3)', marginTop: 1 }}>{file.meta}</div>
       </div>
       <button className="press" onClick={() => onEdit(file)} aria-label="Customize" style={iconBtn}>
         <IconEdit size={16} />
+      </button>
+      <button className="press" onClick={download} aria-label="Download" style={iconBtn}>
+        <IconDownload size={16} />
       </button>
       <button className="press" onClick={() => onTogglePin(file.id)} aria-label="Pin to Sanctuary" style={{
         ...iconBtn, color: file.pinned ? 'var(--text)' : 'var(--text-3)',
@@ -1841,7 +1996,7 @@ function RawRow({ file, onTogglePin, onDelete, onEdit }) {
 }
 
 const iconBtn = {
-  width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
+  width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
   display: 'flex', alignItems: 'center', justifyContent: 'center',
   color: 'var(--text-2)', border: '1px solid var(--hairline)',
 };
@@ -1864,7 +2019,7 @@ function Vault({ rituals, rawAudio, onRename, onDeleteRitual, onTogglePin, onDel
 
   return (
     <div style={{ padding: '24px 20px 200px', animation: 'almaFade 400ms var(--ease)' }}>
-      <div style={{ textAlign: 'center', marginBottom: 18 }}>
+      <div style={{ textAlign: 'center', marginBottom: 20 }}>
         <div className="eyebrow">File Manager</div>
         <h1 style={{ margin: '6px 0 0', fontSize: 28, fontWeight: 600, letterSpacing: -0.4 }}>Vault</h1>
       </div>
@@ -1874,7 +2029,7 @@ function Vault({ rituals, rawAudio, onRename, onDeleteRitual, onTogglePin, onDel
 
       {/* Pro banner */}
       <button className="press" onClick={onUpgrade} style={{
-        width: '100%', borderRadius: 22, marginBottom: 18, overflow: 'hidden',
+        width: '100%', borderRadius: 22, marginBottom: 20, overflow: 'hidden',
         position: 'relative', height: 110, display: 'block',
         background: `url('alma/img/gradient4.webp') center / cover no-repeat`,
         border: 'none', cursor: 'pointer',
@@ -1887,14 +2042,14 @@ function Vault({ rituals, rawAudio, onRename, onDeleteRitual, onTogglePin, onDel
         </div>
         {/* text left side */}
         <div style={{ position: 'absolute', left: 20, top: '50%', transform: 'translateY(-50%)', textAlign: 'left' }}>
-          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2.5, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', marginBottom: 4 }}>ALMA Pro</div>
-          <div style={{ fontSize: 18, fontWeight: 700, color: '#fff', letterSpacing: -0.3, lineHeight: 1.2, marginBottom: 8 }}>Unlock everything</div>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '5px 13px', borderRadius: 20, background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(6px)', border: '1px solid rgba(255,255,255,0.22)' }}>
-            <span style={{ fontSize: 12.5, fontWeight: 600, color: '#fff', whiteSpace: 'nowrap' }}>Start free trial →</span>
+          <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: 2.5, color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase', marginBottom: 4 }}>ALMA Pro</div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: '#fff', letterSpacing: -0.3, lineHeight: 1.2, marginBottom: 8 }}>Unlock everything</div>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '5px 13px', borderRadius: 20, background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(6px)', border: '1px solid rgba(255,255,255,0.22)' }}>
+            <span style={{ fontSize: 16, fontWeight: 600, color: '#fff', whiteSpace: 'nowrap' }}>Start free trial →</span>
           </div>
         </div>
         {/* storage pill — bottom right */}
-        <div style={{ position: 'absolute', bottom: 10, right: 14, fontSize: 11.5, fontWeight: 600, color: 'rgba(255,255,255,0.55)', whiteSpace: 'nowrap' }}>
+        <div style={{ position: 'absolute', bottom: 10, right: 14, fontSize: 16, fontWeight: 600, color: 'rgba(255,255,255,0.55)', whiteSpace: 'nowrap' }}>
           {used}/{SLOTS} slots used
         </div>
       </button>
@@ -1914,14 +2069,14 @@ function Vault({ rituals, rawAudio, onRename, onDeleteRitual, onTogglePin, onDel
             ))}
           </div>
           <button className="press" onClick={onGoMixer} style={{
-            display: 'flex', alignItems: 'center', gap: 12, padding: 14, borderRadius: 16, marginTop: 10,
+            display: 'flex', alignItems: 'center', gap: 12, padding: 14, borderRadius: 16, marginTop: 12,
             border: '1.5px dashed var(--hairline-strong)', color: 'var(--text-3)',
             background: 'transparent', width: '100%',
           }}>
             <span style={{ width: 36, height: 36, borderRadius: 11, border: '1.5px dashed var(--hairline-strong)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <IconPlus size={18} />
             </span>
-            <span style={{ fontSize: 14.5, fontWeight: 500, whiteSpace: 'nowrap' }}>Add Ritual — open the Mixer</span>
+            <span style={{ fontSize: 16, fontWeight: 500, whiteSpace: 'nowrap' }}>Add Ritual — open the Mixer</span>
           </button>
           </>
         ) : (
@@ -1936,7 +2091,7 @@ function Vault({ rituals, rawAudio, onRename, onDeleteRitual, onTogglePin, onDel
             </div>
             {/* empty upload slots */}
             {used < SLOTS && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 9, marginTop: 12 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12 }}>
                 {Array.from({ length: SLOTS - used }).map((_, i) => (
                   <button key={i} className="press" onClick={handleImportClick} style={{
                     display: 'flex', alignItems: 'center', gap: 12, padding: 14, borderRadius: 16,
@@ -1946,7 +2101,7 @@ function Vault({ rituals, rawAudio, onRename, onDeleteRitual, onTogglePin, onDel
                     <span style={{ width: 36, height: 36, borderRadius: 11, border: '1.5px dashed var(--hairline-strong)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       <IconPlus size={18} />
                     </span>
-                    <span style={{ fontSize: 14.5, fontWeight: 500, whiteSpace: 'nowrap' }}>Import audio — slot {used + i + 1}</span>
+                    <span style={{ fontSize: 16, fontWeight: 500, whiteSpace: 'nowrap' }}>Import audio — slot {used + i + 1}</span>
                   </button>
                 ))}
               </div>
@@ -1959,7 +2114,7 @@ function Vault({ rituals, rawAudio, onRename, onDeleteRitual, onTogglePin, onDel
 }
 
 function Empty({ text }) {
-  return <div style={{ padding: '34px 0', textAlign: 'center', color: 'var(--text-3)', fontSize: 14 }}>{text}</div>;
+  return <div style={{ padding: '34px 0', textAlign: 'center', color: 'var(--text-3)', fontSize: 16 }}>{text}</div>;
 }
 
 window.Vault = Vault;
@@ -2013,8 +2168,8 @@ function PaywallSheet({ open, onClose }) {
           </div>
           {/* wordmark */}
           <div style={{ position: 'absolute', bottom: 22, left: 0, right: 0, textAlign: 'center' }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 4, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', marginBottom: 3 }}>ALMA</div>
-            <div style={{ fontSize: 22, fontWeight: 700, color: '#fff', letterSpacing: -0.4 }}>Go Pro</div>
+            <div style={{ fontSize: 16, fontWeight: 700, letterSpacing: 4, color: 'rgba(255,255,255,0.55)', textTransform: 'uppercase', marginBottom: 4 }}>ALMA</div>
+            <div style={{ fontSize: 22, fontWeight: 600, color: '#fff', letterSpacing: -0.4 }}>Go Pro</div>
           </div>
           {/* close — 40px, frosted white */}
           <button className="press" onClick={onClose} aria-label="Close" style={{
@@ -2032,18 +2187,18 @@ function PaywallSheet({ open, onClose }) {
 
           {/* headline */}
           <div style={{ textAlign: 'center', marginBottom: 20 }}>
-            <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text)', letterSpacing: -0.4, lineHeight: 1.2 }}>
+            <div style={{ fontSize: 22, fontWeight: 600, color: 'var(--text)', letterSpacing: -0.4, lineHeight: 1.2 }}>
               Your complete sound sanctuary
             </div>
-            <div style={{ fontSize: 14.5, color: 'var(--text-2)', marginTop: 7 }}>
+            <div style={{ fontSize: 16, color: 'var(--text-2)', marginTop: 8 }}>
               Unlock everything and deepen your practice
             </div>
           </div>
 
           {/* feature list */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 13, marginBottom: 20 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 20 }}>
             {FEATURES.map(({ icon: Icon, title, desc }) => (
-              <div key={title} style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
+              <div key={title} style={{ display: 'flex', alignItems: 'flex-start', gap: 16 }}>
                 <div style={{
                   width: 38, height: 38, borderRadius: 11, flexShrink: 0,
                   background: 'var(--surface-2)', border: '1px solid var(--hairline)',
@@ -2052,16 +2207,16 @@ function PaywallSheet({ open, onClose }) {
                   <Icon size={18} />
                 </div>
                 <div style={{ paddingTop: 2 }}>
-                  <span style={{ fontSize: 14.5, fontWeight: 600, color: 'var(--text)' }}>{title} </span>
-                  <span style={{ fontSize: 14, color: 'var(--text-2)' }}>{desc}</span>
+                  <span style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)' }}>{title} </span>
+                  <span style={{ fontSize: 16, color: 'var(--text-2)' }}>{desc}</span>
                 </div>
               </div>
             ))}
           </div>
 
           {/* plan selector */}
-          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-2)', textAlign: 'center', marginBottom: 12 }}>Select a plan</div>
-          <div style={{ display: 'flex', gap: 12, marginBottom: 10 }}>
+          <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-2)', textAlign: 'center', marginBottom: 12 }}>Select a plan</div>
+          <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
             {/* Yearly */}
             <button className="press" onClick={() => setPlan('yearly')} style={{
               flex: 1, padding: '14px 12px', borderRadius: 18, position: 'relative', textAlign: 'left',
@@ -2073,10 +2228,10 @@ function PaywallSheet({ open, onClose }) {
                 position: 'absolute', top: -11, left: 12,
                 padding: '3px 10px', borderRadius: 20,
                 background: 'var(--accent)', color: 'var(--on-accent)',
-                fontSize: 11, fontWeight: 700, letterSpacing: 0.4,
+                fontSize: 16, fontWeight: 700, letterSpacing: 0.4,
               }}>SAVE 48%</div>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', letterSpacing: 0.5, textTransform: 'uppercase' }}>Yearly</div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)', letterSpacing: 0.5, textTransform: 'uppercase' }}>Yearly</div>
                 <div style={{
                   width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
                   background: plan === 'yearly' ? 'var(--accent)' : 'transparent',
@@ -2086,8 +2241,8 @@ function PaywallSheet({ open, onClose }) {
                   {plan === 'yearly' && <IconCheck size={11} style={{ color: 'var(--on-accent)' }} />}
                 </div>
               </div>
-              <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text)' }}>$49.99 <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-2)' }}>/yr</span></div>
-              <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 3 }}>$4.17/mo · billed annually</div>
+              <div style={{ fontSize: 22, fontWeight: 600, color: 'var(--text)' }}>$49.99 <span style={{ fontSize: 16, fontWeight: 500, color: 'var(--text-2)' }}>/yr</span></div>
+              <div style={{ fontSize: 16, color: 'var(--text-3)', marginTop: 4 }}>$4.17/mo · billed annually</div>
             </button>
             {/* Monthly */}
             <button className="press" onClick={() => setPlan('monthly')} style={{
@@ -2096,8 +2251,8 @@ function PaywallSheet({ open, onClose }) {
               border: `1.5px solid ${plan === 'monthly' ? 'var(--text)' : 'var(--hairline)'}`,
               transition: 'border-color 200ms var(--ease), background 200ms var(--ease)',
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 5 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', letterSpacing: 0.5, textTransform: 'uppercase' }}>Monthly</div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                <div style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)', letterSpacing: 0.5, textTransform: 'uppercase' }}>Monthly</div>
                 <div style={{
                   width: 20, height: 20, borderRadius: '50%', flexShrink: 0,
                   background: plan === 'monthly' ? 'var(--accent)' : 'transparent',
@@ -2107,12 +2262,12 @@ function PaywallSheet({ open, onClose }) {
                   {plan === 'monthly' && <IconCheck size={11} style={{ color: 'var(--on-accent)' }} />}
                 </div>
               </div>
-              <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text)' }}>$7.99 <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-2)' }}>/mo</span></div>
-              <div style={{ fontSize: 12, color: 'var(--text-3)', marginTop: 3 }}>billed monthly</div>
+              <div style={{ fontSize: 22, fontWeight: 600, color: 'var(--text)' }}>$7.99 <span style={{ fontSize: 16, fontWeight: 500, color: 'var(--text-2)' }}>/mo</span></div>
+              <div style={{ fontSize: 16, color: 'var(--text-3)', marginTop: 4 }}>billed monthly</div>
             </button>
           </div>
 
-          <div style={{ fontSize: 12.5, color: 'var(--text-3)', textAlign: 'center' }}>Change or cancel anytime</div>
+          <div style={{ fontSize: 16, color: 'var(--text-3)', textAlign: 'center' }}>Change or cancel anytime</div>
         </div>
 
         {/* CTA */}
@@ -2120,13 +2275,13 @@ function PaywallSheet({ open, onClose }) {
           <button className="press" onClick={onClose} style={{
             width: '100%', padding: '17px', borderRadius: 18,
             background: 'var(--accent)', color: 'var(--on-accent)',
-            fontSize: 17, fontWeight: 700, letterSpacing: -0.2,
+            fontSize: 16, fontWeight: 700, letterSpacing: -0.2,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             boxShadow: '0 10px 30px -8px var(--accent-glow)',
           }}>
             Start 7-Day Free Trial
           </button>
-          <div style={{ textAlign: 'center', fontSize: 12, color: 'var(--text-3)', marginTop: 10 }}>
+          <div style={{ textAlign: 'center', fontSize: 16, color: 'var(--text-3)', marginTop: 12 }}>
             {plan === 'yearly' ? '7 days free, then $49.99/yr' : '7 days free, then $7.99/mo'} · cancel anytime
           </div>
         </div>
@@ -2183,17 +2338,17 @@ function PinCustomizerSheet({ file, onClose, onSave }) {
         {file && (
           <>
             {/* Header preview */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 20 }}>
               <PinOrb color={color} icon={icon} size={56} radius={15} glow />
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div className="eyebrow" style={{ marginBottom: 6 }}>Customize</div>
+                <div className="eyebrow" style={{ marginBottom: 8 }}>Customize</div>
                 <input
                   value={name}
                   onChange={e => setName(e.target.value)}
                   placeholder={file.name}
                   style={{
                     width: '100%', background: 'var(--surface-2)', border: '1px solid var(--hairline-strong)',
-                    borderRadius: 10, padding: '7px 11px', color: 'var(--text)', fontSize: 15, fontWeight: 600,
+                    borderRadius: 10, padding: '7px 11px', color: 'var(--text)', fontSize: 16, fontWeight: 600,
                     fontFamily: 'var(--font)', outline: 'none',
                   }}
                 />
@@ -2201,8 +2356,8 @@ function PinCustomizerSheet({ file, onClose, onSave }) {
             </div>
 
             {/* Color row */}
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-2)', marginBottom: 12 }}>Color</div>
-            <div style={{ display: 'flex', gap: 14, marginBottom: 24 }}>
+            <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-2)', marginBottom: 12 }}>Color</div>
+            <div style={{ display: 'flex', gap: 16, marginBottom: 24 }}>
               {PIN_COLORS.map(c => {
                 const on = color === c.id;
                 return (
@@ -2221,9 +2376,9 @@ function PinCustomizerSheet({ file, onClose, onSave }) {
             </div>
 
             {/* Icon grid */}
-            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-2)', marginBottom: 12 }}>Icon</div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-2)', marginBottom: 12 }}>Icon</div>
             <div style={{
-              display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 10, marginBottom: 26,
+              display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, marginBottom: 24,
             }}>
               {PIN_ICONS.map(i => {
                 const on = icon === i.id;
@@ -2247,7 +2402,7 @@ function PinCustomizerSheet({ file, onClose, onSave }) {
               width: '100%', padding: '16px', borderRadius: 18,
               background: 'var(--accent)', color: 'var(--on-accent)',
               fontSize: 16, fontWeight: 600, boxShadow: '0 10px 26px -8px var(--accent-glow)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, whiteSpace: 'nowrap',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, whiteSpace: 'nowrap',
             }}>
               <IconCheck size={18} /> {file._isNew ? 'Add to Vault' : 'Save'}
             </button>
@@ -2335,7 +2490,7 @@ const __TWEAKS_STYLE = `
   .twk-x{appearance:none;border:0;background:transparent;color:rgba(41,38,27,.55);
     width:22px;height:22px;border-radius:6px;cursor:default;font-size:13px;line-height:1}
   .twk-x:hover{background:rgba(0,0,0,.06);color:#29261b}
-  .twk-body{padding:2px 14px 14px;display:flex;flex-direction:column;gap:10px;
+  .twk-body{padding:2px 14px 14px;display:flex;flex-direction:column;gap:12px;
     overflow-y:auto;overflow-x:hidden;min-height:0;
     scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.15) transparent}
   .twk-body::-webkit-scrollbar{width:8px}
@@ -2344,8 +2499,8 @@ const __TWEAKS_STYLE = `
     border:2px solid transparent;background-clip:content-box}
   .twk-body::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,.25);
     border:2px solid transparent;background-clip:content-box}
-  .twk-row{display:flex;flex-direction:column;gap:5px}
-  .twk-row-h{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
+  .twk-row{display:flex;flex-direction:column;gap:4px}
+  .twk-row-h{flex-direction:row;align-items:center;justify-content:space-between;gap:12px}
   .twk-lbl{display:flex;justify-content:space-between;align-items:baseline;
     color:rgba(41,38,27,.72)}
   .twk-lbl>span:first-child{font-weight:500}
@@ -2413,7 +2568,7 @@ const __TWEAKS_STYLE = `
   .twk-swatch::-webkit-color-swatch{border:0;border-radius:5.5px}
   .twk-swatch::-moz-color-swatch{border:0;border-radius:5.5px}
 
-  .twk-chips{display:flex;gap:6px}
+  .twk-chips{display:flex;gap:8px}
   .twk-chip{position:relative;appearance:none;flex:1;min-width:0;height:46px;
     padding:0;border:0;border-radius:6px;overflow:hidden;cursor:default;
     box-shadow:0 0 0 .5px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.06);
@@ -2834,10 +2989,10 @@ function IOSStatusBar({ dark = false, time = '9:41' }) {
       <div style={{ flex: 1, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: 1.5 }}>
         <span style={{
           fontFamily: '-apple-system, "SF Pro", system-ui', fontWeight: 590,
-          fontSize: 17, lineHeight: '22px', color: c,
+          fontSize: 16, lineHeight: '22px', color: c,
         }}>{time}</span>
       </div>
-      <div style={{ flex: 1, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, paddingTop: 1, paddingRight: 1 }}>
+      <div style={{ flex: 1, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, paddingTop: 1, paddingRight: 1 }}>
         <svg width="19" height="12" viewBox="0 0 19 12">
           <rect x="0" y="7.5" width="3.2" height="4.5" rx="0.7" fill={c}/>
           <rect x="4.8" y="5" width="3.2" height="7" rx="0.7" fill={c}/>
@@ -2910,8 +3065,8 @@ function IOSNavBar({ title = 'Title', dark = false, trailingIcon = true }) {
   );
   return (
     <div style={{
-      display: 'flex', flexDirection: 'column', gap: 10,
-      paddingTop: 62, paddingBottom: 10, position: 'relative', zIndex: 5,
+      display: 'flex', flexDirection: 'column', gap: 12,
+      paddingTop: 62, paddingBottom: 12, position: 'relative', zIndex: 5,
     }}>
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -2936,7 +3091,7 @@ function IOSNavBar({ title = 'Title', dark = false, trailingIcon = true }) {
       <div style={{
         padding: '0 16px',
         fontFamily: '-apple-system, system-ui',
-        fontSize: 34, fontWeight: 700, lineHeight: '41px',
+        fontSize: 34, fontWeight: 600, lineHeight: '41px',
         color: text, letterSpacing: 0.4,
       }}>{title}</div>
     </div>
@@ -2955,7 +3110,7 @@ function IOSListRow({ title, detail, icon, chevron = true, isLast = false, dark 
     <div style={{
       display: 'flex', alignItems: 'center', minHeight: 52,
       padding: '0 16px', position: 'relative',
-      fontFamily: '-apple-system, system-ui', fontSize: 17,
+      fontFamily: '-apple-system, system-ui', fontSize: 16,
       letterSpacing: -0.43,
     }}>
       {icon && (
@@ -2965,7 +3120,7 @@ function IOSListRow({ title, detail, icon, chevron = true, isLast = false, dark 
         }} />
       )}
       <div style={{ flex: 1, color: text }}>{title}</div>
-      {detail && <span style={{ color: sec, marginRight: 6 }}>{detail}</span>}
+      {detail && <span style={{ color: sec, marginRight: 8 }}>{detail}</span>}
       {chevron && (
         <svg width="8" height="14" viewBox="0 0 8 14" style={{ flexShrink: 0 }}>
           <path d="M1 1l6 6-6 6" stroke={ter} strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
@@ -2988,7 +3143,7 @@ function IOSList({ header, children, dark = false }) {
     <div>
       {header && (
         <div style={{
-          fontFamily: '-apple-system, system-ui', fontSize: 13,
+          fontFamily: '-apple-system, system-ui', fontSize: 16,
           color: hc, textTransform: 'uppercase',
           padding: '8px 36px 6px', letterSpacing: -0.08,
         }}>{header}</div>
@@ -3074,7 +3229,7 @@ function IOSKeyboard({ dark = false }) {
   );
 
   const row = (keys, pad = 0) => (
-    <div style={{ display: 'flex', gap: 6.5, justifyContent: 'center', padding: `0 ${pad}px` }}>
+    <div style={{ display: 'flex', gap: 8.5, justifyContent: 'center', padding: `0 ${pad}px` }}>
       {keys.map(l => key(l, { flex: true, k: l }))}
     </div>
   );
@@ -3115,7 +3270,7 @@ function IOSKeyboard({ dark = false }) {
             {i > 0 && <div style={{ width: 1, height: 25, background: '#ccc', opacity: 0.3 }} />}
             <div style={{
               flex: 1, textAlign: 'center',
-              fontFamily: '-apple-system, system-ui', fontSize: 17,
+              fontFamily: '-apple-system, system-ui', fontSize: 16,
               color: sugg, letterSpacing: -0.43, lineHeight: '22px',
             }}>{w}</div>
           </React.Fragment>
@@ -3124,20 +3279,20 @@ function IOSKeyboard({ dark = false }) {
 
       {/* key layout */}
       <div style={{
-        display: 'flex', flexDirection: 'column', gap: 13,
+        display: 'flex', flexDirection: 'column', gap: 12,
         padding: '0 6.5px', width: '100%', boxSizing: 'border-box',
         position: 'relative',
       }}>
         {row(['q','w','e','r','t','y','u','i','o','p'])}
         {row(['a','s','d','f','g','h','j','k','l'], 20)}
-        <div style={{ display: 'flex', gap: 14.25, alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 16.25, alignItems: 'center' }}>
           {key(icons.shift, { w: 45, k: 'shift' })}
-          <div style={{ display: 'flex', gap: 6.5, flex: 1 }}>
+          <div style={{ display: 'flex', gap: 8.5, flex: 1 }}>
             {['z','x','c','v','b','n','m'].map(l => key(l, { flex: true, k: l }))}
           </div>
           {key(icons.del, { w: 45, k: 'del' })}
         </div>
-        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {key('ABC', { w: 92.25, fs: 18, k: 'abc' })}
           {key('', { flex: true, k: 'space' })}
           {key(icons.ret, { w: 92.25, ret: true, k: 'ret' })}
@@ -3156,19 +3311,7 @@ Object.assign(window, {
 
 
 // ALMA — Statistics screen
-
-function ProgressBar({ value, max }) {
-  const pct = max > 0 ? Math.min(100, Math.round((value / max) * 100)) : 0;
-  return (
-    <div style={{ height: 6, borderRadius: 3, background: 'var(--surface-2)', width: '100%', overflow: 'hidden' }}>
-      <div style={{
-        height: '100%', width: `${pct}%`, borderRadius: 3, minWidth: pct > 0 ? 6 : 0,
-        background: 'linear-gradient(90deg, var(--accent), var(--accent-press))',
-        transition: 'width 700ms var(--ease)',
-      }} />
-    </div>
-  );
-}
+const { useState: useStatS } = React;
 
 function StatTile({ label, value }) {
   return (
@@ -3176,19 +3319,57 @@ function StatTile({ label, value }) {
       background: 'var(--surface)', border: '1px solid var(--hairline)',
       borderRadius: 20, padding: '16px 18px',
     }}>
-      <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 }}>
+      <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 8 }}>
         {label}
       </div>
-      <div style={{ fontSize: 28, fontWeight: 700, color: 'var(--text)', letterSpacing: -0.5 }}>
+      <div style={{ fontSize: 28, fontWeight: 600, color: 'var(--text)', letterSpacing: -0.5 }}>
         {value}
       </div>
     </div>
   );
 }
 
+function GradientBar({ value, max }) {
+  const pct = max > 0 ? Math.min(100, Math.round((value / max) * 100)) : 0;
+  return (
+    <div style={{ height: 8, borderRadius: 100, background: 'rgba(255,255,255,0.06)', overflow: 'hidden', position: 'relative' }}>
+      <div style={{
+        position: 'absolute', top: 0, left: 0, bottom: 0, width: '100%',
+        clipPath: `inset(0 ${Math.max(0, 100 - pct)}% 0 0 round 100px)`,
+        background: `url('alma/img/gradient4.webp') center / cover no-repeat`,
+        transition: 'clip-path 700ms var(--ease)',
+      }} />
+    </div>
+  );
+}
+
+function WeekRow({ w, last }) {
+  return (
+    <div style={{
+      display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+      padding: '14px 20px',
+      borderBottom: last ? 'none' : '1px solid var(--hairline)',
+    }}>
+      <span style={{ fontSize: 16, fontWeight: 500, color: 'var(--text-2)' }}>{w.week}</span>
+      <span style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)' }}>{fmtWeekMin(w.min)}</span>
+    </div>
+  );
+}
+
 function Stats({ onBack, weeklyGoalMin, weekData }) {
-  const thisWeekMin = (weekData || WEEK_SESSION_DATA).reduce((s, d) => s + d.min, 0);
+  const [tab, setTab] = useStatS('week');
+  const data = weekData || WEEK_SESSION_DATA;
+  const thisWeekMin = data.reduce((s, d) => s + d.min, 0);
+  const activeDaysWeek = data.filter(d => d.min > 0).length;
+  const bestDayMin = Math.max(...data.map(d => d.min));
   const avgMin = Math.round(LIFETIME_STATS.totalMin / LIFETIME_STATS.totalSessions);
+  const streak = (() => {
+    let s = 0;
+    for (let i = data.length - 1; i >= 0; i--) { if (data[i].min > 0) s++; else break; }
+    return s;
+  })();
+
+  const TABS = [{ id: 'week', label: 'Week' }, { id: 'month', label: 'Month' }, { id: 'lifetime', label: 'Lifetime' }];
 
   return (
     <div style={{
@@ -3197,66 +3378,112 @@ function Stats({ onBack, weeklyGoalMin, weekData }) {
       animation: 'almaFade 250ms var(--ease)',
     }}>
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '60px 20px 0' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '60px 20px 16px' }}>
         <button className="press" onClick={onBack} style={{
-          width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
+          width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           background: 'var(--surface-2)', border: '1px solid var(--hairline)', color: 'var(--text-2)',
         }}>
           <IconChevLeft size={20} />
         </button>
-        <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text)', letterSpacing: -0.3 }}>Statistics</div>
+        <div style={{ fontSize: 22, fontWeight: 600, color: 'var(--text)', letterSpacing: -0.3 }}>Statistics</div>
+      </div>
+
+      {/* Sticky segmented control */}
+      <div style={{ padding: '0 20px 16px', background: 'var(--bg-0)', position: 'sticky', top: 0, zIndex: 10 }}>
+        <div style={{ display: 'flex', background: 'var(--surface)', border: '1px solid var(--hairline)', borderRadius: 14, padding: 3 }}>
+          {TABS.map(t => (
+            <button key={t.id} className="press" onClick={() => setTab(t.id)} style={{
+              flex: 1, padding: '10px 0', borderRadius: 11,
+              background: tab === t.id ? 'var(--text)' : 'transparent',
+              color: tab === t.id ? 'var(--bg-0)' : 'var(--text-3)',
+              fontSize: 16, fontWeight: 600,
+              transition: 'background 180ms var(--ease), color 180ms var(--ease)',
+            }}>{t.label}</button>
+          ))}
+        </div>
       </div>
 
       {/* Scrollable body */}
-      <div style={{ flex: 1, overflowY: 'auto', padding: '20px 20px 100px', display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '0 20px 100px', display: 'flex', flexDirection: 'column', gap: 12 }}>
 
-        {/* 2×2 summary tiles */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-          <StatTile label="Total Time"  value={fmtWeekMin(LIFETIME_STATS.totalMin)} />
-          <StatTile label="Sessions"    value={String(LIFETIME_STATS.totalSessions)} />
-          <StatTile label="Avg Session" value={fmtWeekMin(avgMin)} />
-          <StatTile label="This Week"   value={fmtWeekMin(thisWeekMin)} />
-        </div>
-
-        {/* Current week progress */}
-        <div style={{
-          background: 'var(--surface)', border: '1px solid var(--hairline)',
-          borderRadius: 20, padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 12,
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)' }}>Weekly Goal</span>
-            <span style={{ fontSize: 13, color: 'var(--text-3)' }}>{fmtWeekMin(thisWeekMin)} / {fmtWeekMin(weeklyGoalMin)}</span>
+        {tab === 'week' && <>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <StatTile label="Active Days" value={`${activeDaysWeek} / 7`} />
+            <StatTile label="Total Time"  value={fmtWeekMin(thisWeekMin)} />
+            <StatTile label="Best Day"    value={bestDayMin > 0 ? fmtWeekMin(bestDayMin) : '—'} />
+            <StatTile label="Streak"      value={streak > 0 ? `${streak}d` : '—'} />
           </div>
-          <ProgressBar value={thisWeekMin} max={weeklyGoalMin} />
-          <div style={{ fontSize: 12, color: 'var(--text-3)', textAlign: 'right' }}>
-            {weeklyGoalMin > 0 ? `${Math.min(100, Math.round(thisWeekMin / weeklyGoalMin * 100))}% complete` : ''}
-          </div>
-        </div>
 
-        {/* Past weeks */}
-        <div style={{
-          background: 'var(--surface)', border: '1px solid var(--hairline)',
-          borderRadius: 20, padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 14,
-        }}>
-          <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)' }}>Past Weeks</div>
-          {WEEKLY_HISTORY.map((w, i) => (
-            <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontSize: 13, color: 'var(--text-2)', fontWeight: 500 }}>{w.week}</span>
-                <span style={{ fontSize: 13, color: 'var(--text-3)' }}>{fmtWeekMin(w.min)}</span>
-              </div>
-              <ProgressBar value={w.min} max={weeklyGoalMin} />
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--hairline)', borderRadius: 20, padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <span style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.8 }}>This Week</span>
+            <div style={{ display: 'flex', gap: 8 }}>
+              {data.map((d, i) => {
+                const active = d.min > 0;
+                const opacity = streakOpacity(d.min);
+                return (
+                  <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flex: 1 }}>
+                    <div style={{
+                      width: '100%', aspectRatio: '1 / 1', borderRadius: 8,
+                      background: active ? `color-mix(in srgb, var(--accent) ${Math.round(opacity * 100)}%, transparent)` : 'rgba(255,255,255,0.04)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      <span style={{ fontSize: 16, fontWeight: 600, color: active ? 'var(--text-2)' : 'var(--text-3)', letterSpacing: 0.3 }}>{d.day}</span>
+                    </div>
+                    {active && <span style={{ fontSize: 16, color: 'var(--text-3)', fontWeight: 500, whiteSpace: 'nowrap' }}>{fmtDayMin(d.min)}</span>}
+                  </div>
+                );
+              })}
             </div>
-          ))}
-        </div>
+          </div>
+
+          {weeklyGoalMin > 0 && (
+            <div style={{ background: 'var(--surface)', border: '1px solid var(--hairline)', borderRadius: 20, padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.8 }}>Weekly Goal</span>
+                <span style={{ fontSize: 16, color: 'var(--text-3)' }}>{fmtWeekMin(thisWeekMin)} / {fmtWeekMin(weeklyGoalMin)}</span>
+              </div>
+              <GradientBar value={thisWeekMin} max={weeklyGoalMin} />
+            </div>
+          )}
+        </>}
+
+        {tab === 'month' && <>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <StatTile label="Active Days" value={String(MONTH_DATA.activeDays)} />
+            <StatTile label="Total Time"  value={fmtWeekMin(MONTH_DATA.totalMin)} />
+            <StatTile label="Best Week"   value={fmtWeekMin(MONTH_DATA.bestWeekMin)} />
+            <StatTile label="Avg Session" value={fmtWeekMin(avgMin)} />
+          </div>
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--hairline)', borderRadius: 20, overflow: 'hidden' }}>
+            <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--hairline)' }}>
+              <span style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.8 }}>By Week</span>
+            </div>
+            {WEEKLY_HISTORY.map((w, i) => <WeekRow key={i} w={w} last={i === WEEKLY_HISTORY.length - 1} />)}
+          </div>
+        </>}
+
+        {tab === 'lifetime' && <>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <StatTile label="Total Time"   value={fmtWeekMin(LIFETIME_STATS.totalMin)} />
+            <StatTile label="Sessions"     value={String(LIFETIME_STATS.totalSessions)} />
+            <StatTile label="Avg Session"  value={fmtWeekMin(avgMin)} />
+            <StatTile label="Member Since" value={LIFETIME_STATS.memberSince} />
+          </div>
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--hairline)', borderRadius: 20, overflow: 'hidden' }}>
+            <div style={{ padding: '14px 20px', borderBottom: '1px solid var(--hairline)' }}>
+              <span style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.8 }}>All Weeks</span>
+            </div>
+            {WEEKLY_HISTORY.map((w, i) => <WeekRow key={i} w={w} last={i === WEEKLY_HISTORY.length - 1} />)}
+          </div>
+        </>}
 
       </div>
     </div>
   );
 }
 
-Object.assign(window, { Stats, StatTile, ProgressBar });
+Object.assign(window, { Stats, StatTile, GradientBar });
 
 
 // ALMA — Profile screen
@@ -3287,19 +3514,20 @@ function streakOpacity(min) {
   return 1;
 }
 
-function Profile({ userName, onSetName, goalMin, onSetGoal, weeklyGoalMin, onSetWeeklyGoal, weekData, onToast, onLogout, onDeleteAccount, onOpenStats, onSwitchAccount }) {
+function Profile({ userName, onSetName, goalMin, onSetGoal, weeklyGoalMin, onSetWeeklyGoal, weekData, onToast, onLogout, onDeleteAccount, onOpenStats, onSwitchAccount, theme, onToggleTheme }) {
   const [editingName, setEditingName] = useStateProf(false);
   const [nameInput, setNameInput] = useStateProf(userName);
   const [showGoalPicker, setShowGoalPicker] = useStateProf(false);
+  const [goalType, setGoalType] = useStateProf(() => localStorage.getItem('alma-goal-type') || 'weekly');
+  useEffectProf(() => { localStorage.setItem('alma-goal-type', goalType); }, [goalType]);
   const [customGoalInput, setCustomGoalInput] = useStateProf('');
   const [showCustomGoal, setShowCustomGoal] = useStateProf(false);
   const customGoalRef = useRefProf(null);
-  const [showWeeklyGoalPicker, setShowWeeklyGoalPicker] = useStateProf(false);
-  const [customWeeklyGoalInput, setCustomWeeklyGoalInput] = useStateProf('');
-  const [showCustomWeeklyGoal, setShowCustomWeeklyGoal] = useStateProf(false);
-  const customWeeklyGoalRef = useRefProf(null);
   const [confirmDelete, setConfirmDelete] = useStateProf(false);
   const [showSwitchAccount, setShowSwitchAccount] = useStateProf(false);
+  const [showSettings, setShowSettings] = useStateProf(false);
+  const [remindersOn, setRemindersOn] = useStateProf(true);
+  const [reminderTime, setReminderTime] = useStateProf('08:00');
   const nameRef = useRefProf(null);
 
   const MOCK_ACCOUNTS = [
@@ -3313,9 +3541,9 @@ function Profile({ userName, onSetName, goalMin, onSetGoal, weeklyGoalMin, onSet
   const activeDays = (weekData || WEEK_SESSION_DATA).filter(d => d.min > 0).length;
   const data = weekData || WEEK_SESSION_DATA;
   const totalMin = data.reduce((s, d) => s + d.min, 0);
-  // lotus_1 (Mon) … lotus_7 (Sun) — image number = stage title index
+  // lotus1 (Mon) … lotus7 (Sun) — image number = stage title index
   const todayLotus = (() => { const d = new Date().getDay(); return d === 0 ? 7 : d; })();
-  const heroImg = `alma/img/lotus/lotus_${todayLotus}.webp`;
+  const heroImg = `images/lotus/lotus${todayLotus}.webp`;
   const progState = PROGRESS_STATES[todayLotus - 1];
 
   const commitName = () => {
@@ -3328,39 +3556,17 @@ function Profile({ userName, onSetName, goalMin, onSetGoal, weeklyGoalMin, onSet
   const GOAL_OPTIONS = [10, 15, 30];
 
   useEffectProf(() => { if (showCustomGoal) customGoalRef.current?.focus(); }, [showCustomGoal]);
-  useEffectProf(() => { if (showCustomWeeklyGoal) customWeeklyGoalRef.current?.focus(); }, [showCustomWeeklyGoal]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', paddingBottom: 100 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%', paddingBottom: 100, position: 'relative' }}>
 
       {/* ── Hero ── */}
-      <div style={{
-        display: 'flex', flexDirection: 'column', alignItems: 'center',
-        paddingTop: 60, gap: 14,
-      }}>
-        {/* square image */}
-        <div style={{
-          width: 160, height: 160, borderRadius: 28, flexShrink: 0, overflow: 'hidden',
-         
-          animation: 'breathe 4s ease-in-out infinite', background: 'none',
-        }}>
-          <img src={heroImg} alt={progState.name}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-        </div>
-        {/* state text below the image */}
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-          <div style={{ fontSize: 20, fontWeight: 700, color: 'var(--text)', letterSpacing: -0.3 }}>
-            {progState.name}
-          </div>
-          
-          <div style={{
-            marginTop: 4, paddingInline: 12, paddingBlock: 4, borderRadius: 20,
-            background: 'var(--surface-2)', border: '1px solid var(--hairline)',
-            fontSize: 12, fontWeight: 600, color: 'var(--text-3)', letterSpacing: 0.4,
-          }}>
-            {activeDays === 0 ? 'Start your journey' : `Day ${activeDays} · ${activeDays}-day streak`}
-          </div>
-        </div>
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', paddingTop: 60 }}>
+        <img src={heroImg} alt={progState.name}
+          style={{ width: 280, height: 320, objectFit: 'contain', display: 'block', animation: 'breathe 4s ease-in-out infinite' }} />
+        <span style={{ fontSize: 12, fontWeight: 600, color: 'var(--text-2)', letterSpacing: 1.6, textTransform: 'uppercase', marginTop: 12 }}>
+          {progState.name}
+        </span>
       </div>
 
       <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 16, paddingTop: 20 }}>
@@ -3368,117 +3574,75 @@ function Profile({ userName, onSetName, goalMin, onSetGoal, weeklyGoalMin, onSet
         {/* ── Weekly stats card ── */}
         <div style={{
           background: 'var(--surface)', border: '1px solid var(--hairline)',
-          borderRadius: 20, padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 16,
+          borderRadius: 22, padding: '18px 20px', display: 'flex', flexDirection: 'column', gap: 16,
         }}>
-          {/* total time */}
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
-            <span style={{ fontSize: 34, fontWeight: 700, color: 'var(--text)', letterSpacing: -1 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+            <span style={{ fontSize: 34, fontWeight: 600, color: 'var(--text)', letterSpacing: -1 }}>
               {fmtWeekMin(totalMin)}
             </span>
-            <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-3)', letterSpacing: 1.2, textTransform: 'uppercase' }}>
+            <span style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-3)', letterSpacing: 1.2, textTransform: 'uppercase' }}>
               This week
             </span>
           </div>
 
-          {/* 7-day streak */}
-          <div style={{ display: 'flex', gap: 6, justifyContent: 'space-between' }}>
+          <div style={{ display: 'flex', gap: 8, justifyContent: 'space-between' }}>
             {data.map((d, i) => {
+              const active = d.min > 0;
               const opacity = streakOpacity(d.min);
               return (
-                <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 5, flex: 1 }}>
+                <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, flex: 1 }}>
                   <div style={{
                     width: '100%', aspectRatio: '1 / 1', borderRadius: 8,
-                    background: `color-mix(in srgb, var(--accent) ${Math.round(opacity * 100)}%, var(--surface-2))`,
-                    border: '1px solid var(--hairline)',
+                    background: active
+                      ? `color-mix(in srgb, var(--accent) ${Math.round(opacity * 100)}%, transparent)`
+                      : 'rgba(255,255,255,0.04)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
-                    <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-3)', letterSpacing: 0.3 }}>
+                    <span style={{ fontSize: 16, fontWeight: 600, color: active ? 'var(--text-2)' : 'var(--text-3)', letterSpacing: 0.3 }}>
                       {d.day}
                     </span>
                   </div>
-                  <span style={{ fontSize: 10, color: 'var(--text-3)', fontWeight: 500, whiteSpace: 'nowrap' }}>
-                    {fmtDayMin(d.min)}
-                  </span>
+                  {active && (
+                    <span style={{ fontSize: 16, color: 'var(--text-3)', fontWeight: 500, whiteSpace: 'nowrap' }}>
+                      {fmtDayMin(d.min)}
+                    </span>
+                  )}
                 </div>
               );
             })}
           </div>
 
-          {/* weekly goal progress bar */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {weeklyGoalMin > 0 && <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.8 }}>Weekly goal</span>
-              <span style={{ fontSize: 12, color: 'var(--text-3)' }}>{fmtWeekMin(totalMin)} / {fmtWeekMin(weeklyGoalMin)}</span>
+              <span style={{ fontSize: 16, fontWeight: 600, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: 0.8 }}>Weekly goal</span>
+              <span style={{ fontSize: 16, color: 'var(--text-3)' }}>{fmtWeekMin(totalMin)} / {fmtWeekMin(weeklyGoalMin)}</span>
             </div>
-            <ProgressBar value={totalMin} max={weeklyGoalMin} />
-          </div>
+            <div style={{ height: 8, borderRadius: 100, background: 'rgba(255,255,255,0.06)', overflow: 'hidden', position: 'relative' }}>
+              <div style={{
+                position: 'absolute', top: 0, left: 0, bottom: 0, width: '100%',
+                clipPath: `inset(0 ${Math.max(0, 100 - Math.min(100, Math.round((totalMin / weeklyGoalMin) * 100)))}% 0 0 round 100px)`,
+                background: `url('alma/img/gradient4.webp') center / cover no-repeat`,
+                transition: 'clip-path 700ms var(--ease)',
+              }} />
+            </div>
+          </div>}
         </div>
 
-        {/* ── Account section ── */}
-        <div style={{
-          background: 'var(--surface)', border: '1px solid var(--hairline)',
-          borderRadius: 20, overflow: 'hidden',
-        }}>
-          {/* Name row */}
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 12,
-            padding: '14px 18px', borderBottom: '1px solid var(--hairline)',
-          }}>
-            <div style={{
-              width: 36, height: 36, borderRadius: '50%',
-              background: 'var(--accent-soft)', border: '1px solid var(--hairline-strong)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-            }}>
-              <IconUser size={18} style={{ color: 'var(--accent)' }} />
-            </div>
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div style={{ fontSize: 11, color: 'var(--text-3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 2 }}>Name</div>
-              {editingName ? (
-                <input
-                  ref={nameRef}
-                  value={nameInput}
-                  onChange={e => setNameInput(e.target.value)}
-                  onBlur={commitName}
-                  onKeyDown={e => { if (e.key === 'Enter') commitName(); if (e.key === 'Escape') { setNameInput(userName); setEditingName(false); } }}
-                  style={{
-                    width: '100%', background: 'transparent', border: 'none', outline: 'none',
-                    fontSize: 16, fontWeight: 500, color: 'var(--text)', fontFamily: 'var(--font)',
-                  }}
-                />
-              ) : (
-                <div style={{ fontSize: 16, fontWeight: 500, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                  {userName}
-                </div>
-              )}
-            </div>
-            <button className="press" onClick={() => setEditingName(true)} style={{
-              width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center',
-              justifyContent: 'center', background: 'var(--surface-2)', border: '1px solid var(--hairline)',
-              color: 'var(--text-3)', flexShrink: 0,
-            }}>
-              <IconEdit size={15} />
-            </button>
-          </div>
-
-          {/* Goal row */}
-          <div style={{
-            padding: '14px 18px',
-            borderBottom: '1px solid var(--hairline)',
-          }}>
+        {/* ── Goal ── */}
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--hairline)', borderRadius: 22, overflow: 'hidden' }}>
+          <div style={{ padding: '16px 18px', borderBottom: showGoalPicker ? '1px solid var(--hairline)' : 'none' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{
-                width: 36, height: 36, borderRadius: '50%',
-                background: 'var(--surface-2)', border: '1px solid var(--hairline-strong)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-              }}>
-                <IconTarget size={18} style={{ color: 'var(--text-2)' }} />
+              <IconTarget size={20} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
+              <span style={{ fontSize: 16, fontWeight: 500, color: 'var(--text)' }}>Goal</span>
+              <div style={{ flex: 1, textAlign: 'right' }}>
+                <span style={{ fontSize: 16, fontWeight: 400, color: goalType === 'daily' ? (goalMin > 0 ? 'var(--text-2)' : 'var(--text-3)') : (weeklyGoalMin > 0 ? 'var(--text-2)' : 'var(--text-3)') }}>
+                  {goalType === 'daily'
+                    ? (goalMin > 0 ? `${goalMin} min / day` : 'Not set')
+                    : (weeklyGoalMin > 0 ? `${fmtWeekMin(weeklyGoalMin)} / week` : 'Not set')}
+                </span>
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 11, color: 'var(--text-3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 2 }}>Daily Goal</div>
-                <div style={{ fontSize: 16, fontWeight: 500, color: 'var(--text)' }}>{goalMin} min / day</div>
-              </div>
-              <button className="press" onClick={() => setShowGoalPicker(p => !p)} style={{
-                width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center',
+              <button className="press" onClick={() => { setShowGoalPicker(p => !p); setShowCustomGoal(false); }} style={{
+                width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center',
                 justifyContent: 'center', background: 'var(--surface-2)', border: '1px solid var(--hairline)',
                 color: 'var(--text-3)', flexShrink: 0,
               }}>
@@ -3486,263 +3650,97 @@ function Profile({ userName, onSetName, goalMin, onSetGoal, weeklyGoalMin, onSet
               </button>
             </div>
             {showGoalPicker && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 14 }}>
+                <div style={{ display: 'flex', background: 'var(--surface-2)', borderRadius: 14, padding: 3 }}>
+                  {[['daily', 'Daily'], ['weekly', 'Weekly']].map(([t, label]) => (
+                    <button key={t} className="press" onClick={() => { setGoalType(t); setShowCustomGoal(false); }} style={{
+                      flex: 1, padding: '10px 0', borderRadius: 11,
+                      background: goalType === t ? 'var(--text)' : 'transparent',
+                      color: goalType === t ? 'var(--bg-0)' : 'var(--text-3)',
+                      fontSize: 16, fontWeight: 600,
+                      transition: 'background 180ms var(--ease), color 180ms var(--ease)',
+                    }}>{label}</button>
+                  ))}
+                </div>
                 <div style={{ display: 'flex', gap: 8 }}>
-                  {GOAL_OPTIONS.map(opt => {
-                    const active = goalMin === opt && !showCustomGoal;
+                  {(() => {
+                    const currentVal = goalType === 'daily' ? goalMin : weeklyGoalMin;
+                    const active = currentVal === 0 && !showCustomGoal;
                     return (
-                      <button key={opt} className="press" onClick={() => { onSetGoal(opt); setShowGoalPicker(false); setShowCustomGoal(false); }} style={{
-                        flex: 1, padding: '9px 0', borderRadius: 12,
+                      <button className="press" onClick={() => {
+                        if (goalType === 'daily') onSetGoal(0); else onSetWeeklyGoal(0);
+                        setShowGoalPicker(false); setShowCustomGoal(false);
+                      }} style={{
+                        flex: 1, padding: '10px 0', borderRadius: 12,
                         background: active ? 'var(--text)' : 'var(--surface-2)',
                         color: active ? 'var(--bg-0)' : 'var(--text-2)',
-                        border: active ? 'none' : '1px solid var(--hairline)',
-                        fontSize: 13, fontWeight: 600,
-                      }}>
-                        {opt}m
-                      </button>
+                        border: active ? 'none' : '1px solid var(--hairline)', fontSize: 16, fontWeight: 600,
+                      }}>Off</button>
+                    );
+                  })()}
+                  {(goalType === 'daily' ? GOAL_OPTIONS : WEEKLY_GOAL_OPTIONS).map(opt => {
+                    const currentVal = goalType === 'daily' ? goalMin : weeklyGoalMin;
+                    const active = currentVal === opt && !showCustomGoal;
+                    return (
+                      <button key={opt} className="press" onClick={() => {
+                        if (goalType === 'daily') onSetGoal(opt); else onSetWeeklyGoal(opt);
+                        setShowGoalPicker(false); setShowCustomGoal(false);
+                      }} style={{
+                        flex: 1, padding: '10px 0', borderRadius: 12,
+                        background: active ? 'var(--text)' : 'var(--surface-2)',
+                        color: active ? 'var(--bg-0)' : 'var(--text-2)',
+                        border: active ? 'none' : '1px solid var(--hairline)', fontSize: 16, fontWeight: 600,
+                      }}>{goalType === 'daily' ? `${opt}m` : fmtWeekMin(opt)}</button>
                     );
                   })}
-                  <button className="press" onClick={() => { setShowCustomGoal(p => !p); setCustomGoalInput(String(goalMin)); }} style={{
-                    flex: 1, padding: '9px 0', borderRadius: 12,
-                    background: showCustomGoal ? 'var(--text)' : 'var(--surface-2)',
-                    color: showCustomGoal ? 'var(--bg-0)' : 'var(--text-2)',
-                    border: showCustomGoal ? 'none' : '1px solid var(--hairline)',
-                    fontSize: 13, fontWeight: 600,
-                  }}>
-                    Custom
-                  </button>
+                  {showCustomGoal ? (
+                    <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 12, background: 'var(--text)', padding: '6px 8px' }}>
+                      <input ref={customGoalRef} autoFocus type="text" inputMode="numeric" pattern="[0-9]*"
+                        value={customGoalInput}
+                        onChange={e => {
+                          const raw = e.target.value.replace(/\D/g, '');
+                          setCustomGoalInput(raw);
+                          const n = parseInt(raw, 10);
+                          const max = goalType === 'daily' ? 180 : 600;
+                          if (n > 0 && n <= max) { if (goalType === 'daily') onSetGoal(n); else onSetWeeklyGoal(n); }
+                        }}
+                        onKeyDown={e => { if (e.key === 'Enter') { setShowGoalPicker(false); setShowCustomGoal(false); } if (e.key === 'Escape') setShowCustomGoal(false); }}
+                        onBlur={() => { setShowGoalPicker(false); setShowCustomGoal(false); }}
+                        placeholder="min"
+                        style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', color: 'var(--bg-0)', fontSize: 16, fontWeight: 600, textAlign: 'center', fontFamily: 'var(--font)' }}
+                      />
+                    </div>
+                  ) : (
+                    <button className="press" onClick={() => { const cur = goalType === 'daily' ? goalMin : weeklyGoalMin; setShowCustomGoal(true); setCustomGoalInput(String(cur)); }} style={{
+                      flex: 1, padding: '10px 0', borderRadius: 12,
+                      background: 'var(--surface-2)', color: 'var(--text-2)',
+                      border: '1px solid var(--hairline)', fontSize: 16, fontWeight: 600,
+                    }}>Custom</button>
+                  )}
                 </div>
-                {showCustomGoal && (
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <input
-                      ref={customGoalRef}
-                      type="number" min="1" max="180"
-                      value={customGoalInput}
-                      onChange={e => setCustomGoalInput(e.target.value)}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter') {
-                          const v = Math.max(1, Math.min(180, parseInt(customGoalInput) || goalMin));
-                          onSetGoal(v); setShowGoalPicker(false); setShowCustomGoal(false);
-                        }
-                        if (e.key === 'Escape') { setShowCustomGoal(false); }
-                      }}
-                      placeholder="minutes"
-                      style={{
-                        flex: 1, padding: '9px 14px', borderRadius: 12,
-                        background: 'var(--surface-2)', border: '1px solid var(--hairline-strong)',
-                        color: 'var(--text)', fontSize: 14, fontWeight: 500, outline: 'none',
-                        fontFamily: 'var(--font)',
-                      }}
-                    />
-                    <button className="press" onClick={() => {
-                      const v = Math.max(1, Math.min(180, parseInt(customGoalInput) || goalMin));
-                      onSetGoal(v); setShowGoalPicker(false); setShowCustomGoal(false);
-                    }} style={{
-                      padding: '9px 16px', borderRadius: 12,
-                      background: 'var(--accent)', color: '#fff',
-                      fontSize: 13, fontWeight: 600, flexShrink: 0,
-                    }}>
-                      Set
-                    </button>
-                  </div>
-                )}
               </div>
             )}
           </div>
-
-          {/* Weekly goal row */}
-          <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--hairline)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{
-                width: 36, height: 36, borderRadius: '50%',
-                background: 'var(--surface-2)', border: '1px solid var(--hairline-strong)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-              }}>
-                <IconTarget size={18} style={{ color: 'var(--text-2)' }} />
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 11, color: 'var(--text-3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 2 }}>Weekly Goal</div>
-                <div style={{ fontSize: 16, fontWeight: 500, color: 'var(--text)' }}>{fmtWeekMin(weeklyGoalMin)} / week</div>
-              </div>
-              <button className="press" onClick={() => setShowWeeklyGoalPicker(p => !p)} style={{
-                width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center',
-                justifyContent: 'center', background: 'var(--surface-2)', border: '1px solid var(--hairline)',
-                color: 'var(--text-3)', flexShrink: 0,
-              }}>
-                <IconEdit size={15} />
-              </button>
-            </div>
-            {showWeeklyGoalPicker && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12 }}>
-                <div style={{ display: 'flex', gap: 8 }}>
-                  {WEEKLY_GOAL_OPTIONS.map(opt => {
-                    const active = weeklyGoalMin === opt && !showCustomWeeklyGoal;
-                    return (
-                      <button key={opt} className="press" onClick={() => { onSetWeeklyGoal(opt); setShowWeeklyGoalPicker(false); setShowCustomWeeklyGoal(false); }} style={{
-                        flex: 1, padding: '9px 0', borderRadius: 12,
-                        background: active ? 'var(--text)' : 'var(--surface-2)',
-                        color: active ? 'var(--bg-0)' : 'var(--text-2)',
-                        border: active ? 'none' : '1px solid var(--hairline)',
-                        fontSize: 12, fontWeight: 600,
-                      }}>
-                        {fmtWeekMin(opt)}
-                      </button>
-                    );
-                  })}
-                  <button className="press" onClick={() => { setShowCustomWeeklyGoal(p => !p); setCustomWeeklyGoalInput(String(weeklyGoalMin)); }} style={{
-                    flex: 1, padding: '9px 0', borderRadius: 12,
-                    background: showCustomWeeklyGoal ? 'var(--text)' : 'var(--surface-2)',
-                    color: showCustomWeeklyGoal ? 'var(--bg-0)' : 'var(--text-2)',
-                    border: showCustomWeeklyGoal ? 'none' : '1px solid var(--hairline)',
-                    fontSize: 12, fontWeight: 600,
-                  }}>
-                    Custom
-                  </button>
-                </div>
-                {showCustomWeeklyGoal && (
-                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                    <input
-                      ref={customWeeklyGoalRef}
-                      type="number" min="1" max="600"
-                      value={customWeeklyGoalInput}
-                      onChange={e => setCustomWeeklyGoalInput(e.target.value)}
-                      onKeyDown={e => {
-                        if (e.key === 'Enter') {
-                          const v = Math.max(1, Math.min(600, parseInt(customWeeklyGoalInput) || weeklyGoalMin));
-                          onSetWeeklyGoal(v); setShowWeeklyGoalPicker(false); setShowCustomWeeklyGoal(false);
-                        }
-                        if (e.key === 'Escape') { setShowCustomWeeklyGoal(false); }
-                      }}
-                      placeholder="minutes"
-                      style={{
-                        flex: 1, padding: '9px 14px', borderRadius: 12,
-                        background: 'var(--surface-2)', border: '1px solid var(--hairline-strong)',
-                        color: 'var(--text)', fontSize: 14, fontWeight: 500, outline: 'none',
-                        fontFamily: 'var(--font)',
-                      }}
-                    />
-                    <button className="press" onClick={() => {
-                      const v = Math.max(1, Math.min(600, parseInt(customWeeklyGoalInput) || weeklyGoalMin));
-                      onSetWeeklyGoal(v); setShowWeeklyGoalPicker(false); setShowCustomWeeklyGoal(false);
-                    }} style={{
-                      padding: '9px 16px', borderRadius: 12,
-                      background: 'var(--accent)', color: '#fff',
-                      fontSize: 13, fontWeight: 600, flexShrink: 0,
-                    }}>
-                      Set
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Statistics link row */}
-          <div style={{ borderBottom: '1px solid var(--hairline)' }}>
-            <button className="press" onClick={onOpenStats} style={{
-              width: '100%', padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 12,
-              background: 'transparent',
-            }}>
-              <div style={{
-                width: 36, height: 36, borderRadius: '50%',
-                background: 'var(--surface-2)', border: '1px solid var(--hairline-strong)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-              }}>
-                <IconBarChart size={18} style={{ color: 'var(--text-2)' }} />
-              </div>
-              <div style={{ flex: 1, textAlign: 'left' }}>
-                <div style={{ fontSize: 11, color: 'var(--text-3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 2 }}>Progress</div>
-                <div style={{ fontSize: 16, fontWeight: 500, color: 'var(--text)' }}>Statistics</div>
-              </div>
-              <IconChevRight size={18} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
-            </button>
-          </div>
-
-          {/* Plan row */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 18px' }}>
-            <div style={{
-              width: 36, height: 36, borderRadius: '50%',
-              background: 'var(--surface-2)', border: '1px solid var(--hairline-strong)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
-            }}>
-              <IconSparkles size={18} style={{ color: 'var(--text-2)' }} />
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 11, color: 'var(--text-3)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.8, marginBottom: 2 }}>Plan</div>
-              <div style={{ fontSize: 16, fontWeight: 500, color: 'var(--text)' }}>Free</div>
-            </div>
-            <button className="press" onClick={() => onToast('Upgrade coming soon')} style={{
-              paddingInline: 14, paddingBlock: 7, borderRadius: 20,
-              background: 'var(--accent)', color: '#fff',
-              fontSize: 13, fontWeight: 600, border: 'none',
-            }}>
-              Upgrade
-            </button>
-          </div>
         </div>
 
-        {/* ── Account actions ── */}
-        <div style={{
-          background: 'var(--surface)', border: '1px solid var(--hairline)',
-          borderRadius: 20, overflow: 'hidden',
-        }}>
-          <button className="press" onClick={() => setShowSwitchAccount(true)} style={{
-            width: '100%', padding: '15px 18px', display: 'flex', alignItems: 'center',
-            justifyContent: 'space-between', gap: 14, borderBottom: '1px solid var(--hairline)',
-            background: 'transparent', color: 'var(--text-2)',
+        {/* ── Navigation ── */}
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--hairline)', borderRadius: 22, overflow: 'hidden' }}>
+          <button className="press" onClick={onOpenStats} style={{
+            width: '100%', padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 12,
+            background: 'transparent', borderBottom: '1px solid var(--hairline)',
           }}>
-            <span style={{ fontSize: 15, fontWeight: 500 }}>Switch Account</span>
-            <IconChevRight size={16} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
+            <IconBarChart size={20} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
+            <span style={{ flex: 1, textAlign: 'left', fontSize: 16, fontWeight: 500, color: 'var(--text)' }}>Statistics</span>
+            <IconChevRight size={18} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
           </button>
-
-          <button className="press" onClick={() => { window.location.href = 'onboarding.html'; }} style={{
-            width: '100%', padding: '15px 18px', display: 'flex', alignItems: 'center',
-            justifyContent: 'space-between', gap: 14, borderBottom: '1px solid var(--hairline)',
-            background: 'transparent', color: 'var(--text-2)',
+          <button className="press" onClick={() => setShowSettings(true)} style={{
+            width: '100%', padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 12,
+            background: 'transparent',
           }}>
-            <span style={{ fontSize: 15, fontWeight: 500 }}>View Onboarding</span>
-            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--text-3)', background: 'var(--surface-2)', border: '1px solid var(--hairline)', borderRadius: 6, padding: '3px 7px' }}>TEMP</span>
+            <IconSettings size={20} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
+            <span style={{ flex: 1, textAlign: 'left', fontSize: 16, fontWeight: 500, color: 'var(--text)' }}>Settings</span>
+            <IconChevRight size={18} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
           </button>
-
-          <button className="press" onClick={() => { onLogout(); }} style={{
-            width: '100%', padding: '15px 18px', display: 'flex', alignItems: 'center',
-            gap: 14, borderBottom: '1px solid var(--hairline)',
-            background: 'transparent', color: 'var(--text-2)',
-          }}>
-            <span style={{ fontSize: 15, fontWeight: 500 }}>Log Out</span>
-          </button>
-
-          {!confirmDelete ? (
-            <button className="press" onClick={() => setConfirmDelete(true)} style={{
-              width: '100%', padding: '15px 18px', display: 'flex', alignItems: 'center',
-              gap: 14, background: 'transparent', color: '#E0534A',
-            }}>
-              <span style={{ fontSize: 15, fontWeight: 500 }}>Delete Account</span>
-            </button>
-          ) : (
-            <div style={{ padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-              <div style={{ fontSize: 13, color: 'var(--text-2)' }}>Are you sure? This cannot be undone.</div>
-              <div style={{ display: 'flex', gap: 10 }}>
-                <button className="press" onClick={() => setConfirmDelete(false)} style={{
-                  flex: 1, padding: '10px 0', borderRadius: 12, fontSize: 14, fontWeight: 600,
-                  background: 'var(--surface-2)', color: 'var(--text-2)', border: '1px solid var(--hairline)',
-                }}>
-                  Cancel
-                </button>
-                <button className="press" onClick={() => { onDeleteAccount(); setConfirmDelete(false); }} style={{
-                  flex: 1, padding: '10px 0', borderRadius: 12, fontSize: 14, fontWeight: 600,
-                  background: '#E0534A22', color: '#E0534A', border: '1px solid #E0534A44',
-                }}>
-                  Delete
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* ── Version ── */}
-        <div style={{ textAlign: 'center', paddingTop: 4 }}>
-          <span style={{ fontSize: 12, color: 'var(--text-3)' }}>ALMA · v0.1</span>
         </div>
 
       </div>
@@ -3750,7 +3748,7 @@ function Profile({ userName, onSetName, goalMin, onSetGoal, weeklyGoalMin, onSet
       {/* ── Switch Account sheet ── */}
       {showSwitchAccount && (
         <div style={{
-          position: 'absolute', inset: 0, zIndex: 60,
+          position: 'absolute', inset: 0, zIndex: 80,
           background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)',
           display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
           animation: 'almaFade 200ms var(--ease)',
@@ -3762,9 +3760,9 @@ function Profile({ userName, onSetName, goalMin, onSetGoal, weeklyGoalMin, onSet
             animation: 'almaFadeUp 250ms var(--ease)',
           }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
-              <span style={{ fontSize: 17, fontWeight: 700, color: 'var(--text)', letterSpacing: -0.2 }}>Switch Account</span>
+              <span style={{ fontSize: 16, fontWeight: 700, color: 'var(--text)', letterSpacing: -0.2 }}>Switch Account</span>
               <button className="press" onClick={() => setShowSwitchAccount(false)} style={{
-                width: 32, height: 32, borderRadius: '50%', display: 'flex', alignItems: 'center',
+                width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center',
                 justifyContent: 'center', background: 'var(--surface-2)', border: '1px solid var(--hairline)',
                 color: 'var(--text-3)',
               }}>
@@ -3777,27 +3775,27 @@ function Profile({ userName, onSetName, goalMin, onSetGoal, weeklyGoalMin, onSet
                 if (!acc.active) { onSwitchAccount?.(acc); onToast(`Switched to ${acc.name}`); }
                 setShowSwitchAccount(false);
               }} style={{
-                width: '100%', display: 'flex', alignItems: 'center', gap: 14,
+                width: '100%', display: 'flex', alignItems: 'center', gap: 16,
                 padding: '14px 16px', borderRadius: 16, textAlign: 'left',
-                background: acc.active ? 'var(--accent-soft)' : 'var(--surface)',
-                border: acc.active ? '1px solid var(--accent-glow)' : '1px solid var(--hairline)',
+                background: acc.active ? 'var(--surface-2)' : 'var(--surface)',
+                border: '1px solid var(--hairline)',
               }}>
                 <div style={{
                   width: 42, height: 42, borderRadius: '50%', flexShrink: 0,
-                  background: acc.active ? 'var(--accent)' : 'var(--surface-2)',
+                  background: acc.active ? 'var(--text)' : 'var(--surface-2)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: acc.active ? '#fff' : 'var(--text-3)',
+                  color: acc.active ? 'var(--bg-0)' : 'var(--text-3)',
                 }}>
                   <IconUser size={20} />
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--text)', marginBottom: 2 }}>{acc.name}</div>
-                  <div style={{ fontSize: 12, color: 'var(--text-3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{acc.email}</div>
+                  <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)', marginBottom: 2 }}>{acc.name}</div>
+                  <div style={{ fontSize: 16, color: 'var(--text-3)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{acc.email}</div>
                 </div>
                 {acc.active && (
                   <div style={{
-                    fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6,
-                    color: 'var(--accent)', background: 'var(--accent-soft)',
+                    fontSize: 16, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6,
+                    color: 'var(--bg-0)', background: 'var(--text)',
                     padding: '3px 8px', borderRadius: 8, flexShrink: 0,
                   }}>Active</div>
                 )}
@@ -3816,11 +3814,242 @@ function Profile({ userName, onSetName, goalMin, onSetGoal, weeklyGoalMin, onSet
               }}>
                 <IconPlus size={18} />
               </div>
-              <span style={{ fontSize: 15, fontWeight: 500 }}>Add Account</span>
+              <span style={{ fontSize: 16, fontWeight: 500 }}>Add Account</span>
             </button>
           </div>
         </div>
       )}
+
+      {/* ── Settings panel (slides in from right — Android back-stack pattern) ── */}
+      <div style={{
+        position: 'absolute', inset: 0, zIndex: 70,
+        background: 'var(--bg-grad)',
+        transform: showSettings ? 'translateX(0)' : 'translateX(100%)',
+        transition: 'transform 380ms var(--ease)',
+        overflowY: 'auto',
+        pointerEvents: showSettings ? 'auto' : 'none',
+      }}>
+        {/* header */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '56px 20px 20px' }}>
+          <button className="press" onClick={() => setShowSettings(false)} style={{
+            width: 40, height: 40, borderRadius: '50%', flexShrink: 0,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            background: 'var(--surface)', border: '1px solid var(--hairline)', color: 'var(--text-2)',
+          }}>
+            <IconChevLeft size={20} />
+          </button>
+          <span style={{ fontSize: 22, fontWeight: 600, color: 'var(--text)' }}>Settings</span>
+        </div>
+
+        <div style={{ padding: '0 20px', display: 'flex', flexDirection: 'column', gap: 24, paddingBottom: 100 }}>
+
+          {/* ── Account ── */}
+          <div>
+            <div className="eyebrow" style={{ marginBottom: 12, paddingLeft: 4 }}>Account</div>
+            <div style={{ background: 'var(--surface)', border: '1px solid var(--hairline)', borderRadius: 22, overflow: 'hidden' }}>
+              {/* Name */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 18px', borderBottom: '1px solid var(--hairline)' }}>
+                <IconUser size={20} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
+                <span style={{ fontSize: 16, fontWeight: 500, color: 'var(--text)' }}>Name</span>
+                <div style={{ flex: 1, minWidth: 0, textAlign: 'right' }}>
+                  {editingName ? (
+                    <input ref={nameRef} value={nameInput}
+                      onChange={e => setNameInput(e.target.value)}
+                      onBlur={commitName}
+                      onKeyDown={e => { if (e.key === 'Enter') commitName(); if (e.key === 'Escape') { setNameInput(userName); setEditingName(false); } }}
+                      style={{ width: '100%', background: 'transparent', border: 'none', outline: 'none', fontSize: 16, fontWeight: 400, color: 'var(--text)', fontFamily: 'var(--font)', textAlign: 'right' }}
+                    />
+                  ) : (
+                    <span style={{ fontSize: 16, fontWeight: 400, color: 'var(--text-2)' }}>{userName}</span>
+                  )}
+                </div>
+                <button className="press" onClick={() => setEditingName(true)} style={{
+                  width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center',
+                  justifyContent: 'center', background: 'var(--surface-2)', border: '1px solid var(--hairline)',
+                  color: 'var(--text-3)', flexShrink: 0,
+                }}>
+                  <IconEdit size={15} />
+                </button>
+              </div>
+
+              {/* Plan */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '16px 18px', borderBottom: '1px solid var(--hairline)' }}>
+                <IconSparkles size={20} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
+                <span style={{ fontSize: 16, fontWeight: 500, color: 'var(--text)' }}>Plan</span>
+                <span style={{ flex: 1, fontSize: 16, fontWeight: 400, color: 'var(--text-2)', textAlign: 'right', marginRight: 12 }}>Free</span>
+                <button className="press" onClick={() => onToast('Upgrade coming soon')} style={{
+                  paddingInline: 16, paddingBlock: 8, borderRadius: 20,
+                  background: 'var(--accent)', color: '#fff', fontSize: 16, fontWeight: 600, border: 'none',
+                }}>
+                  Upgrade
+                </button>
+              </div>
+
+              {/* Switch Account */}
+              <button className="press" onClick={() => setShowSwitchAccount(true)} style={{
+                width: '100%', padding: '16px 18px', display: 'flex', alignItems: 'center', gap: 12,
+                background: 'transparent',
+              }}>
+                <IconUser size={20} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
+                <span style={{ flex: 1, textAlign: 'left', fontSize: 16, fontWeight: 500, color: 'var(--text)' }}>Switch Account</span>
+                <IconChevRight size={18} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
+              </button>
+            </div>
+          </div>
+
+          {/* ── Notifications ── */}
+          <div>
+            <div className="eyebrow" style={{ marginBottom: 12, paddingLeft: 4 }}>Notifications</div>
+            <div style={{ background: 'var(--surface)', border: '1px solid var(--hairline)', borderRadius: 22, overflow: 'hidden' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 18px', borderBottom: remindersOn ? '1px solid var(--hairline)' : 'none' }}>
+                <IconBell size={20} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)' }}>Session reminders</div>
+                  <div style={{ fontSize: 14, color: 'var(--text-3)', marginTop: 2 }}>Daily nudge to meditate</div>
+                </div>
+                <button className="press" onClick={() => setRemindersOn(v => !v)} style={{
+                  width: 50, height: 30, borderRadius: 15, position: 'relative', flexShrink: 0,
+                  background: remindersOn ? 'var(--text)' : 'var(--surface-2)',
+                  border: `1px solid ${remindersOn ? 'transparent' : 'var(--hairline)'}`,
+                  transition: 'background 220ms var(--ease)',
+                }}>
+                  <span style={{
+                    position: 'absolute', top: 3, left: remindersOn ? 23 : 3, width: 22, height: 22, borderRadius: '50%',
+                    background: remindersOn ? 'var(--bg-0)' : '#fff',
+                    transition: 'left 240ms var(--ease-spring)', boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                  }} />
+                </button>
+              </div>
+
+              {remindersOn && (
+                <button className="press" onClick={() => onToast('Time picker — wire to TimePickerAndroid in RN')} style={{
+                  width: '100%', display: 'flex', alignItems: 'center', gap: 16,
+                  padding: '16px 18px',
+                  background: 'transparent',
+                }}>
+                  <div style={{ width: 20, flexShrink: 0 }} />
+                  <div style={{ flex: 1, textAlign: 'left' }}>
+                    <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)' }}>Reminder time</div>
+                  </div>
+                  <span style={{ fontSize: 16, fontWeight: 400, color: 'var(--text-2)' }}>{reminderTime}</span>
+                  <IconChevRight size={16} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* ── Playback ── */}
+          <div>
+            <div className="eyebrow" style={{ marginBottom: 12, paddingLeft: 4 }}>Playback</div>
+            <div style={{ background: 'var(--surface)', border: '1px solid var(--hairline)', borderRadius: 22, overflow: 'hidden' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '16px 18px' }}>
+                <IconMoon size={20} style={{ color: 'var(--text-3)', flexShrink: 0 }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)' }}>Background audio</div>
+                  <div style={{ fontSize: 14, color: 'var(--text-3)', marginTop: 2 }}>Keep playing when screen is locked</div>
+                </div>
+                <button className="press" onClick={() => onToast('Wire to Android AudioFocus / backgroundModeIOS in RN')} style={{
+                  width: 50, height: 30, borderRadius: 15, position: 'relative', flexShrink: 0,
+                  background: 'var(--text)',
+                  border: '1px solid transparent',
+                  transition: 'background 220ms var(--ease)',
+                }}>
+                  <span style={{
+                    position: 'absolute', top: 3, left: 23, width: 22, height: 22, borderRadius: '50%',
+                    background: 'var(--bg-0)',
+                    transition: 'left 240ms var(--ease-spring)', boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
+                  }} />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Appearance ── */}
+          <div>
+            <div className="eyebrow" style={{ marginBottom: 12, paddingLeft: 4 }}>Appearance</div>
+            <div style={{ background: 'var(--surface)', border: '1px solid var(--hairline)', borderRadius: 22, padding: '16px 18px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                {theme === 'moon' ? <IconMoon size={20} style={{ color: 'var(--text-3)', flexShrink: 0 }} /> : <IconSun size={20} style={{ color: 'var(--text-3)', flexShrink: 0 }} />}
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)' }}>Theme</div>
+                </div>
+                <div style={{ display: 'flex', background: 'var(--surface-2)', borderRadius: 12, padding: 3, gap: 2 }}>
+                  {[['moon', IconMoon], ['sun', IconSun]].map(([t, Icon]) => (
+                    <button key={t} className="press" onClick={() => { if (theme !== t) onToggleTheme(); }} style={{
+                      width: 40, height: 32, borderRadius: 9,
+                      background: theme === t ? 'var(--text)' : 'transparent',
+                      color: theme === t ? 'var(--bg-0)' : 'var(--text-3)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      transition: 'background 200ms var(--ease), color 200ms var(--ease)',
+                    }}>
+                      <Icon size={16} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── About ── */}
+          <div>
+            <div className="eyebrow" style={{ marginBottom: 12, paddingLeft: 4 }}>About</div>
+            <div style={{ background: 'var(--surface)', border: '1px solid var(--hairline)', borderRadius: 22, overflow: 'hidden' }}>
+              <button className="press" onClick={() => onToast('Opening Terms of Service')} style={{
+                width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '16px 18px', borderBottom: '1px solid var(--hairline)', background: 'transparent',
+              }}>
+                <span style={{ fontSize: 16, fontWeight: 500, color: 'var(--text-2)' }}>Terms of Service</span>
+                <IconChevRight size={16} style={{ color: 'var(--text-3)' }} />
+              </button>
+              <button className="press" onClick={() => onToast('Opening Privacy Policy')} style={{
+                width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                padding: '16px 18px', borderBottom: '1px solid var(--hairline)', background: 'transparent',
+              }}>
+                <span style={{ fontSize: 16, fontWeight: 500, color: 'var(--text-2)' }}>Privacy Policy</span>
+                <IconChevRight size={16} style={{ color: 'var(--text-3)' }} />
+              </button>
+              <div style={{ padding: '16px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: 16, fontWeight: 500, color: 'var(--text-3)' }}>Version</span>
+                <span style={{ fontSize: 16, color: 'var(--text-3)' }}>0.1.0</span>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Session actions ── */}
+          <div style={{ background: 'var(--surface)', border: '1px solid var(--hairline)', borderRadius: 22, overflow: 'hidden' }}>
+            <button className="press" onClick={() => { onLogout(); }} style={{
+              width: '100%', padding: '16px 18px', display: 'flex', alignItems: 'center',
+              borderBottom: '1px solid var(--hairline)', background: 'transparent', color: 'var(--text-2)',
+            }}>
+              <span style={{ fontSize: 16, fontWeight: 500 }}>Log Out</span>
+            </button>
+            {!confirmDelete ? (
+              <button className="press" onClick={() => setConfirmDelete(true)} style={{
+                width: '100%', padding: '16px 18px', display: 'flex', alignItems: 'center',
+                background: 'transparent', color: '#E0534A',
+              }}>
+                <span style={{ fontSize: 16, fontWeight: 500 }}>Delete Account</span>
+              </button>
+            ) : (
+              <div style={{ padding: '14px 18px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                <div style={{ fontSize: 16, color: 'var(--text-2)' }}>Are you sure? This cannot be undone.</div>
+                <div style={{ display: 'flex', gap: 12 }}>
+                  <button className="press" onClick={() => setConfirmDelete(false)} style={{
+                    flex: 1, padding: '12px 0', borderRadius: 12, fontSize: 16, fontWeight: 600,
+                    background: 'var(--surface-2)', color: 'var(--text-2)', border: '1px solid var(--hairline)',
+                  }}>Cancel</button>
+                  <button className="press" onClick={() => { onDeleteAccount(); setConfirmDelete(false); }} style={{
+                    flex: 1, padding: '12px 0', borderRadius: 12, fontSize: 16, fontWeight: 600,
+                    background: '#E0534A22', color: '#E0534A', border: '1px solid #E0534A44',
+                  }}>Delete</button>
+                </div>
+              </div>
+            )}
+          </div>
+
+        </div>
+      </div>
+
     </div>
   );
 }
@@ -3908,6 +4137,7 @@ function App() {
   const [savedFlash, setSavedFlash] = useStateA(false);
   const [showPaywall, setShowPaywall] = useStateA(false);
   const [sessionSource, setSessionSource] = useStateA('track'); // 'track' | 'ritual' | 'mixer'
+  const [activeLayerSrc, setActiveLayerSrc] = useStateA(null);
 
   // sanctuary quick-config
   const [configTrack, setConfigTrack] = useStateA(null);
@@ -3915,16 +4145,17 @@ function App() {
   const [mixFocus, setMixFocus] = useStateA(null);
   const [mixDur, setMixDur] = useStateA(15);
   const [mixLayer, setMixLayer] = useStateA(null);
-  const [mixBell, setMixBell] = useStateA(null);     // session bell (independent)
+  const [mixBell, setMixBell] = useStateA(null);
+  const [mixOverlay, setMixOverlay] = useStateA(null);
   const [intervalMin, setIntervalMin] = useStateA(5);
 
   // toast
-  const [toast, setToast] = useStateA('');
+  const [toast, setToast] = useStateA({ msg: '', action: '', onAction: null });
   const toastTimer = useRefA(null);
-  const fireToast = (msg) => {
-    setToast(msg);
+  const fireToast = (msg, action = '', onAction = null) => {
+    setToast({ msg, action, onAction });
     clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToast(''), 2400);
+    toastTimer.current = setTimeout(() => setToast({ msg: '', action: '', onAction: null }), action ? 4000 : 2400);
   };
 
   // cloud loading
@@ -4014,6 +4245,7 @@ function App() {
     setElapsed(0);
     setIsPlaying(true);
     setSessionSource(source);
+    setActiveLayerSrc(layer?.audioSrc || null);
     setPlayerMode('full');
     setConfigTrack(null);
     audio.play(tr.audioSrc, layer?.audioSrc || null);
@@ -4025,6 +4257,7 @@ function App() {
     setElapsed(0);
     setIsPlaying(true);
     setSessionSource('ritual');
+    setActiveLayerSrc(r.layerSrc || null);
     setPlayerMode('full');
     audio.play(r.audioSrc, r.layerSrc || null);
   };
@@ -4096,8 +4329,8 @@ function App() {
 
   // profile state
   const [userName, setUserName] = useStateA(() => localStorage.getItem('alma-name') || 'Your Name');
-  const [goalMin, setGoalMin] = useStateA(() => Number(localStorage.getItem('alma-goal')) || 15);
-  const [weeklyGoalMin, setWeeklyGoalMin] = useStateA(() => Number(localStorage.getItem('alma-weekly-goal')) || 60);
+  const [goalMin, setGoalMin] = useStateA(() => Number(localStorage.getItem('alma-goal')) || 0);
+  const [weeklyGoalMin, setWeeklyGoalMin] = useStateA(() => Number(localStorage.getItem('alma-weekly-goal')) || 0);
   const [statsOpen, setStatsOpen] = useStateA(false);
   useEffectA(() => { localStorage.setItem('alma-name', userName); }, [userName]);
   useEffectA(() => { localStorage.setItem('alma-goal', String(goalMin)); }, [goalMin]);
@@ -4106,8 +4339,7 @@ function App() {
   const dark = theme === 'moon';
 
   return (
-    <IOSDevice dark={dark}>
-      <div className="alma" data-theme={theme} style={{ '--accent': t.accent }}>
+    <div className="alma" data-theme={theme} style={{ '--accent': t.accent }}>
         <div className="scrollbody" key={tab}>
           {tab === 'sanctuary' && (
             <Sanctuary
@@ -4125,9 +4357,17 @@ function App() {
               focus={mixFocus} setFocus={setMixFocus} dur={mixDur} setDur={setMixDur}
               layer={mixLayer} setLayer={setMixLayer}
               bell={mixBell} setBell={setMixBell}
+              overlay={mixOverlay} setOverlay={setMixOverlay}
               intervalMin={intervalMin} setIntervalMin={setIntervalMin}
-              tracks={MASTER_TRACKS} onToast={fireToast}
+              tracks={MASTER_TRACKS} rawAudio={rawAudio} onToast={fireToast}
               onPreviewLayer={() => {}}
+              onAddToVault={(file) => {
+                setRawAudio(ra => [...ra, file]);
+                fireToast('Added to your Vault', 'Undo', () => {
+                  setRawAudio(ra => ra.filter(f => f.id !== file.id));
+                  setMixOverlay(o => o?.id === file.id ? null : o);
+                });
+              }}
             />
           )}
           {tab === 'vault' && (
@@ -4148,6 +4388,7 @@ function App() {
               weeklyGoalMin={weeklyGoalMin} onSetWeeklyGoal={setWeeklyGoalMin}
               weekData={WEEK_SESSION_DATA}
               onToast={fireToast}
+              theme={theme} onToggleTheme={() => setTheme(tr => tr === 'moon' ? 'sun' : 'moon')}
               onLogout={() => { localStorage.removeItem('alma_onboarded'); window.location.href = 'onboarding.html'; }}
               onDeleteAccount={() => fireToast('Account deleted')}
               onOpenStats={() => setStatsOpen(true)}
@@ -4205,13 +4446,15 @@ function App() {
           onCustomize={() => track && setConfigTrack(track)}
           onToggleMute={() => setMuted(m => !m)}
           onSaveRitual={saveRitual}
+          onDone={() => { audio.stop(); setPlayerMode('closed'); setElapsed(0); }}
+          onRepeat={() => { setElapsed(0); setIsPlaying(true); audio.play(track?.audioSrc, activeLayerSrc); }}
         />
 
         {/* paywall */}
         <PaywallSheet open={showPaywall} onClose={() => setShowPaywall(false)} />
 
         {/* toast */}
-        <Toast message={toast} />
+        <Toast message={toast.msg} action={toast.action} onAction={toast.onAction} />
 
         {/* tweaks */}
         <TweaksPanel>
@@ -4222,21 +4465,11 @@ function App() {
           <TweakToggle label="Mandala motion" value={t.mandalaMotion} onChange={(v) => setTweak('mandalaMotion', v)} />
         </TweaksPanel>
       </div>
-    </IOSDevice>
   );
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App />);
 
 </script>
-  <script>
-    function fitStage() {
-      const s = document.getElementById('stage'); if (!s) return;
-      const pad = 32;
-      const sc = Math.min((innerWidth-pad)/402, (innerHeight-pad)/874, 1);
-      s.style.transform = `scale(${sc})`;
-    }
-    addEventListener('resize', fitStage); fitStage(); setTimeout(fitStage, 300);
-  </script>
 </body>
 </html>

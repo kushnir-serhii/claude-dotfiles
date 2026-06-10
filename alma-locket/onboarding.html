@@ -5,82 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>ALMA — Welcome</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
   --accent: #4839F4;
-  --accent-press: #6350F5;
+  --accent-press: #7C4DF0;
   --font: 'Outfit', -apple-system, system-ui, sans-serif;
-  --font-logo: 'Montserrat', sans-serif;
   --ease: cubic-bezier(0.4, 0.0, 0.1, 1);
   --ease-spring: cubic-bezier(0.34, 1.3, 0.64, 1);
-  --bg: #0B0A09;
+  --bg: #0E0B09;
+  --bg-grad: radial-gradient(130% 90% at 50% 8%, #221C19 0%, #161210 42%, #0C0A08 100%);
   --text: #F4F1EC;
-  --text-2: #ACA59D;
-  --text-3: #837C73;
-  --hairline: rgba(255,255,255,0.08);
+  --text-2: #A8AAAF;
+  --text-3: #7A7D85;
+  --hairline: rgba(255,255,255,0.085);
   --hairline-strong: rgba(255,255,255,0.14);
-  --surface: rgba(22, 18, 16, 0.72);
-  --surface-2: rgba(255,255,255,0.045);
-  --lotus: #F3BCC8;
+  --surface: rgba(255,255,255,0.045);
+  --surface-2: rgba(255,255,255,0.07);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
-html, body {
-  height: 100%;
-  width: 100%;
-}
+html, body { height: 100%; width: 100%; }
 
 body {
   font-family: var(--font);
-  background: #0B0A09;
+  background: var(--bg-grad);
   color: var(--text);
   display: flex;
   flex-direction: column;
   min-height: 100svh;
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
-  position: relative;
-}
-
-/* ── Ambient glows ── */
-.aura {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  overflow: hidden;
-}
-.aura-blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(90px);
-  will-change: transform, opacity;
-  transition: background 800ms var(--ease), opacity 800ms var(--ease);
-}
-.aura-blob-1 {
-  width: 340px; height: 340px;
-  background: rgba(243, 188, 200, 0.09);
-  top: 5%; left: 50%;
-  transform: translateX(-50%);
-  animation: glowDrift1 14s infinite ease-in-out;
-}
-.aura-blob-2 {
-  width: 400px; height: 400px;
-  background: rgba(72, 57, 244, 0.12);
-  top: -10%; left: 42%;
-  transform: translateX(-50%);
-  animation: glowDrift2 18s infinite ease-in-out;
-}
-@keyframes glowDrift1 {
-  0%,100% { transform: translateX(-50%) scale(1); opacity:.35; }
-  40%      { transform: translateX(-50%) scale(1.1) translate(16px,-22px); opacity:.45; }
-  70%      { transform: translateX(-50%) scale(.93) translate(-10px,16px); opacity:.25; }
-}
-@keyframes glowDrift2 {
-  0%,100% { transform: translateX(-50%) scale(1.05); opacity:.22; }
-  50%      { transform: translateX(-50%) scale(.9) translate(-24px,10px); opacity:.32; }
 }
 
 /* ── Screen ── */
@@ -103,6 +58,19 @@ body {
 }
 .step.active { display: flex; }
 
+.back-btn {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--hairline);
+  background: var(--surface);
+  color: var(--text-2);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  align-self: flex-start;
+  margin-bottom: 8px;
+}
+
 @keyframes stepIn {
   from { opacity: 0; transform: translateX(24px); }
   to   { opacity: 1; transform: translateX(0); }
@@ -116,40 +84,27 @@ body {
   text-align: center;
   flex: 1;
   justify-content: flex-start;
-  gap: 0;
   padding-top: 8px;
 }
 
-.lotus-wrap {
-  position: relative;
-  width: 100px; height: 100px;
-  display: flex; align-items: center; justify-content: center;
+.lotus-hero {
+  width: 180px;
+  height: 200px;
+  object-fit: contain;
   margin-bottom: 20px;
-}
-.lotus-glow {
-  position: absolute;
-  inset: -12px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(243,188,200,0.18) 0%, transparent 70%);
-  animation: lotusPulse 3.5s ease-in-out infinite;
-}
-@keyframes lotusPulse {
-  0%,100% { opacity:.7; transform:scale(1); }
-  50%      { opacity:1; transform:scale(1.12); }
 }
 
 .brand-name {
-  font-family: var(--font-logo);
-  font-weight: 300;
-  font-size: 30px;
-  letter-spacing: 0.28em;
+  font-weight: 600;
+  font-size: 34px;
+  letter-spacing: 6px;
   text-transform: uppercase;
   color: var(--text);
   line-height: 1;
   margin-bottom: 8px;
 }
 .brand-sub {
-  font-size: 11px;
+  font-size: 16px;
   font-weight: 400;
   color: var(--text-3);
   letter-spacing: 0.1em;
@@ -161,55 +116,66 @@ body {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 0;
 }
 
 .s1-card {
-  background: rgba(22, 18, 16, 0.85);
+  background: var(--surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--hairline);
-  border-radius: 24px;
+  border-radius: 22px;
   padding: 24px 20px;
   text-align: center;
   margin-bottom: 16px;
 }
 .s1-card h3 {
-  font-size: 16px;
-  font-weight: 700;
+  font-size: 22px;
+  font-weight: 600;
   color: var(--text);
   margin-bottom: 8px;
-  line-height: 1.4;
+  line-height: 1.3;
 }
 .s1-card p {
-  font-size: 12px;
+  font-size: 16px;
   color: var(--text-3);
   line-height: 1.6;
 }
 
-/* ─── STEP 2 ─── */
+/* ─── STEP 2 & 3 header ─── */
+.step-lotus {
+  width: 120px;
+  height: 136px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 12px;
+}
+
 .step-label {
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 16px;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--lotus);
+  letter-spacing: 0.1em;
+  color: var(--text-3);
   text-align: center;
   margin-bottom: 6px;
 }
 .step-title {
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 28px;
+  font-weight: 600;
   color: var(--text);
   text-align: center;
+  letter-spacing: -0.3px;
   margin-bottom: 4px;
 }
 .step-sub {
-  font-size: 12px;
+  font-size: 16px;
   color: var(--text-3);
   text-align: center;
   margin-bottom: 20px;
   line-height: 1.5;
 }
 
+/* ─── Intention list ─── */
 .intention-list {
   display: flex;
   flex-direction: column;
@@ -217,7 +183,6 @@ body {
   flex: 1;
   overflow-y: auto;
   margin-bottom: 16px;
-  padding-right: 2px;
 }
 .intention-list::-webkit-scrollbar { display: none; }
 
@@ -234,8 +199,8 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 .intention-item.selected {
-  border-color: var(--accent);
-  background: rgba(72, 57, 244, 0.06);
+  border-color: var(--hairline-strong);
+  background: rgba(255,255,255,0.06);
 }
 .intention-item-left {
   display: flex;
@@ -243,126 +208,105 @@ body {
   gap: 12px;
 }
 .intention-icon {
-  width: 36px; height: 36px;
+  width: 36px;
+  height: 36px;
   border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  font-size: 16px;
+  color: var(--text-3);
 }
-.intention-icon.purple { background: rgba(72,57,244,0.12); }
-.intention-icon.pink   { background: rgba(243,188,200,0.12); }
-.intention-icon.green  { background: rgba(52,211,153,0.12); }
-.intention-icon.violet { background: rgba(167,139,250,0.12); }
-
 .intention-text h4 {
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 600;
   color: var(--text);
   margin-bottom: 2px;
 }
 .intention-text p {
-  font-size: 11px;
+  font-size: 16px;
   color: var(--text-3);
 }
 
 .check-circle {
-  width: 20px; height: 20px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   border: 1.5px solid var(--hairline-strong);
-  display: flex; align-items: center; justify-content: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
   transition: background 200ms var(--ease), border-color 200ms var(--ease);
 }
-.check-circle.checked {
-  background: var(--accent);
-  border-color: var(--accent);
-}
+.check-circle.checked { background: var(--text); border-color: var(--text); }
 .check-circle svg { display: none; }
 .check-circle.checked svg { display: block; }
 
-/* ─── STEP 3 ─── */
-.goal-list {
+/* ─── Goal list ─── */
+.goal-picker {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-bottom: 16px;
+  gap: 8px;
+  margin-bottom: 12px;
 }
-.goal-item {
+.goal-row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 18px;
-  border-radius: 18px;
+  gap: 8px;
+}
+.goal-chip {
+  flex: 1;
+  padding: 11px 0;
+  border-radius: 14px;
+  background: var(--surface-2);
   border: 1px solid var(--hairline);
-  background: rgba(255,255,255,0.025);
+  color: var(--text-2);
+  font-family: var(--font);
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
-  transition: border-color 200ms var(--ease), background 200ms var(--ease);
+  transition: background 180ms var(--ease), color 180ms var(--ease), border-color 180ms var(--ease);
   -webkit-tap-highlight-color: transparent;
 }
-.goal-item.selected {
-  border-color: var(--accent);
-  background: rgba(72, 57, 244, 0.06);
-}
-.goal-item h4 {
+.goal-chip.secondary {
+  color: var(--text-3);
   font-size: 13px;
-  font-weight: 600;
-  color: var(--text);
-  margin-bottom: 2px;
 }
-.goal-item p {
-  font-size: 11px;
-  color: var(--text-3);
+.goal-chip.active {
+  background: var(--text);
+  color: #0B0A09;
+  border-color: transparent;
 }
-.goal-badge {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-3);
-  transition: color 200ms;
-}
-.goal-item.selected .goal-badge { color: var(--accent); }
-
-.weekly-card {
-  background: rgba(255,255,255,0.03);
-  border: 1px solid var(--hairline);
-  border-radius: 16px;
-  padding: 14px 16px;
-  margin-bottom: 0;
-}
-.weekly-card-top {
-  display: flex;
-  justify-content: space-between;
+.custom-input-wrap {
+  flex: 1;
+  display: none;
   align-items: center;
-  margin-bottom: 10px;
+  justify-content: center;
+  border-radius: 14px;
+  background: var(--text);
+  padding: 6px 8px;
 }
-.weekly-label {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--text-3);
-}
-.weekly-value {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--lotus);
-  transition: all 300ms;
-}
-.progress-track {
+.custom-input-wrap input {
   width: 100%;
-  height: 5px;
-  background: rgba(255,255,255,0.06);
-  border-radius: 100px;
-  overflow: hidden;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #0B0A09;
+  font-family: var(--font);
+  font-size: 16px;
+  font-weight: 600;
+  text-align: center;
 }
-.progress-fill {
-  height: 100%;
-  background: var(--accent);
-  border-radius: 100px;
-  transition: width 500ms var(--ease-spring);
-  width: 60%;
+.per-week {
+  font-size: 16px;
+  color: var(--text-3);
+  text-align: center;
+  min-height: 20px;
+  margin-bottom: 16px;
 }
 
-/* ── Shared CTA button ── */
+/* ── CTA button ── */
 .btn-primary {
   width: 100%;
   padding: 15px 20px;
@@ -370,32 +314,21 @@ body {
   border: none;
   cursor: pointer;
   font-family: var(--font);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   letter-spacing: 0.02em;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: background 180ms var(--ease), transform 120ms var(--ease);
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 0 24px rgba(72,57,244,0.35);
+  transition: background 180ms var(--ease), box-shadow 180ms var(--ease), transform 120ms var(--ease);
   -webkit-tap-highlight-color: transparent;
   flex-shrink: 0;
 }
 .btn-primary:active { transform: scale(0.97); }
-.btn-primary.dark {
-  background: var(--text);
-  color: #0B0A09;
-}
-.btn-primary.dark:hover { background: #fff; }
-.btn-primary.accent {
-  background: var(--accent);
-  color: #fff;
-  box-shadow: 0 0 24px rgba(72,57,244,0.35);
-}
-.btn-primary.accent:hover {
-  background: var(--accent-press);
-  box-shadow: 0 0 36px rgba(72,57,244,0.5);
-}
 
 /* ── Progress dots ── */
 .dots {
@@ -412,210 +345,169 @@ body {
   background: var(--hairline-strong);
   transition: width 300ms var(--ease-spring), background 300ms var(--ease);
 }
-.dot.active {
-  width: 20px;
-  background: var(--accent);
-}
+.dot.active { width: 20px; background: var(--text); }
 .dot:not(.active) { width: 6px; }
 </style>
 </head>
 <body>
 
-  <div class="aura">
-    <div class="aura-blob aura-blob-1" id="blob1"></div>
-    <div class="aura-blob aura-blob-2" id="blob2"></div>
-  </div>
+<div class="screen">
 
-  <div class="screen">
-
-    <!-- ── STEP 1: Welcome ── -->
-    <div class="step active" id="step-1">
-      <!-- Brand: top-aligned -->
-      <div class="s1-brand">
-        <div class="lotus-wrap">
-          <div class="lotus-glow"></div>
-          <svg width="80" height="80" viewBox="0 0 100 100" fill="none">
-            <path d="M50 15C53 32 63 42 66 58C69 74 61 80 50 82C39 80 31 74 34 58C37 42 47 32 50 15Z" fill="url(#ob-g-back)" />
-            <path d="M48 20C36 32 24 45 28 62C31 74 42 78 48 79C42 70 41 55 48 38V20Z" fill="url(#ob-g-left)" />
-            <path d="M52 20C64 32 76 45 72 62C69 74 58 78 52 79C58 70 59 55 52 38V20Z" fill="url(#ob-g-right)" />
-            <path d="M50 30C45 42 40 55 42 68C44 76 48 81 50 82C52 81 56 76 58 68C60 55 55 42 50 30Z" fill="url(#ob-g-front)" />
-            <path d="M46 28C30 36 18 52 22 68C25 78 38 80 46 78C38 68 38 52 46 36V28Z" fill="url(#ob-g-far-left)" opacity="0.82"/>
-            <path d="M54 28C70 36 82 52 78 68C75 78 62 80 54 78C62 68 62 52 54 36V28Z" fill="url(#ob-g-far-right)" opacity="0.82"/>
-            <defs>
-              <linearGradient id="ob-g-back" x1="50" y1="15" x2="50" y2="82" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stop-color="#FCDCE2"/><stop offset="50%" stop-color="#F2A5B8"/><stop offset="100%" stop-color="#D16E87"/>
-              </linearGradient>
-              <linearGradient id="ob-g-left" x1="24" y1="20" x2="48" y2="79" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stop-color="#FCE1E6"/><stop offset="60%" stop-color="#EB92A7"/><stop offset="100%" stop-color="#AE425C"/>
-              </linearGradient>
-              <linearGradient id="ob-g-right" x1="76" y1="20" x2="52" y2="79" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stop-color="#FCE1E6"/><stop offset="60%" stop-color="#EB92A7"/><stop offset="100%" stop-color="#AE425C"/>
-              </linearGradient>
-              <linearGradient id="ob-g-front" x1="50" y1="30" x2="50" y2="82" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stop-color="#FFF2F4"/><stop offset="100%" stop-color="#DF7E96"/>
-              </linearGradient>
-              <linearGradient id="ob-g-far-left" x1="18" y1="28" x2="46" y2="80" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stop-color="#FDE8ED"/><stop offset="100%" stop-color="#C46880"/>
-              </linearGradient>
-              <linearGradient id="ob-g-far-right" x1="82" y1="28" x2="54" y2="80" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stop-color="#FDE8ED"/><stop offset="100%" stop-color="#C46880"/>
-              </linearGradient>
-            </defs>
-          </svg>
-        </div>
-        <div class="brand-name">Alma</div>
-        <div class="brand-sub">
-          A quiet place for your sound.
-        </div>
-      </div>
-
-      <!-- Card + button: bottom-aligned via margin-top:auto -->
-      <div class="s1-bottom">
-        <div class="s1-card">
-          <h3>Before entering, let's configure your sanctuary</h3>
-          <p>We'll set up your personalized listening goals, save your starting rituals, and prep your sound mixer.</p>
-        </div>
-
-        <button class="btn-primary dark" onclick="goTo(2)">
-          Begin Your Journey
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </button>
-
-        <div class="dots">
-          <div class="dot active" id="dot-1"></div>
-          <div class="dot" id="dot-2"></div>
-          <div class="dot" id="dot-3"></div>
-        </div>
-      </div>
+  <!-- ── STEP 1: Welcome ── -->
+  <div class="step active" id="step-1">
+    <div class="s1-brand">
+      <img src="images/lotus/lotus1.webp" alt="Lotus" class="lotus-hero" />
+      <div class="brand-name">Alma</div>
+      <div class="brand-sub">A quiet place for your sound.</div>
     </div>
 
-    <!-- ── STEP 2: Intentions ── -->
-    <div class="step" id="step-2">
-      <div class="step-label">1 of 2 · Core Intention</div>
-      <div class="step-title">What brings you stillness?</div>
-      <div class="step-sub">Choose your core needs. We'll populate your initial Mixer.</div>
-
-      <div class="intention-list">
-
-        <div class="intention-item selected" onclick="toggleIntention('focus', this)">
-          <div class="intention-item-left">
-            <div class="intention-icon purple">🧠</div>
-            <div class="intention-text">
-              <h4>Focus & Mental Clarity</h4>
-              <p>Optimized with 40Hz binaural waves</p>
-            </div>
-          </div>
-          <div class="check-circle checked" id="check-focus">
-            <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-        </div>
-
-        <div class="intention-item" onclick="toggleIntention('sleep', this)">
-          <div class="intention-item-left">
-            <div class="intention-icon violet">🌙</div>
-            <div class="intention-text">
-              <h4>Deep Sleep Sanctuary</h4>
-              <p>Includes Forest Night and rain layers</p>
-            </div>
-          </div>
-          <div class="check-circle" id="check-sleep">
-            <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-        </div>
-
-        <div class="intention-item" onclick="toggleIntention('stress', this)">
-          <div class="intention-item-left">
-            <div class="intention-icon pink">🌸</div>
-            <div class="intention-text">
-              <h4>Stress & Anxiety Relief</h4>
-              <p>Anchored with custom OM Wave Chants</p>
-            </div>
-          </div>
-          <div class="check-circle" id="check-stress">
-            <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-        </div>
-
-        <div class="intention-item" onclick="toggleIntention('nature', this)">
-          <div class="intention-item-left">
-            <div class="intention-icon green">🌿</div>
-            <div class="intention-text">
-              <h4>Nature Immersion</h4>
-              <p>Gentle Rain & Ocean Waves combinations</p>
-            </div>
-          </div>
-          <div class="check-circle" id="check-nature">
-            <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-          </div>
-        </div>
-
+    <div class="s1-bottom">
+      <div class="s1-card">
+        <h3>Before entering, let's configure your sanctuary</h3>
+        <p>We'll set up your personalized listening goals, save your starting rituals, and prep your sound mixer.</p>
       </div>
-
-      <button class="btn-primary accent" onclick="goTo(3)">
-        Next: Set Your Target
+      <button class="btn-primary" onclick="goTo(2)">
+        Begin Your Journey
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </button>
-
       <div class="dots">
-        <div class="dot" id="dot-1"></div>
-        <div class="dot active" id="dot-2"></div>
-        <div class="dot" id="dot-3"></div>
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
       </div>
     </div>
-
-    <!-- ── STEP 3: Goals ── -->
-    <div class="step" id="step-3">
-      <div class="step-label">2 of 2 · Daily Commitment</div>
-      <div class="step-title">Set your daily target</div>
-      <div class="step-sub">Your goal shapes the rituals we prepare for you.</div>
-
-      <div class="goal-list">
-        <div class="goal-item" onclick="selectGoal('5', '35m / week', '25%', this)">
-          <div>
-            <h4>5 Minutes / Day</h4>
-            <p>Quick, mindful reset pauses</p>
-          </div>
-          <span class="goal-badge">Gentle</span>
-        </div>
-        <div class="goal-item selected" id="goal-15" onclick="selectGoal('15', '1h 45m / week', '60%', this)">
-          <div>
-            <h4>15 Minutes / Day</h4>
-            <p>Highly recommended · Standard sanctuary time</p>
-          </div>
-          <span class="goal-badge">Ideal</span>
-        </div>
-        <div class="goal-item" onclick="selectGoal('30', '3h 30m / week', '100%', this)">
-          <div>
-            <h4>30 Minutes / Day</h4>
-            <p>Deep immersive focus or meditation</p>
-          </div>
-          <span class="goal-badge">Immersion</span>
-        </div>
-      </div>
-
-      <div class="weekly-card">
-        <div class="weekly-card-top">
-          <span class="weekly-label">Weekly Projection</span>
-          <span class="weekly-value" id="weekly-val">1h 45m / week</span>
-        </div>
-        <div class="progress-track">
-          <div class="progress-fill" id="progress-fill"></div>
-        </div>
-      </div>
-
-      <button class="btn-primary accent" style="margin-top:auto" onclick="window.location.href='signin.html'">
-        Enter Your Sanctuary
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </button>
-
-      <div class="dots">
-        <div class="dot" id="dot-1"></div>
-        <div class="dot" id="dot-2"></div>
-        <div class="dot active" id="dot-3"></div>
-      </div>
-    </div>
-
   </div>
+
+  <!-- ── STEP 2: Intentions ── -->
+  <div class="step" id="step-2">
+    <button class="back-btn" onclick="goTo(1)" aria-label="Back">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <img src="images/lotus/lotus3.webp" alt="Lotus" class="step-lotus" />
+    <div class="step-label">1 of 2 · Core Intention</div>
+    <div class="step-title">What brings you stillness?</div>
+    <div class="step-sub">Choose your core needs. We'll populate your initial Mixer.</div>
+
+    <div class="intention-list">
+
+      <div class="intention-item selected" onclick="toggleIntention('focus', this)">
+        <div class="intention-item-left">
+          <div class="intention-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg>
+          </div>
+          <div class="intention-text">
+            <h4>Focus &amp; Mental Clarity</h4>
+            <p>Optimized with 40Hz binaural waves</p>
+          </div>
+        </div>
+        <div class="check-circle checked" id="check-focus">
+          <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#0B0A09" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+
+      <div class="intention-item" onclick="toggleIntention('sleep', this)">
+        <div class="intention-item-left">
+          <div class="intention-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </div>
+          <div class="intention-text">
+            <h4>Deep Sleep Sanctuary</h4>
+            <p>Includes Forest Night and rain layers</p>
+          </div>
+        </div>
+        <div class="check-circle" id="check-sleep">
+          <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#0B0A09" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+
+      <div class="intention-item" onclick="toggleIntention('stress', this)">
+        <div class="intention-item-left">
+          <div class="intention-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"/><path d="M9.6 4.6A2 2 0 1 1 11 8H2"/><path d="M12.6 19.4A2 2 0 1 0 14 16H2"/></svg>
+          </div>
+          <div class="intention-text">
+            <h4>Stress &amp; Anxiety Relief</h4>
+            <p>Anchored with custom OM Wave Chants</p>
+          </div>
+        </div>
+        <div class="check-circle" id="check-stress">
+          <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#0B0A09" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+
+      <div class="intention-item" onclick="toggleIntention('nature', this)">
+        <div class="intention-item-left">
+          <div class="intention-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+          </div>
+          <div class="intention-text">
+            <h4>Nature Immersion</h4>
+            <p>Gentle Rain &amp; Ocean Waves combinations</p>
+          </div>
+        </div>
+        <div class="check-circle" id="check-nature">
+          <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#0B0A09" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+
+    </div>
+
+    <button class="btn-primary" onclick="goTo(3)">
+      Next: Set Your Target
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+
+    <div class="dots">
+      <div class="dot"></div>
+      <div class="dot active"></div>
+      <div class="dot"></div>
+    </div>
+  </div>
+
+  <!-- ── STEP 3: Goals ── -->
+  <div class="step" id="step-3">
+    <button class="back-btn" onclick="goTo(2)" aria-label="Back">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <img src="images/lotus/lotus5.webp" alt="Lotus" class="step-lotus" />
+    <div class="step-label">2 of 2 · Daily Commitment</div>
+    <div class="step-title">Set your daily target</div>
+    <div class="step-sub">Your goal shapes the rituals we prepare for you.</div>
+
+    <div class="goal-picker">
+      <div class="goal-row">
+        <button class="goal-chip" id="chip-10" onclick="selectGoal(10, this)">10m</button>
+        <button class="goal-chip" id="chip-30" onclick="selectGoal(30, this)">30m</button>
+        <button class="goal-chip" id="chip-60" onclick="selectGoal(60, this)">1h</button>
+      </div>
+      <div class="goal-row">
+        <button class="goal-chip secondary" id="chip-custom" onclick="activateCustom()">Custom</button>
+        <div class="custom-input-wrap" id="custom-wrap">
+          <input id="custom-input" type="text" inputmode="numeric" pattern="[0-9]*"
+            placeholder="min"
+            oninput="onCustomInput(this)"
+            onblur="onCustomBlur()"
+            onkeydown="if(event.key==='Enter')this.blur()" />
+        </div>
+        <button class="goal-chip secondary" id="chip-notsure" onclick="selectNotSure(this)">Not sure yet</button>
+      </div>
+    </div>
+
+    <div class="per-week" id="per-week"></div>
+
+    <button class="btn-primary" style="margin-top: auto" onclick="window.location.href='signin.html'">
+      Enter Your Sanctuary
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+
+    <div class="dots">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot active"></div>
+    </div>
+  </div>
+
+</div>
 
 <script>
   const intentions = new Set(['focus']);
@@ -639,11 +531,57 @@ body {
     }
   }
 
-  function selectGoal(min, weekly, pct, el) {
-    document.querySelectorAll('.goal-item').forEach(g => g.classList.remove('selected'));
-    el.classList.add('selected');
-    document.getElementById('weekly-val').textContent = weekly;
-    document.getElementById('progress-fill').style.width = pct;
+  function fmtPerWeek(min) {
+    const total = min * 7;
+    const h = Math.floor(total / 60), m = total % 60;
+    const fmt = h > 0 ? (m > 0 ? `${h}h ${m}m` : `${h}`) : `${m}m`;
+    return `That's ${fmt} per week`;
+  }
+
+  function clearChips() {
+    document.querySelectorAll('.goal-chip').forEach(c => c.classList.remove('active'));
+  }
+
+  function selectGoal(min, el) {
+    clearChips();
+    hideCustom();
+    el.classList.add('active');
+    document.getElementById('per-week').textContent = fmtPerWeek(min);
+  }
+
+  function selectNotSure(el) {
+    clearChips();
+    hideCustom();
+    el.classList.add('active');
+    document.getElementById('per-week').textContent = '';
+  }
+
+  function activateCustom() {
+    clearChips();
+    document.getElementById('chip-custom').style.display = 'none';
+    const wrap = document.getElementById('custom-wrap');
+    wrap.style.display = 'flex';
+    const input = document.getElementById('custom-input');
+    input.value = '';
+    input.focus();
+    document.getElementById('per-week').textContent = '';
+  }
+
+  function hideCustom() {
+    document.getElementById('chip-custom').style.display = '';
+    document.getElementById('custom-wrap').style.display = 'none';
+  }
+
+  function onCustomInput(input) {
+    const raw = input.value.replace(/\D/g, '');
+    input.value = raw;
+    const n = parseInt(raw, 10);
+    document.getElementById('per-week').textContent = n > 0 ? fmtPerWeek(n) : '';
+  }
+
+  function onCustomBlur() {
+    const input = document.getElementById('custom-input');
+    if (!input.value.trim()) hideCustom();
   }
 </script>
 </body>
